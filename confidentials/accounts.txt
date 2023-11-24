@@ -10,3 +10,8 @@ MongoDB Database User
 username: marymae
 password: pUUAoPDGqOEFjtZw
 
+--------------------------------------------
+
+Database URI Connection
+
+mongodb+srv://marymae:pUUAoPDGqOEFjtZw@cluster1.mzn5dc1.mongodb.net/gymlocator?retryWrites=true&w=majority
