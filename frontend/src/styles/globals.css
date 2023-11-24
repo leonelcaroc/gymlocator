@@ -1,0 +1,103 @@
+@import url("font-family.css");
+
+/* Fonts
+  Inter-Thin
+  Inter-ExtraLight
+  Inter-Light
+  Inter-Medium
+  Inter-Regular
+  Inter-SemiBold
+  Inter-Bold
+  Inter-ExtraBold
+  Inter-Black
+ */
+
+body {
+  font-family: "Inter" !important;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.gm-title {
+  background-color: #cc0000;
+  color: #fff;
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+}
+
+.im-title {
+  background-color: #b6720b;
+  color: #fff;
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+}
+
+.fm-title {
+  background-color: #585858;
+  color: #fff;
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+}
+
+.cm-title {
+  background-color: #484ff6;
+  color: #fff;
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+}
+
+.nm-title {
+  background-color: #007822;
+  color: #fff;
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+}
+
+.agm-title {
+  background-color: #fff;
+  color: #da0000;
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+  outline: 1px solid #da0000;
+}
+
+.aim-title {
+  background-color: #fff;
+  color: #bd7100;
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+  outline: 1px solid #bd7100;
+}
+
+.afm-title {
+  background-color: #fff;
+  color: #585858;
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+  outline: 1px solid #585858;
+}
+
+.acm-title {
+  background-color: #fff;
+  color: #484ff6;
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+  outline: 1px solid #484ff6;
+}
+
+@media (max-width: 400px) {
+  #data-head > th,
+  #data-row > td,
+  #data-expandable > td {
+    padding: 10px !important;
+  }
+}
+
+#data-head > th {
+  text-align: center !important;
+}
+
+#data-expandable > td > * {
+  margin-bottom: 7px !important;
+}
