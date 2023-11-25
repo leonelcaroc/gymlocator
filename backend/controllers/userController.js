@@ -1,7 +1,7 @@
 import asyncHandler from "express-async-handler";
 import generateToken from "../utils/generateToken.js";
+import validator from "validator";
 import User from "../models/userModel.js";
-import Search from "../models/searchQueryModel.js";
 
 // desc     Auth user/set token
 // route    POST /api/users/auth
@@ -31,6 +31,25 @@ const authUser = asyncHandler(async (req, res) => {
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
+  // const trimmedName = validator.trim(name);
+  // const trimmedPassword = validator.trim(password);
+
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ error: "Invalid email address" });
+  }
+
+  if (!validator.isLength(password, { min: 8, max: 16 })) {
+    return res
+      .status(400)
+      .json({ error: "Password must be between 6 and 8 characters" });
+  }
+
+  if (!validator.matches(password, /^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]+$/)) {
+    return res.status(400).json({
+      error: "Password must contain at least one special character (!@#$%^&*)",
+    });
+  }
+
   const userExists = await User.findOne({ email });
 
   if (userExists) {
@@ -47,9 +66,10 @@ const registerUser = asyncHandler(async (req, res) => {
   if (user) {
     generateToken(res, user._id);
     res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
+      // _id: user._id,
+      // name: user.name,
+      // email: user.email,
+      message: "Account Created",
     });
   } else {
     res.status(400);
