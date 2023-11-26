@@ -7,21 +7,19 @@ import User from "../models/userModel.js";
 // route    POST /api/users/auth
 // @access  Public
 const authUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ username });
 
   if (user && (await user.matchPassword(password))) {
     generateToken(res, user._id);
     res.status(200).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
+      message: "Login Successfully",
     });
   } else {
-    res.status(401).json({ message: "Invalid email or password" });
+    res.status(401).json({ message: "Invalid username or password" });
 
-    throw new Error("Invalid email or password.");
+    throw new Error("Invalid username or password.");
   }
 });
 
@@ -29,10 +27,21 @@ const authUser = asyncHandler(async (req, res) => {
 // route    POST /api/users
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
-
-  // const trimmedName = validator.trim(name);
-  // const trimmedPassword = validator.trim(password);
+  const {
+    firstname,
+    middlename,
+    lastname,
+    gender,
+    birthdate,
+    address,
+    phoneNumber,
+    membershipType,
+    membershipFee,
+    payment,
+    username,
+    password,
+    email,
+  } = req.body;
 
   if (!validator.isEmail(email)) {
     return res.status(400).json({ error: "Invalid email address" });
@@ -50,25 +59,37 @@ const registerUser = asyncHandler(async (req, res) => {
     });
   }
 
-  const userExists = await User.findOne({ email });
+  const userEmailExists = await User.findOne({ email });
+  const userNameExists = await User.findOne({ username });
 
-  if (userExists) {
+  if (userEmailExists) {
     res.status(400);
-    throw new Error("User already exists.");
+    throw new Error("Email already exists.");
+  }
+
+  if (userNameExists) {
+    res.status(400);
+    throw new Error("Username already exists.");
   }
 
   const user = await User.create({
-    email,
-    name,
+    firstname,
+    middlename,
+    lastname,
+    gender,
+    birthdate,
+    address,
+    phoneNumber,
+    membershipType,
+    membershipFee,
+    payment,
+    username,
     password,
+    email,
   });
 
   if (user) {
-    generateToken(res, user._id);
     res.status(201).json({
-      // _id: user._id,
-      // name: user.name,
-      // email: user.email,
       message: "Account Created",
     });
   } else {
