@@ -2,25 +2,21 @@ import express from "express";
 const router = express.Router();
 import {
   authOwner,
-  // registerOwnerStepOne,
-  // registerOwnerStepTwo,
-  // registerOwnerStepThree,
-  registerOwner,
+  registerOwnerStep,
   logoutOwner,
   getOwnerProfile,
   updateOwnerProfile,
+  addNewGym,
 } from "../controllers/gymOwnerController.js";
-import { protect } from "../middleware/authMiddleware.js";
+import { protectOwner } from "../middleware/gymOwnerAuthMiddleware.js";
 
-// router.post("/details", registerOwnerStepOne);
-// router.post("/info", registerOwnerStepTwo);
-// router.post("/permit", registerOwnerStepThree);
-router.post("/register", registerOwner);
+router.post("/register", registerOwnerStep);
 router.post("/auth", authOwner);
 router.post("/logout", logoutOwner);
+router.post("/addgym", protectOwner, addNewGym);
 router
   .route("/profile")
-  .get(protect, getOwnerProfile)
-  .put(protect, updateOwnerProfile);
+  .get(protectOwner, getOwnerProfile)
+  .put(protectOwner, updateOwnerProfile);
 
 export default router;

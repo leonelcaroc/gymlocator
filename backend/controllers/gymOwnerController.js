@@ -16,9 +16,7 @@ const authOwner = asyncHandler(async (req, res) => {
   if (user && (await user.matchPassword(password))) {
     generateToken(res, user._id);
     res.status(200).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
+      message: "Successfully Login",
     });
   } else {
     res.status(401).json({ message: "Invalid email or password" });
@@ -31,57 +29,7 @@ const authOwner = asyncHandler(async (req, res) => {
 // route    POST /api/users
 // @access  Public
 //---------------------
-const registerOwner = asyncHandler(async (req, res) => {
-  const { firstname, lastname, email, password } = req.body;
-
-  const trimmedFirstName = validator.trim(firstname);
-  const trimmedLastName = validator.trim(lastname);
-  const trimmedPassword = validator.trim(password);
-
-  if (!validator.isEmail(email)) {
-    return res.status(400).json({ error: "Invalid email address" });
-  }
-
-  if (!validator.isLength(trimmedPassword, { min: 8, max: 16 })) {
-    return res
-      .status(400)
-      .json({ error: "Password must be between 6 and 8 characters" });
-  }
-
-  if (
-    !validator.matches(trimmedPassword, /^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]+$/)
-  ) {
-    return res.status(400).json({
-      error: "Password must contain at least one special character (!@#$%^&*)",
-    });
-  }
-
-  const userExists = await GymOwner.findOne({ email });
-
-  if (userExists) {
-    res.status(400);
-    throw new Error("User already exists.");
-  }
-
-  const user = await GymOwner.create({
-    email,
-    firstname: trimmedFirstName,
-    lastname: trimmedLastName,
-    password: trimmedPassword,
-  });
-
-  if (user) {
-    // generateToken(res, user._id);
-    res.status(201).json({
-      message: "Account Created",
-    });
-  } else {
-    res.status(400);
-    throw new Error("Invalid user data.");
-  }
-});
-
-// const registerOwnerStepOne = asyncHandler(async (req, res) => {
+// const registerOwner = asyncHandler(async (req, res) => {
 //   const { firstname, lastname, email, password } = req.body;
 
 //   const trimmedFirstName = validator.trim(firstname);
@@ -92,124 +40,36 @@ const registerOwner = asyncHandler(async (req, res) => {
 //     return res.status(400).json({ error: "Invalid email address" });
 //   }
 
-//   if (!validator.isLength(trimmedFirstName, { min: 1 })) {
-//     return res.status(400).json({ error: "First name is required." });
-//   }
-
-//   if (!validator.isLength(trimmedLastName, { min: 1 })) {
-//     return res.status(400).json({ error: "Last name is required." });
+//   if (!validator.isLength(trimmedPassword, { min: 8, max: 16 })) {
+//     return res
+//       .status(400)
+//       .json({ error: "Password must be between 6 and 8 characters" });
 //   }
 
 //   if (
-//     !validator.isLength(trimmedPassword, { min: 8, max: 16 }) ||
 //     !validator.matches(trimmedPassword, /^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]+$/)
 //   ) {
 //     return res.status(400).json({
-//       error:
-//         "Password must be between 8 and 16 characters and contain at least one special character (!@#$%^&*)",
+//       error: "Password must contain at least one special character (!@#$%^&*)",
 //     });
 //   }
-
-//   stepData = {
-//     firstName: trimmedFirstName,
-//     lastName: trimmedLastName,
-//     email: email,
-//     password: trimmedPassword,
-//   };
 
 //   const userExists = await GymOwner.findOne({ email });
 
 //   if (userExists) {
 //     res.status(400);
 //     throw new Error("User already exists.");
-//   } else {
-//     res.status(200).json({ message: "First step completed" });
-//   }
-// });
-
-// const registerOwnerStepTwo = asyncHandler(async (req, res) => {
-//   const {
-//     gymname,
-//     contact,
-//     address,
-//     desc,
-//     startday,
-//     endday,
-//     opentime,
-//     closetime,
-//   } = req.body;
-
-//   const trimmedGymName = validator.trim(gymname);
-//   const trimmedContact = validator.trim(contact);
-//   const trimmedDesc = validator.trim(desc);
-//   const trimmedAddress = validator.trim(address);
-
-//   if (!validator.isLength(trimmedGymName, { min: 1 })) {
-//     return res.status(400).json({ error: "Gym name is required." });
 //   }
 
-//   if (!validator.isLength(trimmedContact, { min: 11, max: 11 })) {
-//     return res.status(400).json({ error: "Contact number is invalid" });
-//   }
-
-//   if (!validator.isLength(trimmedDesc, { min: 1 })) {
-//     return res.status(400).json({ error: "Gym Description is required." });
-//   }
-
-//   if (!validator.isLength(trimmedAddress, { min: 1 })) {
-//     return res.status(400).json({ error: "Gym Address is required." });
-//   }
-
-//   //   const isValidTime = (time) => {
-//   //     const timeRegex = /^(0[0-9]|1[0-2]):[0-5][0-9]\s?(AM|PM)$/i;
-//   //     return timeRegex.test(time);
-//   //   };
-
-//   //   if (!isValidTime(opentime || closetime)) {
-//   //     return res.status(400).json({ error: "Time is invalid." });
-//   //   }
-
-//   stepData = {
-//     ...stepData,
-//     gyms: [
-//       {
-//         gymname: trimmedGymName,
-//         contact: trimmedContact,
-//         desc: trimmedDesc,
-//         address: trimmedAddress,
-//         schedule: { days: [startday, endday], time: [opentime, closetime] },
-//       },
-//     ],
-//   };
-
-//   //   res.status(200).json({ message: "Second step completed" });
-//   res.status(200).json({ stepData });
-// });
-
-// const registerOwnerStepThree = asyncHandler(async (req, res) => {
-//   const { base64Data } = req.body;
-
-//   //   if (!validator.isBase64(base64Data)) {
-//   //     return res.status(400).json({ error: "Invalid Base64 data." });
-//   //   }
-
-//   // stepData = {
-//   //   ...stepData,
-//   //   gyms: [
-//   //     {
-//   //       ...stepData.gyms[0],
-//   //       permitBase64: base64Data,
-//   //     },
-//   //   ],
-//   // };
-
-//   const data = Object.assign({}, stepData, {
-//     gyms: { permitBase64: base64Data },
+//   const user = await GymOwner.create({
+//     email,
+//     firstname: trimmedFirstName,
+//     lastname: trimmedLastName,
+//     password: trimmedPassword,
 //   });
 
-//   const user = await GymOwner.create({ data });
-
 //   if (user) {
+//     // generateToken(res, user._id);
 //     res.status(201).json({
 //       message: "Account Created",
 //     });
@@ -217,9 +77,117 @@ const registerOwner = asyncHandler(async (req, res) => {
 //     res.status(400);
 //     throw new Error("Invalid user data.");
 //   }
-
-//   res.status(200).json({ stepData });
 // });
+
+const registerOwnerStep = asyncHandler(async (req, res) => {
+  const {
+    firstname,
+    lastname,
+    email,
+    password,
+    gymname,
+    contact,
+    address,
+    description,
+    startday,
+    endday,
+    opentime,
+    closetime,
+    base64Data,
+  } = req.body;
+
+  const trimmedFirstName = validator.trim(firstname);
+  const trimmedLastName = validator.trim(lastname);
+  const trimmedPassword = validator.trim(password);
+  const trimmedGymName = validator.trim(gymname);
+  const trimmedContact = validator.trim(contact);
+  const trimmedDesc = validator.trim(description);
+  const trimmedAddress = validator.trim(address);
+
+  if (!validator.isLength(trimmedGymName, { min: 1 })) {
+    return res.status(400).json({ error: "Gym name is required." });
+  }
+
+  if (!validator.isLength(trimmedContact, { min: 11, max: 11 })) {
+    return res.status(400).json({ error: "Contact number is invalid" });
+  }
+
+  if (!validator.isLength(trimmedDesc, { min: 1 })) {
+    return res.status(400).json({ error: "Gym Description is required." });
+  }
+
+  if (!validator.isLength(trimmedAddress, { min: 1 })) {
+    return res.status(400).json({ error: "Gym Address is required." });
+  }
+
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ error: "Invalid email address" });
+  }
+
+  if (!validator.isLength(trimmedFirstName, { min: 1 })) {
+    return res.status(400).json({ error: "First name is required." });
+  }
+
+  if (!validator.isLength(trimmedLastName, { min: 1 })) {
+    return res.status(400).json({ error: "Last name is required." });
+  }
+
+  if (
+    !validator.isLength(trimmedPassword, { min: 8, max: 16 }) ||
+    !validator.matches(trimmedPassword, /^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]+$/)
+  ) {
+    return res.status(400).json({
+      error:
+        "Password must be between 8 and 16 characters and contain at least one special character (!@#$%^&*)",
+    });
+  }
+
+  const newOwner = {
+    firstName: trimmedFirstName,
+    lastName: trimmedLastName,
+    email: email,
+    password: trimmedPassword,
+    gym: {
+      gymname: trimmedGymName,
+      contact: trimmedContact,
+      description: trimmedDesc,
+      address: trimmedAddress,
+      permitBase64: base64Data,
+      schedule: { days: [startday, endday], time: [opentime, closetime] },
+    },
+  };
+
+  const userExists = await GymOwner.findOne({ email });
+
+  if (userExists) {
+    res.status(400);
+    throw new Error("User already exists.");
+  }
+  const user = await GymOwner.create({
+    firstname: trimmedFirstName,
+    lastname: trimmedLastName,
+    email: email,
+    password: trimmedPassword,
+    gym: {
+      gymname: trimmedGymName,
+      contact: trimmedContact,
+      description: trimmedDesc,
+      address: trimmedAddress,
+      permitBase64: base64Data,
+      schedule: { days: [startday, endday], time: [opentime, closetime] },
+    },
+  });
+
+  if (user) {
+    res.status(201).json({
+      message: "Account Created",
+      // ...newOwner,
+    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid user data.");
+  }
+});
 
 // desc     Logout user
 // route    POST /api/users/logout
@@ -239,7 +207,8 @@ const logoutOwner = asyncHandler(async (req, res) => {
 const getOwnerProfile = asyncHandler(async (req, res) => {
   const user = {
     _id: req.user._id,
-    name: req.user.name,
+    firstname: req.user.firstname,
+    lastname: req.user.lastname,
     email: req.user.email,
   };
 
@@ -253,18 +222,19 @@ const updateOwnerProfile = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
 
   if (user) {
-    user.name = req.body.name || user.name;
-    user.email = req.body.email || user.email;
+    user.firstname = req.body.firstname || user.firstname;
+    user.lastname = req.body.lastname || user.lastname;
 
-    if (req.body.password) {
-      user.password = req.body.password;
-    }
+    // if (req.body.password) {
+    //   user.password = req.body.password;
+    // }
 
     const updatedUser = await user.save();
 
     res.status(200).json({
       _id: updatedUser._id,
-      name: updatedUser.name,
+      firstname: updatedUser.firstname,
+      lastname: updatedUser.lastname,
       email: updatedUser.email,
     });
   } else {
@@ -273,16 +243,51 @@ const updateOwnerProfile = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  res.status(200).json({ message: "Update user profile" });
+  res.status(200).json({
+    message: "Updated user profile",
+  });
+});
+
+const addNewGym = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
+
+  if (user) {
+    // Assuming req.body contains gym information, adjust accordingly
+    const newGym = {
+      gymname: req.body.gymname,
+      address: req.body.address,
+      contact: req.body.contact,
+      description: req.body.description,
+      permitBase64: req.body.permitBase64,
+      schedule: {
+        days: [req.body.startday, req.body.endday],
+        time: [req.body.opentime, req.body.closetime],
+      },
+    };
+
+    user.gyms.push(newGym);
+
+    const addGym = await user.save();
+
+    res.status(200).json({
+      message: "New gym added",
+      addGym,
+    });
+  } else {
+    res.status(404);
+
+    throw new Error("User not found");
+  }
 });
 
 export {
   authOwner,
-  // registerOwnerStepOne,
+  registerOwnerStep,
   // registerOwnerStepTwo,
   // registerOwnerStepThree,
-  registerOwner,
+  // registerOwner,
   logoutOwner,
   getOwnerProfile,
   updateOwnerProfile,
+  addNewGym,
 };

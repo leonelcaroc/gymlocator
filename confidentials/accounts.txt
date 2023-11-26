@@ -15,3 +15,23 @@ password: pUUAoPDGqOEFjtZw
 Database URI Connection
 
 mongodb+srv://marymae:pUUAoPDGqOEFjtZw@cluster1.mzn5dc1.mongodb.net/gymlocator?retryWrites=true&w=majority
+
+--------------------------------------------
+
+Admin Accounts
+
+email: marymaeerasga30@gmail.com
+pass: mary123
+
+email: zeemarq001@gmail.com
+pass: zee123
+
+
+email: danzkie25cabalida@gmail.com
+pass: dan123
+
+--------------------------------------------
+
+Contabo Account                                    
+email: marymaeerasga30@gmail.com
+pass: gymlocator30

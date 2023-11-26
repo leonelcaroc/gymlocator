@@ -8,6 +8,7 @@ import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import connectDB from "./config/db.js";
 const PORT = 5000;
 import userRoutes from "./routes/userRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import gymOwnerRoutes from "./routes/gymOwnerRoutes.js";
 // import searchRoutes from "./routes/searchRoutes.js";
 
@@ -16,6 +17,7 @@ connectDB();
 const app = express();
 
 app.use(helmet());
+
 app.disable("x-powered-by");
 
 app.use(express.json());
@@ -25,6 +27,7 @@ app.use(cookieParser());
 
 app.use("/api/users", userRoutes);
 app.use("/api/gymowner", gymOwnerRoutes);
+app.use("/api/admin", adminRoutes);
 // app.use("/api/search", searchRoutes);
 
 if (process.env.NODE_ENV === "production") {
