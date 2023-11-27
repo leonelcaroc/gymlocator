@@ -1,9 +1,10 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import HardReload from "vite-plugin-hard-reload";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), HardReload()],
   server: {
     open: "http://localhost:3000",
     port: 3000,

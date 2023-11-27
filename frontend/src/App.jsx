@@ -1,21 +1,10 @@
 import { Outlet } from "react-router-dom";
 import { Flex } from "@chakra-ui/react";
+import HomeSearch from "./layout/HomeSearch/HomeSearch";
+import Home from "./pages/Home";
 
 const App = () => {
-  return (
-    <Flex flexDirection="column" height="100vh">
-      Hello World
-      {/* <Header /> */}
-      {/* <Flex
-        as="main"
-        flex="1"
-        margin="auto"
-        width="full"
-        justifyContent="center"
-      ></Flex> */}
-      {/* <Footer /> */}
-    </Flex>
-  );
+  return <Home />;
 };
 
 export default App;

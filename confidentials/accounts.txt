@@ -36,8 +36,20 @@ Contabo Account
 email: marymaeerasga30@gmail.com
 pass: gymlocator30
 
+Root User
+ip: 46.250.236.126
+pass: gymlocator30
+
+--------------------------------------------
+
+Namecheap Account                               
+username: marymaeerasga                   
+pass: LanceThrower30
+
 --------------------------------------------
 
 Stripe Account
 email: zeemarq001@gmail.com
 password: zeenazeena
+
+--------------------------------------------
