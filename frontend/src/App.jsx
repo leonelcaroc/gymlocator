@@ -1,10 +1,14 @@
-import { Outlet } from "react-router-dom";
-import { Flex } from "@chakra-ui/react";
-import HomeSearch from "./layout/HomeSearch/HomeSearch";
+import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
+import Explore from "./pages/Explore";
 
 const App = () => {
-  return <Home />;
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/explore" element={<Explore />} />
+    </Routes>
+  );
 };
 
 export default App;
