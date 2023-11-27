@@ -4,7 +4,8 @@ import FullReload from "vite-plugin-full-reload";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), FullReload()],
+  plugins: [react(), FullReload(["gymlocator/frontend/**/*"])],
+
   server: {
     open: "http://localhost:3000",
     port: 3000,
