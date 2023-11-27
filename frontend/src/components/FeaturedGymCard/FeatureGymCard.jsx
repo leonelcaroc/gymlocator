@@ -12,6 +12,7 @@ import {
   Icon,
 } from "@chakra-ui/react";
 import { FaStar } from "react-icons/fa";
+import gym from "../../assets/images/gym-sample.jpg";
 
 const FeatureGymCard = ({ name }) => {
   return (
@@ -21,11 +22,7 @@ const FeatureGymCard = ({ name }) => {
       marginInline="1rem"
     >
       <CardBody>
-        <Image
-          src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt=""
-          borderRadius="lg"
-        />
+        <Image src={gym} alt="This is a gym" borderRadius="lg" />
         <Stack mt="6" spacing="3">
           <Heading
             size="md"
@@ -43,8 +40,8 @@ const FeatureGymCard = ({ name }) => {
             <Icon as={FaStar} color="brand.100" />
           </Stack>
           <Text textAlign="center">
-            This sofa is perfect for modern tropical spaces, baroque inspired
-            spaces.
+            Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit diam
+            amet diam eos
           </Text>
         </Stack>
       </CardBody>
