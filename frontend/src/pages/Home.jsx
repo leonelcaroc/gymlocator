@@ -3,6 +3,7 @@ import { Flex } from "@chakra-ui/react";
 import Header from "../layout/Header/Header";
 import HomeSearch from "../layout/HomeSearch/HomeSearch";
 import Feature from "../layout/Feature/Feature";
+import HomeFooter from "../layout/Footer/HomeFooter";
 
 const Home = () => {
   return (
@@ -10,15 +11,7 @@ const Home = () => {
       <Header />
       <HomeSearch />
       <Feature />
-
-      {/* <Flex
-        as="main"
-        flex="1"
-        margin="auto"
-        width="full"
-        justifyContent="center"
-      ></Flex> */}
-      {/* <Footer /> */}
+      <HomeFooter />
     </Flex>
   );
 };
