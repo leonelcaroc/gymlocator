@@ -8,7 +8,11 @@ const Nav = ({ isScrolled }) => {
     <Box as="nav">
       <HStack spacing="">
         <NavButton isScrolled={isScrolled} buttonName="Home" route="/" />
-        <NavButton isScrolled={isScrolled} buttonName="Find a Gym" route="/" />
+        <NavButton
+          isScrolled={isScrolled}
+          buttonName="Find a Gym"
+          route="/explore"
+        />
         <NavButton isScrolled={isScrolled} buttonName="Own a Gym" route="/" />
         <NavMenuButton isScrolled={isScrolled} buttonName="Pages" route="/" />
         <NavButton isScrolled={isScrolled} buttonName="Login" route="/" />

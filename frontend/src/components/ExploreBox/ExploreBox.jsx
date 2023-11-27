@@ -56,21 +56,31 @@ const ExploreBox = () => {
         </InputRightElement>
       </InputGroup>
       <Flex marginBottom="1rem">
-        <Select placeholder="Ratings" marginRight="0.5rem">
+        <Select
+          placeholder="Ratings"
+          marginRight="0.5rem"
+          borderRadius="20px"
+          cursor="pointer"
+        >
           <option value="5">5 stars</option>
           <option value="4">4 stars</option>
           <option value="3">3 stars</option>
           <option value="2">2 stars</option>
           <option value="1">1 stars</option>
         </Select>
-        <Select placeholder="Classes" marginRight="0.5rem">
+        <Select
+          placeholder="Classes"
+          marginRight="0.5rem"
+          borderRadius="20px"
+          cursor="pointer"
+        >
           <option value="Yoga">Yoga</option>
           <option value="Pilates">Pilates</option>
           <option value="Zumba">Zumba</option>
           <option value="Spinning">Spinning</option>
           <option value="Aerobics">Aerobics</option>
         </Select>
-        <Select placeholder="Amenities">
+        <Select placeholder="Amenities" borderRadius="20px" cursor="pointer">
           <option value="Pool">Pool</option>
           <option value="Sauna">Sauna</option>
           <option value="Steam Room">Steam Room</option>
@@ -79,7 +89,9 @@ const ExploreBox = () => {
         </Select>
       </Flex>
       <Divider />
-      <Box>
+      <Box maxHeight="300px" overflow="auto">
+        <ExploreGymCard />
+        <ExploreGymCard />
         <ExploreGymCard />
       </Box>
     </Flex>

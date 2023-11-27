@@ -12,11 +12,11 @@ const Explore = () => {
       backgroundPosition="center"
       backgroundRepeat="no-repeat"
       backgroundSize="cover"
-      height="100vh"
+      minHeight="100vh"
     >
       <Header />
       <Flex
-        paddingTop="12rem"
+        paddingTop="8rem"
         paddingBottom="8rem"
         marginInline="auto"
         width="full"
