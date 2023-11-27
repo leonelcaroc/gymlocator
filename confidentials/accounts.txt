@@ -35,3 +35,9 @@ pass: dan123
 Contabo Account                                    
 email: marymaeerasga30@gmail.com
 pass: gymlocator30
+
+--------------------------------------------
+
+Stripe Account
+email: zeemarq001@gmail.com
+password: zeenazeena

@@ -2,21 +2,69 @@ import express from "express";
 const router = express.Router();
 import {
   authOwner,
-  registerOwnerStep,
+  registerOwner,
   logoutOwner,
   getOwnerProfile,
   updateOwnerProfile,
-  addNewGym,
+  getGymDetails,
+  updateGymDetails,
+  addGymEquipments,
+  getGymEquipments,
+  addGymPlans,
+  getGymPlans,
+  addGymServices,
+  getGymServices,
+  addGymTrainers,
+  getGymTrainers,
+  getStripePrices,
+  addGymAmenities,
+  getGymAmenities,
+  addGymAnnouncement,
+  getGymAnnouncement,
+  addGymClasses,
+  getGymClasses,
 } from "../controllers/gymOwnerController.js";
 import { protectOwner } from "../middleware/gymOwnerAuthMiddleware.js";
 
-router.post("/register", registerOwnerStep);
+router.post("/register", registerOwner);
 router.post("/auth", authOwner);
 router.post("/logout", logoutOwner);
-router.post("/addgym", protectOwner, addNewGym);
+router
+  .route("/gymdetails")
+  .get(protectOwner, getGymDetails)
+  .put(protectOwner, updateGymDetails);
+router
+  .route("/equipments")
+  .get(protectOwner, getGymEquipments)
+  .put(protectOwner, addGymEquipments);
+router
+  .route("/plans")
+  .get(protectOwner, getGymPlans)
+  .put(protectOwner, addGymPlans);
+router
+  .route("/services")
+  .get(protectOwner, getGymServices)
+  .put(protectOwner, addGymServices);
+router
+  .route("/trainers")
+  .get(protectOwner, getGymTrainers)
+  .put(protectOwner, addGymTrainers);
+router
+  .route("/amenity")
+  .get(protectOwner, getGymAmenities)
+  .put(protectOwner, addGymAmenities);
+router
+  .route("/announcement")
+  .get(protectOwner, getGymAnnouncement)
+  .put(protectOwner, addGymAnnouncement);
+router
+  .route("/classes")
+  .get(protectOwner, getGymClasses)
+  .put(protectOwner, addGymClasses);
 router
   .route("/profile")
   .get(protectOwner, getOwnerProfile)
   .put(protectOwner, updateOwnerProfile);
+router.route("/prices").get(protectOwner, getStripePrices);
 
 export default router;
