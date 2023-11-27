@@ -11,7 +11,7 @@ import { Link as ReachLink } from "react-router-dom";
 import { IoChevronDown } from "react-icons/io5";
 import { useState } from "react";
 
-const NavMenuButton = ({ buttonName, route }) => {
+const NavMenuButton = ({ buttonName, route, isScrolled }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleMouseEnter = () => {
@@ -32,7 +32,7 @@ const NavMenuButton = ({ buttonName, route }) => {
           padding="0 1rem"
           marginBlock="1rem"
           cursor="pointer"
-          color="neutral.100"
+          color={isScrolled ? "black" : "neutral.100"}
           fontSize="18px"
           fontWeight="600"
           transition="color 0.2s"
@@ -42,7 +42,7 @@ const NavMenuButton = ({ buttonName, route }) => {
         >
           {buttonName}
         </MenuButton>
-        <MenuList>
+        <MenuList onMouseLeave={handleMouseLeave}>
           <MenuItem>About Us</MenuItem>
           <MenuItem>Contact Us</MenuItem>
         </MenuList>
