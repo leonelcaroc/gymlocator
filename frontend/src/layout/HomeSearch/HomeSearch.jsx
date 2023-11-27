@@ -41,6 +41,7 @@ const HomeSearch = () => {
             placeholder="Search for..."
             borderRadius="30px"
             height="56px"
+            color="accent.500"
           />
           <InputRightElement
             width="7rem"
