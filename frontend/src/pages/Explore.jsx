@@ -3,10 +3,19 @@ import { Flex, Box } from "@chakra-ui/react";
 import Header from "../layout/Header/Header";
 import ExploreBox from "../components/ExploreBox/ExploreBox";
 import backgroundImage from "../assets/images/gym-sample.jpg";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import { Icon } from "leaflet";
+// import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+// import { Icon } from "leaflet";
+import ReactMapGl from "react-map-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+
+const TOKEN =
+  "pk.eyJ1IjoidGVhbXNlY3JldDI1IiwiYSI6ImNscGgybG5vNDA1N3kycXAwemdnN3ViZHgifQ.-_tUlVTRPjswzrl2b6nuag";
 
 const Explore = () => {
+  // const Map = ReactMapboxGl({
+  //   accessToken: process.env.REACT_APP_MAPBOX_TOKEN,
+  // });
+
   const markers = [
     {
       geocode: [51.1305, -0.075],
@@ -22,10 +31,10 @@ const Explore = () => {
     },
   ];
 
-  const customIcon = new Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
-    iconSize: [38, 38],
-  });
+  // const customIcon = new Icon({
+  //   iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+  //   iconSize: [38, 38],
+  // });
 
   return (
     <Flex
@@ -53,7 +62,7 @@ const Explore = () => {
           padding="10px"
           bgColor="gray.100"
         >
-          <MapContainer
+          {/* <MapContainer
             center={[51.13305, -0.085]}
             zoom={13}
             scrollWheelZoom={false}
@@ -64,15 +73,20 @@ const Explore = () => {
             />
 
             {markers.map((marker, index) => (
-              <Marker
-                key={index}
-                position={marker.geocode}
-                // icon={customIcon}
-              >
+              <Marker key={index} position={marker.geocode} icon={customIcon}>
                 <Popup>{marker.popUp}</Popup>
               </Marker>
             ))}
-          </MapContainer>
+          </MapContainer> */}
+          <ReactMapGl
+            latitude="51.13305"
+            longitude="-0.085"
+            zoom="6"
+            mapboxAccessToken={TOKEN}
+            width="100%"
+            height="100%"
+            transitionDuration="200"
+          ></ReactMapGl>
         </Box>
       </Flex>
     </Flex>
