@@ -64,7 +64,11 @@ const Explore = () => {
             />
 
             {markers.map((marker, index) => (
-              <Marker key={index} position={marker.geocode} icon={customIcon}>
+              <Marker
+                key={index}
+                position={marker.geocode}
+                // icon={customIcon}
+              >
                 <Popup>{marker.popUp}</Popup>
               </Marker>
             ))}
