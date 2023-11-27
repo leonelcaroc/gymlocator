@@ -43,24 +43,16 @@ const HomeFooter = () => {
         </Text>
         <List spacing={3}>
           <ListItem cursor="pointer" _hover={{ color: "brand.100" }}>
-            <ListIcon as={FaAngleRight} />
-            About Us
+            <ListIcon as={FaLocationDot} />
+            123 Street, Philippines
           </ListItem>
           <ListItem cursor="pointer" _hover={{ color: "brand.100" }}>
-            <ListIcon as={FaAngleRight} />
-            Contact Us
+            <ListIcon as={FaPhoneAlt} />
+            +965 345 67890
           </ListItem>
           <ListItem cursor="pointer" _hover={{ color: "brand.100" }}>
-            <ListIcon as={FaAngleRight} />
-            Privacy Policy
-          </ListItem>
-          <ListItem cursor="pointer" _hover={{ color: "brand.100" }}>
-            <ListIcon as={FaAngleRight} />
-            Terms & Condition
-          </ListItem>
-          <ListItem cursor="pointer" _hover={{ color: "brand.100" }}>
-            <ListIcon as={FaAngleRight} />
-            FAQs & Help
+            <ListIcon as={MdEmail} />
+            gymlocator@gmail.com
           </ListItem>
         </List>
       </Flex>
