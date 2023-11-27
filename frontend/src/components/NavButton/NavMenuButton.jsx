@@ -39,6 +39,7 @@ const NavMenuButton = ({ buttonName, route, isScrolled }) => {
           _hover={{ color: "brand.100" }}
           _active={{ color: "brand.100" }}
           bgColor="transparent"
+          _focusVisible={{ outline: "none" }}
         >
           {buttonName}
         </MenuButton>

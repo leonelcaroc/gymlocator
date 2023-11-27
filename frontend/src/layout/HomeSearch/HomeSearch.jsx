@@ -19,7 +19,6 @@ const HomeSearch = () => {
       backgroundPosition="center"
       backgroundRepeat="no-repeat"
       backgroundSize="cover"
-      // bgColor="lightgray"
       justifyContent="center"
       alignItems="center"
       height="600px"
