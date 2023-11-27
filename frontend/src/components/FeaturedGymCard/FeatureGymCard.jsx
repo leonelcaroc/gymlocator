@@ -15,7 +15,11 @@ import { FaStar } from "react-icons/fa";
 
 const FeatureGymCard = ({ name }) => {
   return (
-    <Card maxW="sm" boxShadow="lg" marginInline="1rem">
+    <Card
+      maxW="sm"
+      boxShadow="rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px"
+      marginInline="1rem"
+    >
       <CardBody>
         <Image
           src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
