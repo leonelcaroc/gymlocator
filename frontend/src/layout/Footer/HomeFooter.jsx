@@ -39,7 +39,7 @@ const HomeFooter = () => {
       </Flex>
       <Flex flexDirection="column">
         <Text fontSize="1.5rem" fontWeight="800" marginBottom="1rem">
-          Company
+          Contact
         </Text>
         <List spacing={3}>
           <ListItem cursor="pointer" _hover={{ color: "brand.100" }}>
