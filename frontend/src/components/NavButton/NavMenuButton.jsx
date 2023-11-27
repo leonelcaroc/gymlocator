@@ -32,7 +32,7 @@ const NavMenuButton = ({ buttonName, route, isScrolled }) => {
           padding="0 1rem"
           marginBlock="1rem"
           cursor="pointer"
-          color={isScrolled ? "black" : "neutral.100"}
+          color={isScrolled ? "brand.200" : "neutral.100"}
           fontSize="18px"
           fontWeight="600"
           transition="color 0.2s"
