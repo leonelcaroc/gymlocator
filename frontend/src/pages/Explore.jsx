@@ -3,8 +3,30 @@ import { Flex, Box } from "@chakra-ui/react";
 import Header from "../layout/Header/Header";
 import ExploreBox from "../components/ExploreBox/ExploreBox";
 import backgroundImage from "../assets/images/gym-sample.jpg";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { Icon } from "leaflet";
 
 const Explore = () => {
+  const markers = [
+    {
+      geocode: [51.1305, -0.075],
+      popUp: "Daddee's Gym",
+    },
+    {
+      geocode: [51.1205, -0.09],
+      popUp: "Gold's Gym",
+    },
+    {
+      geocode: [51.1405, -0.094],
+      popUp: "Anytime Fitness",
+    },
+  ];
+
+  const customIcon = new Icon({
+    iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+    iconSize: [38, 38],
+  });
+
   return (
     <Flex
       flexDirection="column"
@@ -24,7 +46,30 @@ const Explore = () => {
         paddingInline="5rem"
       >
         <ExploreBox />
-        <Box color="neutral.100">Google Maps</Box>
+        <Box
+          height="30rem"
+          width="35rem"
+          borderRadius="10px"
+          padding="10px"
+          bgColor="gray.100"
+        >
+          <MapContainer
+            center={[51.13305, -0.085]}
+            zoom={13}
+            scrollWheelZoom={false}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+
+            {markers.map((marker, index) => (
+              <Marker key={index} position={marker.geocode} icon={customIcon}>
+                <Popup>{marker.popUp}</Popup>
+              </Marker>
+            ))}
+          </MapContainer>
+        </Box>
       </Flex>
     </Flex>
   );

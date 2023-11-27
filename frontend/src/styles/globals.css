@@ -10,3 +10,8 @@ body {
 li {
   list-style: none;
 }
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
