@@ -31,8 +31,6 @@ const Header = () => {
       transition="background-color 0.3s ease"
       bgColor={isScrolled ? "neutral.100" : "black"}
       boxShadow={isScrolled ? "md" : "none"}
-
-      // top="0"
     >
       <Flex justifyContent="center" alignItems="center">
         <Icon

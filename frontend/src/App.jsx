@@ -31,6 +31,7 @@ import UserProfile from "./layout/UserLayout/UserProfile";
 import UserBookings from "./layout/UserLayout/UserBookings";
 import UserReminders from "./layout/UserLayout/UserReminders";
 import UserAnnouncements from "./layout/UserLayout/UserAnnouncements";
+import UserLogin from "./pages/UserLogin";
 import "leaflet/dist/leaflet.css";
 
 const App = () => {
@@ -70,6 +71,8 @@ const App = () => {
         <Route path="reminders" element={<UserReminders />} />
         <Route path="announcements" element={<UserAnnouncements />} />
       </Route>
+
+      <Route path="/userlogin" element={<UserLogin />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>

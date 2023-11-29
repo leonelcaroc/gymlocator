@@ -18,12 +18,16 @@ const Nav = ({ isScrolled }) => {
           buttonName="Own a Gym"
           route="/gym/details"
         />
-        <NavMenuButton isScrolled={isScrolled} buttonName="Pages" route="/" />
-        <NavButton
+        <NavMenuButton
+          isScrolled={isScrolled}
+          buttonName="Login"
+          route={null}
+        />
+        {/* <NavButton
           isScrolled={isScrolled}
           buttonName="Login"
           route="/gym/login"
-        />
+        /> */}
       </HStack>
     </Box>
   );

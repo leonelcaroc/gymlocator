@@ -18,7 +18,7 @@ import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
 
-const GymOwnerLogin = () => {
+const UserLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -30,7 +30,7 @@ const GymOwnerLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // navigate("/gymowner");
+    // navigate("/user");
 
     console.log(email, password);
   };
@@ -48,7 +48,7 @@ const GymOwnerLogin = () => {
         <Stack spacing="0.5rem" marginBottom="1rem">
           <HStack spacing="0.5rem">
             <Box fontSize="2rem" color="neutral.100" fontWeight="800">
-              Gym Owner
+              User
             </Box>
             <Box fontSize="2rem" color="brand.100" fontWeight="800">
               Login
@@ -102,4 +102,4 @@ const GymOwnerLogin = () => {
   );
 };
 
-export default GymOwnerLogin;
+export default UserLogin;
