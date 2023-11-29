@@ -29,10 +29,11 @@ import User from "./pages/User";
 import UserDashboard from "./layout/UserLayout/UserDashboard";
 import UserProfile from "./layout/UserLayout/UserProfile";
 import UserBookings from "./layout/UserLayout/UserBookings";
-import UserReminders from "./layout/UserLayout/UserReminders";
+import UserReminders from "./layout/UserLayout/UserSubscriptions";
 import UserAnnouncements from "./layout/UserLayout/UserAnnouncements";
 import UserLogin from "./pages/UserLogin";
 import "leaflet/dist/leaflet.css";
+import UserSubscriptions from "./layout/UserLayout/UserSubscriptions";
 
 const App = () => {
   return (
@@ -68,7 +69,7 @@ const App = () => {
         <Route index={true} element={<UserDashboard />} />
         <Route path="profile" element={<UserProfile />} />
         <Route path="bookings" element={<UserBookings />} />
-        <Route path="reminders" element={<UserReminders />} />
+        <Route path="subscriptions" element={<UserSubscriptions />} />
         <Route path="announcements" element={<UserAnnouncements />} />
       </Route>
 

@@ -9,13 +9,11 @@ import {
   Icon,
   Image,
   useDisclosure,
+  Stack,
+  Divider,
 } from "@chakra-ui/react";
 import { IoLocationSharp } from "react-icons/io5";
-import { MdPeopleAlt } from "react-icons/md";
-import { FaHourglassHalf } from "react-icons/fa";
-import { FaDollarSign } from "react-icons/fa";
-import AdminDashboard from "../layout/AdminDashboard/AdminDashboard";
-import AdminGymManage from "../layout/AdminGymManage/AdminGymManage";
+
 import { Outlet } from "react-router-dom";
 
 const Admin = () => {
@@ -78,9 +76,21 @@ const Admin = () => {
           alignItems="center"
           paddingRight="3rem"
         >
-          <Text fontSize="1.2rem" cursor="pointer" _hover={{ color: "gray" }}>
-            Mary
-          </Text>
+          <Stack direction="row" h="80px" p={4}>
+            <Flex alignItems="center" fontSize="1.2rem" cursor="pointer">
+              Mary
+            </Flex>
+            <Divider orientation="vertical" />
+
+            <Flex
+              alignItems="center"
+              fontSize="1.2rem"
+              cursor="pointer"
+              _hover={{ color: "gray" }}
+            >
+              Logout
+            </Flex>
+          </Stack>
         </Flex>
 
         <Outlet />
