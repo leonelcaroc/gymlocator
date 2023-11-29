@@ -24,6 +24,13 @@ import GymOwnerEquipments from "./layout/GymOwnerEquipments/GymOwnerEquipments";
 import GymOwnerPlans from "./layout/GymOwnerPlans/GymOwnerPlans";
 import GymOwnerServices from "./layout/GymOwnerServices/GymOwnerServices";
 import GymOwnerTrainers from "./layout/GymOwnerTrainers/GymOwnerTrainers";
+
+import User from "./pages/User";
+import UserDashboard from "./layout/UserLayout/UserDashboard";
+import UserProfile from "./layout/UserLayout/UserProfile";
+import UserBookings from "./layout/UserLayout/UserBookings";
+import UserReminders from "./layout/UserLayout/UserReminders";
+import UserAnnouncements from "./layout/UserLayout/UserAnnouncements";
 import "leaflet/dist/leaflet.css";
 
 const App = () => {
@@ -54,6 +61,14 @@ const App = () => {
         <Route path="plans" element={<GymOwnerPlans />} />
         <Route path="services" element={<GymOwnerServices />} />
         <Route path="trainers" element={<GymOwnerTrainers />} />
+      </Route>
+
+      <Route path="/user" element={<User />}>
+        <Route index={true} element={<UserDashboard />} />
+        <Route path="profile" element={<UserProfile />} />
+        <Route path="bookings" element={<UserBookings />} />
+        <Route path="reminders" element={<UserReminders />} />
+        <Route path="announcements" element={<UserAnnouncements />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
