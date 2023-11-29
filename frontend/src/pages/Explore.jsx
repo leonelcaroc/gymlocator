@@ -75,25 +75,33 @@ const Explore = () => {
   ]);
   const [location, setLocation] = useState(null);
 
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(successLoc, errorLoc);
-  } else {
-    console.log("Geolocation not supported");
-  }
+  // ----------------------------------------
 
-  function successLoc(position) {
-    const latitude = position.coords.latitude;
-    const longitude = position.coords.longitude;
-    setPosition([latitude, longitude]);
-    setLocation([latitude, longitude]);
-    console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-  }
+  useEffect(() => {
+    let isMounted = true;
 
-  function errorLoc() {
-    console.log("Unable to retrieve your location");
-  }
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          if (isMounted) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            setLocation([latitude, longitude]);
+            console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+          }
+        },
+        () => {
+          console.log("Unable to retrieve your location");
+        }
+      );
+    } else {
+      console.log("Geolocation not supported");
+    }
 
-  // --------------------------------
+    return () => {
+      isMounted = false; // Cleanup to avoid memory leaks
+    };
+  }, []); // Empty dependency array means this effect runs once after the initial render
 
   const markers = [
     {
