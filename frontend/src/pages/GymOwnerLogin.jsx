@@ -30,6 +30,8 @@ const GymOwnerLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    navigate("/gymowner");
+
     console.log(email, password);
   };
 
