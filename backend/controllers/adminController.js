@@ -13,8 +13,12 @@ const authAdmin = asyncHandler(async (req, res) => {
 
   if (user && (await user.matchPassword(password))) {
     generateToken(res, user._id);
-    res.status(200).json({
-      message: "Login Successfully",
+
+    res.json({
+      _id: user._id,
+      email: user.email,
+      firstname: user.firstname,
+      lastname: user.lastname,
     });
   } else {
     res.status(401).json({ message: "Invalid email or password" });

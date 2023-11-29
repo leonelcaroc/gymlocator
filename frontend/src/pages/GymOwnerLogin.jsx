@@ -17,19 +17,8 @@ import gym from "../assets/images/background.webp";
 import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
-import useUser from "../store/user";
-import useAdmin from "../store/admin";
-import { postLoginAdmin } from "../api/adminApi";
-import { useQuery, useMutation } from "react-query";
-// import { useDispatch, useSelector } from "react-redux";
-// import { useAdminLoginMutation } from "../store/adminApiSlice";
-// import { setAdminCredentials } from "../store/adminAuthSlice";
 
-const AdminLogin = () => {
-  // const { user, addUser, updateUser, removeUser } = useUser();
-  const { admin, loginAdmin, addAdmin, updateAdmin, removeAdmin } = useAdmin();
-  // const { owner, addOwner, updateOwner, removeOwner } = useOwner();
-
+const GymOwnerLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -38,31 +27,10 @@ const AdminLogin = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (admin) {
-      navigate("/admin");
-    }
-  }, [navigate, admin]);
-
-  const loginAdminMutation = useMutation(postLoginAdmin, {
-    onSuccess: (data) => {
-      console.log("data", data);
-      navigate("/admin");
-    },
-    onError: (error) => {
-      console.log("error", error);
-    },
-  });
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      await loginAdminMutation.mutateAsync({ email, password });
-      // Optionally, redirect or perform other actions upon successful login
-    } catch (error) {
-      console.error("Login failed:", error.message);
-    }
+    console.log(email, password);
   };
 
   return (
@@ -78,7 +46,7 @@ const AdminLogin = () => {
         <Stack spacing="0.5rem" marginBottom="1rem">
           <HStack spacing="0.5rem">
             <Box fontSize="2rem" color="neutral.100" fontWeight="800">
-              Admin
+              Gym Owner
             </Box>
             <Box fontSize="2rem" color="brand.100" fontWeight="800">
               Login
@@ -132,4 +100,4 @@ const AdminLogin = () => {
   );
 };
 
-export default AdminLogin;
+export default GymOwnerLogin;

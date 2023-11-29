@@ -11,6 +11,14 @@ const adminSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  firstname: {
+    type: String,
+    required: true,
+  },
+  lastname: {
+    type: String,
+    required: true,
+  },
 });
 
 adminSchema.pre("save", async function (next) {

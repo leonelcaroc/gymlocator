@@ -1,19 +1,12 @@
-/* eslint-disable import/named */
-/* eslint-disable import/default */
-/* eslint-disable arrow-body-style */
-/* eslint-disable implicit-arrow-linebreak */
-import { configureStore } from "@reduxjs/toolkit";
-import { apiSlice } from "./apiSlice";
-import adminReducer from "./adminAuthSlice.js";
+import { create } from "zustand";
 
-const store = configureStore({
-  reducer: {
-    adminAuth: adminReducer,
-    [apiSlice.reducerPath]: apiSlice.reducer,
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(apiSlice.middleware),
-  devTools: true,
-});
+const useStore = create((set) => ({
+  user: null,
+  admin: localStorage.getItem("adminInfo")
+    ? JSON.parse(localStorage.getItem("adminInfo"))
+    : null,
+  owner: null,
+  setAdmin: (data) => set({ admin: data }),
+}));
 
-export default store;
+export default useStore;
