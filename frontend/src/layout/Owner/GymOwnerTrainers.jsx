@@ -43,6 +43,10 @@ const GymOwnerTrainers = () => {
                 <Input type="text" placeholder="First Name" />
               </Box>
               <Box>
+                <Text fontWeight="bold">Middle Name</Text>
+                <Input type="text" placeholder="Middle Name" />
+              </Box>
+              <Box>
                 <Text fontWeight="bold">Last Name</Text>
                 <Input type="text" placeholder="Last Name" />
               </Box>
@@ -73,9 +77,9 @@ const GymOwnerTrainers = () => {
                 <Text fontWeight="bold">Certifications</Text>
                 <CheckboxGroup colorScheme="green">
                   <Stack spacing={[1, 5]} direction={["column", "row"]}>
-                    <Checkbox value="naruto">Naruto</Checkbox>
-                    <Checkbox value="sasuke">Sasuke</Checkbox>
-                    <Checkbox value="kakashi">Kakashi</Checkbox>
+                    <Checkbox value="naruto">Personal Trainer</Checkbox>
+                    <Checkbox value="sasuke">Yoga Instructor</Checkbox>
+                    <Checkbox value="kakashi">Pilates Instructor</Checkbox>
                   </Stack>
                 </CheckboxGroup>
               </Stack>
@@ -83,9 +87,9 @@ const GymOwnerTrainers = () => {
                 <Text fontWeight="bold">Specialties</Text>
                 <CheckboxGroup colorScheme="green">
                   <Stack spacing={[1, 5]} direction={["column", "row"]}>
-                    <Checkbox value="naruto">Naruto</Checkbox>
-                    <Checkbox value="sasuke">Sasuke</Checkbox>
-                    <Checkbox value="kakashi">Kakashi</Checkbox>
+                    <Checkbox value="naruto">Strength Training</Checkbox>
+                    <Checkbox value="sasuke">Cardio</Checkbox>
+                    <Checkbox value="kakashi">Nutrition</Checkbox>
                   </Stack>
                 </CheckboxGroup>
               </Stack>
@@ -99,7 +103,6 @@ const GymOwnerTrainers = () => {
               </Box>
             </Stack>
           </ModalBody>
-
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
               Close
