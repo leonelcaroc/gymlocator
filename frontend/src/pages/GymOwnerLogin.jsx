@@ -93,6 +93,7 @@ const GymOwnerLogin = () => {
             width="full"
             _hover={{ color: "brand.100", bgColor: "gray.200" }}
             type="submit"
+            onClick={() => navigate("/gymowner")}
           >
             Login
           </Button>

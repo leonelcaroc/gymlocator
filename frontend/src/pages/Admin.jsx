@@ -14,10 +14,11 @@ import {
 } from "@chakra-ui/react";
 import { IoLocationSharp } from "react-icons/io5";
 
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
 const Admin = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigate = useNavigate();
 
   return (
     <Flex minHeight="100vh">
@@ -87,6 +88,7 @@ const Admin = () => {
               fontSize="1.2rem"
               cursor="pointer"
               _hover={{ color: "gray" }}
+              onClick={() => navigate("/")}
             >
               Logout
             </Flex>

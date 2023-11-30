@@ -23,11 +23,12 @@ import AdminDashboard from "../layout/AdminDashboard/AdminDashboard";
 import AdminGymManage from "../layout/AdminGymManage/AdminGymManage";
 import GymOwnerNav from "../components/GymOwnerNav.jsx/GymOwnerNav";
 import GymInformationNav from "../components/GymInformationNav/GymInformationNav";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { MdOutlineArrowDropUp } from "react-icons/md";
 
 const GymOwner = () => {
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
+  const navigate = useNavigate();
 
   return (
     <Flex minHeight="100vh">
@@ -143,6 +144,7 @@ const GymOwner = () => {
               fontSize="1.2rem"
               cursor="pointer"
               _hover={{ color: "gray" }}
+              onClick={() => navigate("/")}
             >
               Logout
             </Flex>

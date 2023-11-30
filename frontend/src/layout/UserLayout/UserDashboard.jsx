@@ -17,14 +17,14 @@ import {
 const UserDashboard = () => {
   return (
     <Box padding="2rem">
-      <Text fontSize="1.2rem" marginBottom="0.5rem">
-        Welcome to Personal Dashboard
-      </Text>
-      <Text color="brand.200" fontSize="2rem" marginBottom="2rem">
+      <Text color="brand.200" fontSize="2rem" marginBottom="1rem">
         Good day,{" "}
         <Text as="span" color="brand.100">
           Erasga Mae
         </Text>
+      </Text>
+      <Text fontSize="1.5rem" marginBottom="0.5rem">
+        Welcome to Personal Dashboard
       </Text>
 
       <Box marginBlock="2rem">

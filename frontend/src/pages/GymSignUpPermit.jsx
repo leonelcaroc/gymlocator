@@ -102,7 +102,7 @@ const GymSignUpPermit = () => {
             height="45px"
             _hover={{ bgColor: "gray.400", color: "brand.200" }}
             fontSize="1.1rem"
-            onClick={() => navigate("/gymowner")}
+            onClick={() => navigate("/gym/login")}
           >
             Signup
           </Button>

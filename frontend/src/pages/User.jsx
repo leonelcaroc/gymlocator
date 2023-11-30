@@ -22,11 +22,12 @@ import { FaDollarSign } from "react-icons/fa";
 
 import UserNav from "../components/UserNav/UserNav";
 
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { MdOutlineArrowDropUp } from "react-icons/md";
 
 const User = () => {
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
+  const navigate = useNavigate();
 
   return (
     <Flex minHeight="100vh">
@@ -75,6 +76,7 @@ const User = () => {
               fontSize="1.2rem"
               cursor="pointer"
               _hover={{ color: "gray" }}
+              onClick={() => navigate("/")}
             >
               Logout
             </Flex>
