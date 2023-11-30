@@ -32,7 +32,7 @@ const GymOwnerDashboard = () => {
           </Box>
 
           <Icon
-            as={MdPeopleAlt}
+            as={FaHourglassHalf}
             color="gray"
             fontSize="2.5rem"
             marginInline="2rem"
@@ -47,9 +47,8 @@ const GymOwnerDashboard = () => {
             <Text marginBottom="0.5rem">EARNINGS</Text>
             <Text fontSize="1.5rem">PHP 1000</Text>
           </Box>
-
           <Icon
-            as={FaHourglassHalf}
+            as={MdPeopleAlt}
             color="gray"
             fontSize="2.5rem"
             marginInline="2rem"
