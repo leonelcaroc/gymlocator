@@ -1,5 +1,21 @@
 import { Outlet } from "react-router-dom";
-import { Flex, Box, Text } from "@chakra-ui/react";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Flex,
+  Box,
+  Text,
+  Stack,
+  Input,
+  Select,
+  Button,
+  useDisclosure,
+} from "@chakra-ui/react";
 import Header from "../layout/Header/Header";
 import ExploreBox from "../components/ExploreBox/ExploreBox";
 import backgroundImage from "../assets/images/gym-sample.jpg";

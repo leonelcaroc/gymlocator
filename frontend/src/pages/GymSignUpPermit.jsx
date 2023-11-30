@@ -72,7 +72,7 @@ const GymSignUpPermit = () => {
           <Text
             id="upload-permit-id"
             as="label"
-            for="upload-permit"
+            htmlFor="upload-permit"
             marginInline="0.8rem 1.2rem"
           >
             Choose file

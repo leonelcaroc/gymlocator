@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Heading,
   Text,
   Box,
   Flex,
@@ -7,6 +8,14 @@ import {
   Input,
   Stack,
   Textarea,
+  TableContainer,
+  Table,
+  Thead,
+  Td,
+  Th,
+  Tr,
+  Tbody,
+  Divider,
 } from "@chakra-ui/react";
 
 const GymOwnerEquipments = () => {
@@ -30,21 +39,15 @@ const GymOwnerEquipments = () => {
       </Text>
       <Stack spacing="2rem">
         <Flex flexDirection="column" gap="0.5rem">
-          <Text color="gray" fontSize="1.2rem">
-            Equipment Name
-          </Text>
+          <Text fontWeight="bold">Equipment Name</Text>
           <Input type="text" placeholder="Equipment Name" />
         </Flex>
         <Flex flexDirection="column" gap="0.5rem">
-          <Text color="gray" fontSize="1.2rem">
-            Description
-          </Text>
-          <Textarea placeholder="Here is a sample placeholder" />
+          <Text fontWeight="bold">Description</Text>
+          <Textarea placeholder="Type your equipment description here" />
         </Flex>
         <Flex flexDirection="column" gap="0.5rem">
-          <Text color="gray" fontSize="1.2rem">
-            Upload Equipment Image:
-          </Text>
+          <Text fontWeight="bold">Upload Equipment Image:</Text>
           <Input
             id="upload-equipment"
             type="file"
@@ -54,7 +57,7 @@ const GymOwnerEquipments = () => {
           <Text
             id="upload-equipment-image"
             as="label"
-            for="upload-equipment"
+            htmlFor="upload-equipment"
             marginInline="0.8rem 1.2rem"
             width="fit-content"
           >
@@ -66,6 +69,41 @@ const GymOwnerEquipments = () => {
           Add Equipment
         </Button>
       </Stack>
+      <Divider marginBlock="2rem" borderWidth="1px" borderColor="gray.400" />
+      <TableContainer marginTop="1.5rem">
+        <Heading as="h3" size="lg" marginBottom="1rem">
+          List of Equipments
+        </Heading>
+        <Table variant="simple">
+          <Thead>
+            <Tr>
+              <Th>Equipment Name</Th>
+              <Th>Description</Th>
+              <Th>Image</Th>
+              <Th>Action</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              <Td>Resistance Band</Td>
+              <Td>This is for stretching</Td>
+              <Td color="brand.100">
+                <Text _hover={{ textDecoration: "underline" }} cursor="pointer">
+                  resistance_band.jpg
+                </Text>
+              </Td>
+              <Td display="flex" gap="0.5rem">
+                <Button bgColor="blue" color="neutral.100" marginBottom="1rem">
+                  Edit
+                </Button>
+                <Button bgColor="red" color="white">
+                  Delete
+                </Button>
+              </Td>
+            </Tr>
+          </Tbody>
+        </Table>
+      </TableContainer>
     </Box>
   );
 };

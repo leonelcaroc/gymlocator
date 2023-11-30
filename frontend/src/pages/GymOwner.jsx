@@ -49,7 +49,7 @@ const GymOwner = () => {
             Gym Locator
           </Text>
         </Flex>
-        <Box>
+        <Box bgColor="brand.100" height="100%">
           <GymOwnerNav
             route="/gymowner"
             name="Dashboard"
