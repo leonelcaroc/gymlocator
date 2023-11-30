@@ -38,11 +38,11 @@ const AdminLogin = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (admin) {
-      navigate("/admin");
-    }
-  }, [navigate, admin]);
+  // useEffect(() => {
+  //   if (admin) {
+  //     navigate("/admin");
+  //   }
+  // }, [navigate, admin]);
 
   const loginAdminMutation = useMutation(postLoginAdmin, {
     onSuccess: (data) => {
@@ -64,6 +64,42 @@ const AdminLogin = () => {
       console.error("Login failed:", error.message);
     }
   };
+
+  // -------------------------------------------------------
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const url = "http://localhost:5000/api/admin/auth";
+      const data = {
+        email: "zeemarq001@gmail.com",
+        password: "zee123",
+      };
+
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // Add any additional headers if needed
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const payload = await response.json();
+        console.log("Payload:", payload);
+      } catch (error) {
+        console.error("Error:", error.message);
+      }
+    };
+
+    // Call the fetchData function within useEffect
+    fetchData();
+  }, []);
+  // -------------------------------------------------------
 
   return (
     <Center
