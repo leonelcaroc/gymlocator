@@ -24,7 +24,7 @@ const GymSignUpDetails = () => {
       backgroundRepeat="no-repeat"
       backgroundSize="cover"
     >
-      <Box>
+      <Box maxWidth="40rem">
         <Text color="gray.100" fontSize="3rem" fontWeight="800">
           Welcome to{" "}
           <Text as="span" color="brand.100">
@@ -40,18 +40,22 @@ const GymSignUpDetails = () => {
         </Text>
 
         <VStack spacing="1rem">
-          <Flex width="100%" justifyContent="space-between">
+          <Flex width="100%" gap="1rem">
             <Input
               type="text"
               placeholder="First name"
-              width="48%"
+              bgColor="neutral.100"
+              height="45px"
+            />
+            <Input
+              type="text"
+              placeholder="Middle name"
               bgColor="neutral.100"
               height="45px"
             />
             <Input
               type="text"
               placeholder="Last name"
-              width="48%"
               bgColor="neutral.100"
               height="45px"
             />
