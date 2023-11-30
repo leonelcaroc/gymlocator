@@ -11,8 +11,9 @@ li {
   list-style: none;
 }
 
-#upload-permit-id {
-  display: inline-block;
+#upload-permit-id,
+#upload-equipment-image {
+  display: inline;
   background-color: rgb(213, 213, 213);
   color: rgb(16, 16, 16);
   padding: 0.2rem 0.5rem;
