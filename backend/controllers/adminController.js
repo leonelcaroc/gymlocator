@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import generateToken from "../utils/generateToken.js";
 import validator from "validator";
 import Admin from "../models/adminModel.js";
+import createToken from "../utils/createToken.js";
 
 // desc     Auth user/set token
 // route    POST /api/users/auth
@@ -12,13 +13,15 @@ const authAdmin = asyncHandler(async (req, res) => {
   const user = await Admin.findOne({ email });
 
   if (user && (await user.matchPassword(password))) {
-    generateToken(res, user._id);
+    const token = createToken(user._id);
 
-    res.json({
+    res.status(200).json({
       _id: user._id,
       email: user.email,
       firstname: user.firstname,
       lastname: user.lastname,
+      message: "Login Successful!",
+      token,
     });
   } else {
     res.status(401).json({ message: "Invalid email or password" });

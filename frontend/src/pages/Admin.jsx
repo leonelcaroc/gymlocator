@@ -16,9 +16,19 @@ import { IoLocationSharp } from "react-icons/io5";
 
 import { Outlet, useNavigate } from "react-router-dom";
 
+import { useEffect } from "react";
+
 const Admin = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigate = useNavigate();
+
+  const adminInfo = JSON.parse(localStorage.getItem("adminInfo"));
+
+  useEffect(() => {
+    if (!adminInfo) {
+      navigate("/adminlogin");
+    }
+  }, [navigate, localStorage.getItem("adminInfo")]);
 
   return (
     <Flex minHeight="100vh">
@@ -79,7 +89,7 @@ const Admin = () => {
         >
           <Stack direction="row" h="80px" p={4}>
             <Flex alignItems="center" fontSize="1.2rem" cursor="pointer">
-              Mary
+              {adminInfo.firstname}
             </Flex>
             <Divider orientation="vertical" />
 
@@ -88,7 +98,10 @@ const Admin = () => {
               fontSize="1.2rem"
               cursor="pointer"
               _hover={{ color: "gray" }}
-              onClick={() => navigate("/")}
+              onClick={() => {
+                localStorage.removeItem("adminInfo");
+                navigate("/adminlogin");
+              }}
             >
               Logout
             </Flex>

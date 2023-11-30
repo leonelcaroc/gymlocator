@@ -3,9 +3,9 @@ import useStore from "./store";
 const useAdmin = () => {
   const { admin } = useStore();
 
-  const loginAdmin = async () => {
+  const loginAdmin = async (email, password) => {
     try {
-      const response = await fetch("http://localhost:5000/api/admin/auth/", {
+      const response = await fetch("/admin/auth/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,11 +1,11 @@
-// axiosConfig.js
-import axios from "axios";
+// // axiosConfig.js
+// import axios from "axios";
 
-const createAxiosInstance = (baseURL) => {
-  return axios.create({
-    baseURL,
-    // Other configuration options...
-  });
-};
+// const createAxiosInstance = (baseURL) => {
+//   return axios.create({
+//     baseURL,
+//     // Other configuration options...
+//   });
+// };
 
-export default createAxiosInstance;
+// export default createAxiosInstance;

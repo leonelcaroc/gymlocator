@@ -12,23 +12,22 @@ import {
   InputGroup,
   InputRightElement,
   Icon,
+  useToast,
 } from "@chakra-ui/react";
 import gym from "../assets/images/background.webp";
 import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
-import useUser from "../store/user";
+
 import useAdmin from "../store/admin";
-import { postLoginAdmin } from "../api/adminApi";
-import { useQuery, useMutation } from "react-query";
-// import { useDispatch, useSelector } from "react-redux";
-// import { useAdminLoginMutation } from "../store/adminApiSlice";
-// import { setAdminCredentials } from "../store/adminAuthSlice";
+// import { postLoginAdmin } from "../api/adminApi";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import axios from "axios";
 
 const AdminLogin = () => {
-  // const { user, addUser, updateUser, removeUser } = useUser();
-  const { admin, loginAdmin, addAdmin, updateAdmin, removeAdmin } = useAdmin();
-  // const { owner, addOwner, updateOwner, removeOwner } = useOwner();
+  const toast = useToast();
+
+  // const { admin, loginAdmin, addAdmin, updateAdmin, removeAdmin } = useAdmin();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,68 +37,63 @@ const AdminLogin = () => {
 
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   if (admin) {
-  //     navigate("/admin");
-  //   }
-  // }, [navigate, admin]);
-
-  const loginAdminMutation = useMutation(postLoginAdmin, {
-    onSuccess: (data) => {
-      console.log("data", data);
+  useEffect(() => {
+    if (localStorage?.getItem("adminInfo")) {
       navigate("/admin");
+    }
+  }, [navigate, localStorage.getItem("adminInfo")]);
+
+  const queryClient = useQueryClient();
+
+  const loginMutation = useMutation(
+    async (formData) => {
+      const response = await axios.post(
+        "http://localhost:5000/api/admin/auth",
+        formData
+      );
+      return response.data;
     },
-    onError: (error) => {
-      console.log("error", error);
-    },
-  });
+    {
+      onSuccess: (data) => {
+        // Save the data to localStorage or perform other actions
+        localStorage.setItem("adminInfo", JSON.stringify(data));
+        toast({
+          title: data.message,
+          // description: "We've created your account for you.",
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+        console.log(data);
+
+        // Invalidate and refetch any queries that depend on the user data
+        queryClient.invalidateQueries("adminData");
+      },
+      onError: (error) => {
+        toast({
+          title: error.response.data.message,
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+        console.log(error.response.data.message);
+      },
+    }
+  );
+
+  // const { data } = useQuery(["cat"], () => {
+  //   return Axios.get("https://catfact.ninja/fact").then((res) => res.data);
+  // });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      await loginAdminMutation.mutateAsync({ email, password });
-      // Optionally, redirect or perform other actions upon successful login
+      loginMutation.mutate({ email, password });
     } catch (error) {
       console.error("Login failed:", error.message);
     }
   };
-
-  // -------------------------------------------------------
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const url = "http://localhost:5000/api/admin/auth";
-      const data = {
-        email: "zeemarq001@gmail.com",
-        password: "zee123",
-      };
-
-      try {
-        const response = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            // Add any additional headers if needed
-          },
-          body: JSON.stringify(data),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const payload = await response.json();
-        console.log("Payload:", payload);
-      } catch (error) {
-        console.error("Error:", error.message);
-      }
-    };
-
-    // Call the fetchData function within useEffect
-    fetchData();
-  }, []);
-  // -------------------------------------------------------
 
   return (
     <Center
@@ -123,6 +117,7 @@ const AdminLogin = () => {
 
           <Text color="gray.200">Please sign in to continue</Text>
         </Stack>
+
         <form onSubmit={handleSubmit}>
           <Stack spacing="0.5rem" marginBottom="1rem">
             <Input
@@ -159,6 +154,7 @@ const AdminLogin = () => {
             width="full"
             _hover={{ color: "brand.100", bgColor: "gray.200" }}
             type="submit"
+            isLoading={loginMutation.isLoading}
           >
             Login
           </Button>

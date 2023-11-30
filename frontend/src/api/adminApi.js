@@ -1,7 +1,7 @@
-// adminApi.js
-import createAxiosInstance from "./axiosConfig";
+// // adminApi.js
+// import createAxiosInstance from "./axiosConfig";
 
-const adminApi = createAxiosInstance("http://localhost:5000/api/admin");
+// const adminApi = createAxiosInstance("/admin");
 
 // export const getAdminProfile = async () => {
 //   try {
@@ -13,27 +13,27 @@ const adminApi = createAxiosInstance("http://localhost:5000/api/admin");
 //   }
 // };
 
-export const postLoginAdmin = async (email, password) => {
-  try {
-    const { data } = await adminApi.post("/auth", {
-      email,
-      password,
-    });
-    return data;
-  } catch (error) {
-    console.error("Error logging in admin:", error);
-    throw error;
-  }
-};
+// export const postLoginAdmin = async (email, password) => {
+//   try {
+//     const { data } = await adminApi.post("/auth", {
+//       email,
+//       password,
+//     });
+//     return data;
+//   } catch (error) {
+//     console.error("Error logging in admin:", error);
+//     throw error;
+//   }
+// };
 
-export const postLogoutAdmin = async () => {
-  try {
-    const { data } = await adminApi.post("/logout");
-    return data;
-  } catch (error) {
-    console.error("Error logging out admin:", error);
-    throw error;
-  }
-};
+// export const postLogoutAdmin = async () => {
+//   try {
+//     const { data } = await adminApi.post("/logout");
+//     return data;
+//   } catch (error) {
+//     console.error("Error logging out admin:", error);
+//     throw error;
+//   }
+// };
 
-export default adminApi;
+// export default adminApi;

@@ -6,7 +6,6 @@ const useStore = create((set) => ({
     ? JSON.parse(localStorage.getItem("adminInfo"))
     : null,
   owner: null,
-  setAdmin: (data) => set({ admin: data }),
 }));
 
 export default useStore;
