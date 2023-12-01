@@ -78,7 +78,7 @@ const GymSignUpPermit = ({ setState, signUpForm, setForm }) => {
     async (formData) => {
       const response = await axios.post(
         // "http://localhost:5000/api/gymowner/register",
-        "http://gymlocator.co/api/gymowner/register",
+        "https://gymlocator.co/api/gymowner/register",
 
         formData
       );
