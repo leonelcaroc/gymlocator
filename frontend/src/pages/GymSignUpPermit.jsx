@@ -77,7 +77,9 @@ const GymSignUpPermit = ({ setState, signUpForm, setForm }) => {
   const registerMutation = useMutation(
     async (formData) => {
       const response = await axios.post(
-        "http://localhost:5000/api/gymowner/register",
+        // "http://localhost:5000/api/gymowner/register",
+        "http://gymlocator.co/api/gymowner/register",
+
         formData
       );
       return response.data;
