@@ -5,7 +5,7 @@ import GymSignUpInfo from "./GymSignUpInfo";
 import GymSignUpPermit from "./GymSignUpPermit";
 import gym from "../assets/images/background.webp";
 
-const GymOwnerSignup = () => {
+const GymOwnerSignUp = () => {
   const [state, setState] = useState("details");
   const [signUpForm, setForm] = useState({});
 
@@ -43,4 +43,4 @@ const GymOwnerSignup = () => {
   );
 };
 
-export default GymOwnerSignup;
+export default GymOwnerSignUp;
