@@ -6,8 +6,42 @@ import { IoLocationSharp } from "react-icons/io5";
 import { MdPeopleAlt } from "react-icons/md";
 import { FaHourglassHalf } from "react-icons/fa";
 import { FaDollarSign } from "react-icons/fa";
+import axios from "axios";
+import { useQuery } from "react-query";
+
+const apiUrl =
+  import.meta.env.MODE === "production"
+    ? "https://gymlocator.co/api"
+    : "http://localhost:5000/api";
 
 const AdminDashboard = () => {
+  const { data, isLoading, isError } = useQuery(
+    "ownersList",
+    async () => {
+      return axios
+        .get(`${apiUrl}/admin/owners`, {
+          headers: {
+            Authorization: `Bearer ${
+              JSON.parse(localStorage.getItem("adminInfo")).token
+            }`,
+          },
+        })
+        .then((res) => res.data);
+    }
+    // {
+    //   onSuccess: (data) => {
+    //     console.log("Query successful:", data);
+    //     // Your logic for successful response
+    //   },
+    //   onError: (error) => {
+    //     console.error("Query error:", error);
+    //     // Your logic for handling errors
+    //   },
+    // }
+  );
+
+  // console.log(data);
+
   return (
     <Box padding="2rem">
       <Text color="brand.200" fontSize="2rem">
@@ -25,7 +59,12 @@ const AdminDashboard = () => {
         <Flex boxShadow="0px 0px 10px rgba(0, 0, 0, 0.1)" padding="1rem">
           <Box>
             <Text marginBottom="0.5rem">GYM REGISTERED</Text>
-            <Text fontSize="1.5rem">3</Text>
+            <Text fontSize="1.5rem">
+              {
+                data?.filter((owner) => owner.gym.isApproved === "approved")
+                  .length
+              }
+            </Text>
           </Box>
 
           <Icon
@@ -42,7 +81,12 @@ const AdminDashboard = () => {
         >
           <Box>
             <Text marginBottom="0.5rem">PENDING REQUESTS</Text>
-            <Text fontSize="1.5rem">18</Text>
+            <Text fontSize="1.5rem">
+              {
+                data?.filter((owner) => owner.gym.isApproved === "pending")
+                  .length
+              }
+            </Text>
           </Box>
 
           <Icon
