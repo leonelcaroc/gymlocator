@@ -81,9 +81,30 @@ const AdminLogin = () => {
     }
   );
 
+  // {
+  // headers: {
+  //   Authorization: `Bearer ${localStorage.getItem("adminInfo").token}`}`,
+
+  // },
+  // }
+
   // const { data } = useQuery(["cat"], () => {
   //   return Axios.get("https://catfact.ninja/fact").then((res) => res.data);
   // });
+
+  // const { data } = useQuery(["cat"], () => {
+  //   return Axios.get("https://catfact.ninja/fact", {}).then((res) => res.data);
+  // });
+
+  const { data, isLoading } = useQuery(["ownersList"], async () => {
+    return axios
+      .get("", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("adminInfo").token}`,
+        },
+      })
+      .then((res) => res.data);
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
