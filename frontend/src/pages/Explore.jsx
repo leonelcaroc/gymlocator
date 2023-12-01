@@ -29,7 +29,7 @@ import {
 } from "react-leaflet";
 import { Icon } from "leaflet";
 import ReactMapGl from "react-map-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+// import "mapbox-gl/dist/mapbox-gl.css";
 import { useState, useEffect } from "react";
 import L from "leaflet";
 import GetCoordinates from "../components/GetCoordinates/GetCoordinates";
@@ -149,9 +149,7 @@ const Explore = () => {
       minHeight="100vh"
     >
       <Header />
-      {/* <Text bgColor="yellow" fontSize="5rem" color="black" marginTop="10rem">
-        Location: {position[0]}, {position[1]}
-      </Text> */}
+
       <Flex
         paddingTop="8rem"
         paddingBottom="8rem"
@@ -169,10 +167,7 @@ const Explore = () => {
           bgColor="gray.100"
         >
           <MapContainer
-            center={
-              location ? location : [6.90572175274272, 122.07578659057619]
-            }
-            // center={[51.1305, -0.075]}
+            center={location ? location : position}
             zoom={13}
             scrollWheelZoom={true}
             animate={true}
@@ -187,10 +182,11 @@ const Explore = () => {
                 <Popup>{marker.popUp}</Popup>
               </Marker>
             ))} */}
+            {/* {location && <Marker position={location} />} */}
             {location && <Marker position={location} />}
             {/* {location && <MapLocate location={location} />} */}
 
-            {/* <GetCoordinates setPosition={setPosition} /> */}
+            <GetCoordinates setPosition={setPosition} />
             {/* <LocationMarker /> */}
           </MapContainer>
         </Box>

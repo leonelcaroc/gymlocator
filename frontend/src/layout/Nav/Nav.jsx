@@ -16,7 +16,7 @@ const Nav = ({ isScrolled }) => {
         <NavButton
           isScrolled={isScrolled}
           buttonName="Own a Gym"
-          route="/gym/details"
+          route="/gym/signup"
         />
         <NavMenuButton
           isScrolled={isScrolled}

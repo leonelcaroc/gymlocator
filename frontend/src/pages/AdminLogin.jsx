@@ -20,7 +20,6 @@ import { IoEyeOff } from "react-icons/io5";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
 
 import useAdmin from "../store/admin";
-// import { postLoginAdmin } from "../api/adminApi";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import axios from "axios";
 
@@ -71,7 +70,7 @@ const AdminLogin = () => {
       },
       onError: (error) => {
         toast({
-          title: error.response.data.message,
+          title: error.response.data.message || "Something went wrong",
           status: "error",
           duration: 2000,
           position: "bottom-right",

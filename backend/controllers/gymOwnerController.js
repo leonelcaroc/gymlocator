@@ -2,8 +2,23 @@ import asyncHandler from "express-async-handler";
 import generateToken from "../utils/generateToken.js";
 import validator from "validator";
 import GymOwner from "../models/gymOwnerModel.js";
+import multer from "multer";
 
-import { stripe } from "../utils/stripe.js";
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "backend/uploads/");
+//   },
+//   filename: function (req, file, cb) {
+//     cb(
+//       null,
+//       file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+//     );
+//   },
+// });
+
+// const upload = multer({
+//   storage: storage,
+// });
 
 // desc     Auth user/set token
 // route    POST /api/users/auth
@@ -25,69 +40,17 @@ const authOwner = asyncHandler(async (req, res) => {
   }
 });
 
-// desc     Register a new user
-// route    POST /api/users
-// @access  Public
-//---------------------
-// const registerOwner = asyncHandler(async (req, res) => {
-//   const { firstname, lastname, email, password } = req.body;
-
-//   const trimmedFirstName = validator.trim(firstname);
-//   const trimmedLastName = validator.trim(lastname);
-//   const trimmedPassword = validator.trim(password);
-
-//   if (!validator.isEmail(email)) {
-//     return res.status(400).json({ error: "Invalid email address" });
-//   }
-
-//   if (!validator.isLength(trimmedPassword, { min: 8, max: 16 })) {
-//     return res
-//       .status(400)
-//       .json({ error: "Password must be between 6 and 8 characters" });
-//   }
-
-//   if (
-//     !validator.matches(trimmedPassword, /^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]+$/)
-//   ) {
-//     return res.status(400).json({
-//       error: "Password must contain at least one special character (!@#$%^&*)",
-//     });
-//   }
-
-//   const userExists = await GymOwner.findOne({ email });
-
-//   if (userExists) {
-//     res.status(400);
-//     throw new Error("User already exists.");
-//   }
-
-//   const user = await GymOwner.create({
-//     email,
-//     firstname: trimmedFirstName,
-//     lastname: trimmedLastName,
-//     password: trimmedPassword,
-//   });
-
-//   if (user) {
-//     // generateToken(res, user._id);
-//     res.status(201).json({
-//       message: "Account Created",
-//     });
-//   } else {
-//     res.status(400);
-//     throw new Error("Invalid user data.");
-//   }
-// });
-
 const registerOwner = asyncHandler(async (req, res) => {
   const {
     firstname,
+    middlename,
     lastname,
     email,
     password,
     gymname,
     contact,
     address,
+    gymLocation,
     description,
     startday,
     endday,
@@ -97,6 +60,7 @@ const registerOwner = asyncHandler(async (req, res) => {
   } = req.body;
 
   const trimmedFirstName = validator.trim(firstname);
+  const trimmedMiddleName = validator.trim(middlename);
   const trimmedLastName = validator.trim(lastname);
   const trimmedPassword = validator.trim(password);
   const trimmedGymName = validator.trim(gymname);
@@ -108,8 +72,12 @@ const registerOwner = asyncHandler(async (req, res) => {
     return res.status(400).json({ error: "Gym name is required." });
   }
 
-  if (!validator.isLength(trimmedContact, { min: 11, max: 11 })) {
+  if (!validator.isLength(trimmedContact, { min: 1 })) {
     return res.status(400).json({ error: "Contact number is invalid" });
+  }
+
+  if (!Array.isArray(gymLocation)) {
+    return res.status(400).json({ error: "Location is invalid" });
   }
 
   if (!validator.isLength(trimmedDesc, { min: 1 })) {
@@ -128,17 +96,25 @@ const registerOwner = asyncHandler(async (req, res) => {
     return res.status(400).json({ error: "First name is required." });
   }
 
+  if (!validator.isLength(trimmedMiddleName, { min: 1 })) {
+    return res.status(400).json({ error: "Middle name is required." });
+  }
+
   if (!validator.isLength(trimmedLastName, { min: 1 })) {
     return res.status(400).json({ error: "Last name is required." });
   }
 
+  const hasUpperCase = /[A-Z]/.test(trimmedPassword);
+  const hasLowerCase = /[a-z]/.test(trimmedPassword);
+  const hasDigit = /\d/.test(trimmedPassword);
+
   if (
-    !validator.isLength(trimmedPassword, { min: 8, max: 16 }) ||
-    !validator.matches(trimmedPassword, /^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]+$/)
+    !validator.isLength(trimmedPassword, { min: 8 }) ||
+    !(hasUpperCase && hasLowerCase && hasDigit)
   ) {
     return res.status(400).json({
       error:
-        "Password must be between 8 and 16 characters and contain at least one special character (!@#$%^&*)",
+        "Password must be atleast 8 characters and contain at least one uppercase letter, one lowercase letter, and one digit.",
     });
   }
 
@@ -150,6 +126,7 @@ const registerOwner = asyncHandler(async (req, res) => {
   }
   const user = await GymOwner.create({
     firstname: trimmedFirstName,
+    middlename: trimmedMiddleName,
     lastname: trimmedLastName,
     email: email,
     password: trimmedPassword,
@@ -158,6 +135,7 @@ const registerOwner = asyncHandler(async (req, res) => {
       contact: trimmedContact,
       description: trimmedDesc,
       address: trimmedAddress,
+      gymLocation: gymLocation,
       permitBase64: base64Data,
       schedule: { days: [startday, endday], time: [opentime, closetime] },
     },
@@ -165,8 +143,7 @@ const registerOwner = asyncHandler(async (req, res) => {
 
   if (user) {
     res.status(201).json({
-      message: "Account Created",
-      // ...newOwner,
+      message: "Account Created Successfully!",
     });
   } else {
     res.status(400);
@@ -726,6 +703,7 @@ const getStripePrices = asyncHandler(async (req, res) => {
 });
 
 export {
+  // upload,
   authOwner,
   registerOwner,
   logoutOwner,

@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import generateToken from "../utils/generateToken.js";
 import validator from "validator";
 import Admin from "../models/adminModel.js";
+import GymOwner from "../models/gymOwnerModel.js";
 import createToken from "../utils/createToken.js";
 
 // desc     Auth user/set token
@@ -83,15 +84,12 @@ const logoutAdmin = asyncHandler(async (req, res) => {
 // desc     Get user profile
 // route    GET /api/users/profile
 // @access  Private
-// const getUserProfile = asyncHandler(async (req, res) => {
-//   const user = {
-//     _id: req.user._id,
-//     name: req.user.name,
-//     email: req.user.email,
-//   };
+const getOwners = asyncHandler(async (req, res) => {
+  const user = await GymOwner.find({});
 
-//   res.status(200).json(user);
-// });
+  // res.status(200).json(user);
+  res.status(200).json(user);
+});
 
 // desc     Update user profile
 // route    PUT /api/users/profile
@@ -127,6 +125,6 @@ export {
   authAdmin,
   // registerAdmin,
   logoutAdmin,
-  //   getUserProfile,
+  getOwners,
   //   updateUserProfile,
 };

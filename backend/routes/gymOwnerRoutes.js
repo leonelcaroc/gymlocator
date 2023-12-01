@@ -25,8 +25,25 @@ import {
   getGymClasses,
 } from "../controllers/gymOwnerController.js";
 import { protectOwner } from "../middleware/gymOwnerAuthMiddleware.js";
+import multer from "multer";
 
-router.post("/register", registerOwner);
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "backend/uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+
+const upload = multer({
+  storage: storage,
+});
+
+router.post("/register", upload.single("file"), registerOwner);
 router.post("/auth", authOwner);
 router.post("/logout", logoutOwner);
 router

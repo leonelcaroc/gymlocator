@@ -7,9 +7,10 @@ import AdminGymManage from "./layout/AdminGymManage/AdminGymManage";
 import AdminLogin from "./pages/AdminLogin";
 import NotFound from "./pages/NotFound";
 
-import GymSignUpDetails from "./pages/GymSignUpDetails";
-import GymSignUpInfo from "./pages/GymSignUpInfo";
-import GymSignUpPermit from "./pages/GymSignUpPermit";
+// import GymSignUpDetails from "./pages/GymSignUpDetails";
+// import GymSignUpInfo from "./pages/GymSignUpInfo";
+// import GymSignUpPermit from "./pages/GymSignUpPermit";
+import GymOwnerSignup from "./pages/GymOwnerSignup";
 import GymOwnerLogin from "./pages/GymOwnerLogin";
 import GymOwner from "./pages/GymOwner";
 import GymOwnerDashboard from "./layout/Owner/GymOwnerDashboard";
@@ -40,9 +41,9 @@ const App = () => {
       <Route path="/" element={<Home />} />
       <Route path="/explore" element={<Explore />} />
       <Route path="/adminlogin" element={<AdminLogin />} />
-      <Route path="/gym/details" element={<GymSignUpDetails />} />
-      <Route path="/gym/info" element={<GymSignUpInfo />} />
-      <Route path="/gym/signup" element={<GymSignUpPermit />} />
+      {/* <Route path="/gym/details" element={<GymSignUpDetails />} /> */}
+      {/* <Route path="/gym/info" element={<GymSignUpInfo />} /> */}
+      <Route path="/gym/signup" element={<GymOwnerSignup />} />
       <Route path="/gym/login" element={<GymOwnerLogin />} />
 
       <Route path="/admin" element={<Admin />}>

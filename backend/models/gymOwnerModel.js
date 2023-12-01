@@ -178,12 +178,16 @@ const gymSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  gymLocation: {
+    type: Array,
+    required: true,
+  },
   schedule: {
     type: scheduleSchema,
     required: true,
   },
   permitBase64: {
-    type: Buffer,
+    type: String,
     required: true,
   },
   equipments: {
@@ -215,14 +219,19 @@ const gymSchema = mongoose.Schema({
     default: [],
   },
   isApproved: {
-    type: Boolean,
-    default: false,
+    type: String,
+    enum: ["approved", "rejected", "pending"],
+    default: "pending",
   },
 });
 
 const gymOwnerSchema = mongoose.Schema(
   {
     firstname: {
+      type: String,
+      required: true,
+    },
+    middlename: {
       type: String,
       required: true,
     },
@@ -266,7 +275,7 @@ const GymOwner = mongoose.model("Gymowners", gymOwnerSchema);
 
 export default GymOwner;
 
-[
-  { owner: 1, pricing: { monthly: 5000, annual: 10000 } },
-  { owner: 2, pricing: { semiannual: 8000, annual: 15000 } },
-];
+// [
+//   { owner: 1, pricing: { monthly: 5000, annual: 10000 } },
+//   { owner: 2, pricing: { semiannual: 8000, annual: 15000 } },
+// ];
