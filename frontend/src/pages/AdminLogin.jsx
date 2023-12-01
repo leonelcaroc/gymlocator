@@ -22,6 +22,10 @@ import { Link as ReachLink, useNavigate } from "react-router-dom";
 import useAdmin from "../store/admin";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import axios from "axios";
+const apiUrl =
+  import.meta.env.MODE === "production"
+    ? "https://gymlocator.co/api"
+    : "http://localhost:5000/api";
 
 const AdminLogin = () => {
   const toast = useToast();
@@ -46,10 +50,7 @@ const AdminLogin = () => {
 
   const loginMutation = useMutation(
     async (formData) => {
-      const response = await axios.post(
-        "http://localhost:5000/api/admin/auth",
-        formData
-      );
+      const response = await axios.post(`${apiUrl}/admin/auth`, formData);
       return response.data;
     },
     {

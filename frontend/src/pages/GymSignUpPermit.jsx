@@ -32,7 +32,10 @@ import GetCoordinates from "../components/GetCoordinates/GetCoordinates";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "react-query";
 import axios from "axios";
-import { set } from "mongoose";
+const apiUrl =
+  import.meta.env.MODE === "production"
+    ? "https://gymlocator.co/api"
+    : "http://localhost:5000/api";
 
 const GymSignUpPermit = ({ setState, signUpForm, setForm }) => {
   const navigate = useNavigate();
@@ -78,7 +81,7 @@ const GymSignUpPermit = ({ setState, signUpForm, setForm }) => {
     async (formData) => {
       const response = await axios.post(
         // "http://localhost:5000/api/gymowner/register",
-        "https://gymlocator.co/api/gymowner/register",
+        `${apiUrl}/gymowner/register`,
 
         formData
       );
