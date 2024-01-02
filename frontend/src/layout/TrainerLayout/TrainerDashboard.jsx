@@ -27,45 +27,90 @@ const TrainerDashboard = () => {
         Welcome to Personal Trainer Dashboard
       </Text>
 
-      <Box marginBlock="2rem">
-        <Text fontSize="1.2rem">Booking Schedule</Text>
+      <Flex>
+        <Flex
+          justifyContent="center"
+          alignItems="center"
+          height="60px"
+          width="270px"
+        >
+          UPCOMING APPOINTMENTS
+        </Flex>
+        <Flex
+          justifyContent="center"
+          alignItems="center"
+          height="60px"
+          width="270px"
+        >
+          CLIENT
+        </Flex>
+        <Flex
+          justifyContent="center"
+          alignItems="center"
+          height="60px"
+          width="270px"
+        >
+          PENDING REQUESTS
+        </Flex>
+      </Flex>
+
+      <Flex justifyContent="end">
+        <Button bgColor="brand.100" color="neutral.100">
+          Generate Report
+        </Button>
+      </Flex>
+
+      <Box
+        marginBlock="2rem"
+        padding="0.8rem"
+        border="1px solid"
+        borderColor="gray.200"
+      >
+        <Text fontSize="1.2rem">Upcoming Appointments</Text>
         <Flex marginBlock="1rem" gap="1.5rem">
-          <TableContainer>
+          <TableContainer width="full">
             <Table>
               <Thead>
                 <Tr>
                   <Th>Date</Th>
-                  <Th>Trainer</Th>
-                  <Th>Status</Th>
+                  <Th>Client</Th>
                 </Tr>
               </Thead>
               <Tbody>
                 <Tr>
                   <Td>2023-11-25</Td>
                   <Td>Tristan Chiu</Td>
-                  <Td>Pending</Td>
                 </Tr>
               </Tbody>
             </Table>
           </TableContainer>
-          <Box
-            maxWidth="25rem"
-            border=" 1px solid"
-            borderColor="gray.400"
-            padding="7px 10px"
-          >
-            <Text>Gym Announcements</Text>
-            <Text whiteSpace="normal">
-              Stay updated with the latest announcements and news from our gym
-            </Text>
-            <Text
-              color="brand.100"
-              cursor="pointer"
-              _hover={{ color: "green" }}
-            >
-              View All
-            </Text>
-          </Box>
+        </Flex>
+      </Box>
+
+      <Box
+        marginBlock="2rem"
+        padding="1rem"
+        border="1px solid"
+        borderColor="gray.200"
+      >
+        <Text fontSize="1.2rem">Client Lists</Text>
+        <Flex marginBlock="1rem" gap="1.5rem">
+          <TableContainer width="full">
+            <Table>
+              <Thead>
+                <Tr>
+                  <Th>Name</Th>
+                  <Th>Contact Number</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                <Tr>
+                  <Td>Enzo Garcia</Td>
+                  <Td>09915684267</Td>
+                </Tr>
+              </Tbody>
+            </Table>
+          </TableContainer>
         </Flex>
       </Box>
     </Box>
