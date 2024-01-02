@@ -49,6 +49,9 @@ const NavMenuButton = ({ buttonName, route, isScrolled }) => {
         <MenuItem onClick={() => navigate("/gym/login")}>
           Gym Owner Login
         </MenuItem>
+        <MenuItem onClick={() => navigate("/trainerlogin")}>
+          Trainer Login
+        </MenuItem>
       </MenuList>
     </Menu>
     // </Link>

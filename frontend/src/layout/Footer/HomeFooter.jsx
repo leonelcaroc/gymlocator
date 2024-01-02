@@ -48,7 +48,7 @@ const HomeFooter = () => {
           </ListItem>
           <ListItem cursor="pointer" _hover={{ color: "brand.100" }}>
             <ListIcon as={FaPhoneAlt} />
-            +965 345 67890
+            +63 965 345 6789
           </ListItem>
           <ListItem cursor="pointer" _hover={{ color: "brand.100" }}>
             <ListIcon as={MdEmail} />

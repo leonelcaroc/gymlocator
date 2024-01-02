@@ -12,21 +12,13 @@ import {
   InputGroup,
   InputRightElement,
   Icon,
-  useToast,
 } from "@chakra-ui/react";
 import gym from "../assets/images/background.webp";
 import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
-import { useQuery, useQueryClient, useMutation } from "react-query";
-import axios from "axios";
-const apiUrl =
-  import.meta.env.MODE === "production"
-    ? "https://gymlocator.co/api"
-    : "http://localhost:5000/api";
 
-const GymOwnerLogin = () => {
-  const toast = useToast();
+const TrainerLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -35,50 +27,12 @@ const GymOwnerLogin = () => {
 
   const navigate = useNavigate();
 
-  const queryClient = useQueryClient();
-
-  const loginMutation = useMutation(
-    async (formData) => {
-      const response = await axios.post(`${apiUrl}/gymowner/auth`, formData);
-      return response.data;
-    },
-    {
-      onSuccess: (data) => {
-        // Save the data to localStorage or perform other actions
-        localStorage.setItem("ownerInfo", JSON.stringify(data));
-        toast({
-          title: data.message,
-          // description: "We've created your account for you.",
-          status: "success",
-          duration: 2000,
-          position: "bottom-right",
-        });
-        navigate("/gymowner");
-        console.log(data);
-
-        // Invalidate and refetch any queries that depend on the user data
-        queryClient.invalidateQueries("gymOwnerData");
-      },
-      onError: (error) => {
-        toast({
-          title: error.response.data.message || "Something went wrong",
-          status: "error",
-          duration: 2000,
-          position: "bottom-right",
-        });
-        console.log(error.response.data.message);
-      },
-    }
-  );
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      loginMutation.mutate({ email, password });
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
+    // navigate("/user");
+
+    console.log(email, password);
   };
 
   return (
@@ -94,7 +48,7 @@ const GymOwnerLogin = () => {
         <Stack spacing="0.5rem" marginBottom="1rem">
           <HStack spacing="0.5rem">
             <Box fontSize="2rem" color="neutral.100" fontWeight="800">
-              Gym Owner
+              Trainer
             </Box>
             <Box fontSize="2rem" color="brand.100" fontWeight="800">
               Login
@@ -139,7 +93,7 @@ const GymOwnerLogin = () => {
             width="full"
             _hover={{ color: "brand.100", bgColor: "gray.200" }}
             type="submit"
-            isLoading={loginMutation.isLoading}
+            onClick={() => navigate("/trainer")}
           >
             Login
           </Button>
@@ -149,4 +103,4 @@ const GymOwnerLogin = () => {
   );
 };
 
-export default GymOwnerLogin;
+export default TrainerLogin;

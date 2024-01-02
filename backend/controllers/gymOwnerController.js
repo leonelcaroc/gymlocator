@@ -3,6 +3,7 @@ import generateToken from "../utils/generateToken.js";
 import validator from "validator";
 import GymOwner from "../models/gymOwnerModel.js";
 import multer from "multer";
+import createToken from "../utils/createToken.js";
 
 // const storage = multer.diskStorage({
 //   destination: function (req, file, cb) {
@@ -29,9 +30,15 @@ const authOwner = asyncHandler(async (req, res) => {
   const user = await GymOwner.findOne({ email });
 
   if (user && (await user.matchPassword(password))) {
-    generateToken(res, user._id);
+    const token = createToken(user._id);
+
     res.status(200).json({
-      message: "Successfully Login",
+      _id: user._id,
+      email: user.email,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      message: "Login Successful!",
+      token,
     });
   } else {
     res.status(401).json({ message: "Invalid email or password" });

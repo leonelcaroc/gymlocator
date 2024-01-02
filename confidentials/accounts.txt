@@ -53,3 +53,14 @@ email: zeemarq001@gmail.com
 password: zeenazeena
 
 --------------------------------------------
+
+API KEYS GOOGLE MAPS: AIzaSyDrEoMAjf6lO-05iin-Gat1FlMqVHQJ2LU
+
+--------------------------------------------
+
+GYM LOCATOR
+
+EMAIL: gymlocatorzamboanga@gmail.com
+PASSWORD: gymlocZam
+
+--------------------------------------------

@@ -35,6 +35,13 @@ import UserLogin from "./pages/UserLogin";
 import "leaflet/dist/leaflet.css";
 import UserSubscriptions from "./layout/UserLayout/UserSubscriptions";
 
+import Trainer from "./pages/Trainer";
+import TrainerLogin from "./pages/TrainerLogin";
+import TrainerDashboard from "./layout/TrainerLayout/TrainerDashboard";
+import TrainerProfile from "./layout/TrainerLayout/TrainerProfile";
+import TrainerBookings from "./layout/TrainerLayout/TrainerBookings";
+import TrainerSchedule from "./layout/TrainerLayout/TrainerSchedule";
+
 const App = () => {
   return (
     <Routes>
@@ -43,12 +50,16 @@ const App = () => {
       <Route path="/adminlogin" element={<AdminLogin />} />
       <Route path="/gym/signup" element={<GymOwnerSignUp />} />
       <Route path="/gym/login" element={<GymOwnerLogin />} />
+      <Route path="/userlogin" element={<UserLogin />} />
+      <Route path="/trainerlogin" element={<TrainerLogin />} />
 
+      {/* Admin Routes */}
       <Route path="/admin" element={<Admin />}>
         <Route index={true} element={<AdminDashboard />} />
         <Route path="manage" element={<AdminGymManage />} />
       </Route>
 
+      {/* Gym Owner Routes */}
       <Route path="/gymowner" element={<GymOwner />}>
         <Route index={true} element={<GymOwnerDashboard />} />
         <Route path="profile" element={<GymOwnerProfile />} />
@@ -63,6 +74,7 @@ const App = () => {
         <Route path="trainers" element={<GymOwnerTrainers />} />
       </Route>
 
+      {/* User Routes */}
       <Route path="/user" element={<User />}>
         <Route index={true} element={<UserDashboard />} />
         <Route path="profile" element={<UserProfile />} />
@@ -71,7 +83,13 @@ const App = () => {
         <Route path="announcements" element={<UserAnnouncements />} />
       </Route>
 
-      <Route path="/userlogin" element={<UserLogin />} />
+      {/* Trainer Routes */}
+      <Route path="/trainer" element={<Trainer />}>
+        <Route index={true} element={<TrainerDashboard />} />
+        <Route path="profile" element={<TrainerProfile />} />
+        <Route path="bookings" element={<TrainerBookings />} />
+        <Route path="schedule" element={<TrainerSchedule />} />
+      </Route>
 
       <Route path="*" element={<NotFound />} />
     </Routes>
