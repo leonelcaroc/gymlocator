@@ -9,7 +9,6 @@ import NotFound from "./pages/NotFound";
 
 // import GymSignUpDetails from "./pages/GymSignUpDetails";
 // import GymSignUpInfo from "./pages/GymSignUpInfo";
-// import GymSignUpPermit from "./pages/GymSignUpPermit";
 import GymOwnerSignUp from "./pages/GymOwnerSignUp";
 import GymOwnerLogin from "./pages/GymOwnerLogin";
 import GymOwner from "./pages/GymOwner";
