@@ -38,7 +38,6 @@ import TrainerLogin from "./pages/TrainerLogin";
 import TrainerDashboard from "./layout/TrainerLayout/TrainerDashboard";
 import TrainerProfile from "./layout/TrainerLayout/TrainerProfile";
 import TrainerBookings from "./layout/TrainerLayout/TrainerBookings";
-import TrainerSchedule from "./layout/TrainerLayout/TrainerSchedule";
 
 const App = () => {
   return (
@@ -86,7 +85,6 @@ const App = () => {
         <Route index={true} element={<TrainerDashboard />} />
         <Route path="profile" element={<TrainerProfile />} />
         <Route path="bookings" element={<TrainerBookings />} />
-        <Route path="schedule" element={<TrainerSchedule />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

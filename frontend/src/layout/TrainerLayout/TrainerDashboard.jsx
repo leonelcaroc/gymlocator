@@ -4,6 +4,7 @@ import {
   Box,
   Flex,
   Button,
+  Icon,
   Input,
   Tr,
   Td,
@@ -13,6 +14,9 @@ import {
   Th,
   Tbody,
 } from "@chakra-ui/react";
+import { MdPeopleAlt } from "react-icons/md";
+import { IoPerson } from "react-icons/io5";
+import { MdOutlinePendingActions } from "react-icons/md";
 
 const TrainerDashboard = () => {
   return (
@@ -27,30 +31,57 @@ const TrainerDashboard = () => {
         Welcome to Personal Trainer Dashboard
       </Text>
 
-      <Flex>
+      <Flex gap="10px" marginBlock="2rem">
         <Flex
-          justifyContent="center"
-          alignItems="center"
           height="60px"
-          width="270px"
+          width="260px"
+          border="1px solid"
+          borderColor="gray.400"
+          boxShadow="rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px"
+          alignItems="center"
+          justifyContent="center"
         >
-          UPCOMING APPOINTMENTS
+          <Box textAlign="center">APPOINTMENTS</Box>
+          <Icon
+            as={MdPeopleAlt}
+            color="gray"
+            fontSize="2.5rem"
+            marginInline="2rem"
+          />
         </Flex>
         <Flex
-          justifyContent="center"
-          alignItems="center"
           height="60px"
-          width="270px"
+          width="260px"
+          border="1px solid"
+          borderColor="gray.400"
+          boxShadow="rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px"
+          alignItems="center"
+          justifyContent="center"
         >
-          CLIENT
+          <Box textAlign="center">CLIENTS</Box>
+          <Icon
+            as={IoPerson}
+            color="gray"
+            fontSize="2.5rem"
+            marginInline="2rem"
+          />
         </Flex>
         <Flex
-          justifyContent="center"
-          alignItems="center"
           height="60px"
-          width="270px"
+          width="260px"
+          border="1px solid"
+          borderColor="gray.400"
+          boxShadow="rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px"
+          alignItems="center"
+          justifyContent="center"
         >
-          PENDING REQUESTS
+          <Box textAlign="center">PENDING REQUESTS</Box>
+          <Icon
+            as={MdOutlinePendingActions}
+            color="gray"
+            fontSize="2.5rem"
+            marginInline="2rem"
+          />
         </Flex>
       </Flex>
 

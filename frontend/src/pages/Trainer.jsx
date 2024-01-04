@@ -52,10 +52,9 @@ const Trainer = () => {
           <UserNav route="/trainer" name="Dashboard" />
           <UserNav route="/trainer/profile" name="Profile" />
           <UserNav route="/trainer/bookings" name="Bookings" />
-          <UserNav route="/trainer/schedule" name="Schedule" />
         </Box>
       </Box>
-      <Box height="100px" width="full" bgColor="neutral.100">
+      <Box width="full" bgColor="neutral.100">
         <Flex
           boxShadow="0px 0px 10px rgba(0, 0, 0, 0.1)"
           height="100px"

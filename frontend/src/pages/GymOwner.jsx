@@ -124,7 +124,7 @@ const GymOwner = () => {
           />
         </Box>
       </Box>
-      <Box height="100px" width="full" bgColor="neutral.100">
+      <Box width="full" bgColor="neutral.100">
         <Flex
           boxShadow="0px 0px 10px rgba(0, 0, 0, 0.1)"
           height="100px"

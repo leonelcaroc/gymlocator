@@ -34,13 +34,13 @@ const TrainerProfile = () => {
           </Text>
         </Box>
       </Flex>
-      <Flex gap="8rem">
+      <Flex marginBottom="1rem" gap="8rem">
         <Box>
           <Text color="gray" fontSize="1.3rem" width="10rem">
-            Phone Number
+            Email Address
           </Text>
           <Text color="brand.200" fontSize="1.3rem">
-            09254785654
+            mary123@gmail.com
           </Text>
         </Box>
         <Box>
@@ -52,9 +52,38 @@ const TrainerProfile = () => {
           </Text>
         </Box>
       </Flex>
+      <Flex marginBottom="1rem" gap="8rem">
+        <Box>
+          <Text color="gray" fontSize="1.3rem" width="10rem">
+            Phone Number
+          </Text>
+          <Text color="brand.200" fontSize="1.3rem">
+            09254785654
+          </Text>
+        </Box>
+        <Box>
+          <Text color="gray" fontSize="1.3rem">
+            Years of Experience
+          </Text>
+          <Text whiteSpace="normal" color="brand.200" fontSize="1.3rem">
+            5 years
+          </Text>
+        </Box>
+      </Flex>
+
+      <Flex gap="8rem">
+        <Box>
+          <Text color="gray" fontSize="1.3rem" width="10rem">
+            Specialties
+          </Text>
+          <Text color="brand.200" fontSize="1.3rem">
+            Yoga
+          </Text>
+        </Box>
+      </Flex>
 
       <Flex>
-        <Button bgColor="brand.100" marginTop="5rem">
+        <Button bgColor="brand.100" marginTop="3rem">
           Edit Profile
         </Button>
       </Flex>
