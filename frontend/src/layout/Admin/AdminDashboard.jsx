@@ -40,8 +40,6 @@ const AdminDashboard = () => {
     // }
   );
 
-  // console.log(data);
-
   return (
     <Box padding="2rem">
       <Text color="brand.200" fontSize="2rem">

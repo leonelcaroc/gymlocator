@@ -19,13 +19,11 @@ import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
 
-import useAdmin from "../store/admin";
+// import useAdmin from "../store/admin";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import axios from "axios";
-const apiUrl =
-  import.meta.env.MODE === "production"
-    ? "https://gymlocator.co/api"
-    : "http://localhost:5000/api";
+import { postLoginAdmin } from "../api/adminApi";
+import adminApi from "../api/adminApi";
 
 const AdminLogin = () => {
   const toast = useToast();
@@ -48,15 +46,18 @@ const AdminLogin = () => {
 
   const queryClient = useQueryClient();
 
+  // -------------------------------------------------------
+  // Login Mutation
+
   const loginMutation = useMutation(
     async (formData) => {
-      const response = await axios.post(`${apiUrl}/admin/auth`, formData);
-      return response.data;
+      return postLoginAdmin(formData.email, formData.password);
     },
     {
       onSuccess: (data) => {
         // Save the data to localStorage or perform other actions
         localStorage.setItem("adminInfo", JSON.stringify(data));
+        console.log(data);
         toast({
           title: data.message,
           // description: "We've created your account for you.",
@@ -64,7 +65,6 @@ const AdminLogin = () => {
           duration: 2000,
           position: "bottom-right",
         });
-        console.log(data);
 
         // Invalidate and refetch any queries that depend on the user data
         queryClient.invalidateQueries("adminData");
@@ -80,31 +80,6 @@ const AdminLogin = () => {
       },
     }
   );
-
-  // {
-  // headers: {
-  //   Authorization: `Bearer ${localStorage.getItem("adminInfo").token}`}`,
-
-  // },
-  // }
-
-  // const { data } = useQuery(["cat"], () => {
-  //   return Axios.get("https://catfact.ninja/fact").then((res) => res.data);
-  // });
-
-  // const { data } = useQuery(["cat"], () => {
-  //   return Axios.get("https://catfact.ninja/fact", {}).then((res) => res.data);
-  // });
-
-  const { data, isLoading } = useQuery(["ownersList"], async () => {
-    return axios
-      .get("", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminInfo").token}`,
-        },
-      })
-      .then((res) => res.data);
-  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -186,3 +161,28 @@ const AdminLogin = () => {
 };
 
 export default AdminLogin;
+
+// {
+// headers: {
+//   Authorization: `Bearer ${localStorage.getItem("adminInfo").token}`}`,
+
+// },
+// }
+
+// const { data } = useQuery(["cat"], () => {
+//   return Axios.get("https://catfact.ninja/fact").then((res) => res.data);
+// });
+
+// const { data } = useQuery(["cat"], () => {
+//   return Axios.get("https://catfact.ninja/fact", {}).then((res) => res.data);
+// });
+
+// const { data, isLoading } = useQuery(["ownersList"], async () => {
+//   return axios
+//     .get("", {
+//       headers: {
+//         Authorization: `Bearer ${localStorage.getItem("adminInfo").token}`,
+//       },
+//     })
+//     .then((res) => res.data);
+// });

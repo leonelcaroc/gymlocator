@@ -2,8 +2,8 @@ import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Explore from "./pages/Explore";
 import Admin from "./pages/Admin";
-import AdminDashboard from "./layout/AdminDashboard/AdminDashboard";
-import AdminGymManage from "./layout/AdminGymManage/AdminGymManage";
+import AdminDashboard from "./layout/Admin/AdminDashboard";
+import AdminGymManage from "./layout/Admin/AdminGymManage";
 import AdminLogin from "./pages/AdminLogin";
 import NotFound from "./pages/NotFound";
 
