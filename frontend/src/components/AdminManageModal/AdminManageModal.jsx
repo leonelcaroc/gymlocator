@@ -15,7 +15,36 @@ import {
 } from "@chakra-ui/react";
 import gym from "../../assets/images/gym-sample.jpg";
 
-const AdminManageModal = ({ isOpen, onClose }) => {
+const AdminManageModal = ({
+  isOpen,
+  onClose,
+  owner,
+  updateGymStatusMutation,
+}) => {
+  if (!owner) {
+    return null; // Don't render the modal if no owner is selected
+  }
+
+  const handleApproveGym = async (e) => {
+    e.preventDefault();
+
+    try {
+      updateGymStatusMutation.mutate({ action: "approve", id: owner._id });
+    } catch (error) {
+      console.error("Update gym status failed:", error.message);
+    }
+  };
+
+  const handleRejectGym = (e) => {
+    e.preventDefault();
+
+    try {
+      updateGymStatusMutation.mutate({ action: "reject", id: owner._id });
+    } catch (error) {
+      console.error("Update gym status failed:", error.message);
+    }
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -34,10 +63,12 @@ const AdminManageModal = ({ isOpen, onClose }) => {
             />
           </Box>
 
-          <Text>Gym Name: Gold's Gym</Text>
-          <Text>Owner: Mae Erasga</Text>
-          <Text>Address: Zamboanga City</Text>
-          <Text>Contact: 09458965872</Text>
+          <Text>Gym Name: {owner.gym.gymname}</Text>
+          <Text>
+            Owner: {owner.firstname} {owner.lastname}
+          </Text>
+          <Text>Address: {owner.gym.address}</Text>
+          <Text>Contact: {owner.gym.contact}</Text>
           <Flex>
             <Text>Business Permit: </Text>
             <Text
@@ -51,10 +82,10 @@ const AdminManageModal = ({ isOpen, onClose }) => {
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="green" mr={3}>
+          <Button colorScheme="green" mr={3} onClick={handleApproveGym}>
             Approve
           </Button>
-          <Button colorScheme="red" mr={3}>
+          <Button colorScheme="red" mr={3} onClick={handleRejectGym}>
             Reject
           </Button>
           <Button colorScheme="gray" mr={3} onClick={onClose}>

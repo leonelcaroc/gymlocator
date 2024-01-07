@@ -1,26 +1,21 @@
 // adminApi.js
-import axiosInstance from "./axiosConfig";
+import axiosInstance from "../axiosConfig";
+import TokenService from "../../services/token";
 
 const adminApi = axiosInstance.create({
   baseURL: `${axiosInstance.defaults.baseURL}/admin`,
 });
 
-// export const getAdminProfile = async () => {
-//   try {
-//     const { data } = await adminApi.get("/");
-//     return data;
-//   } catch (error) {
-//     console.error("Error fetching admin profile:", error);
-//     throw error;
-//   }
-// };
-
 export const postLoginAdmin = async (email, password) => {
   try {
-    const { data } = await adminApi.post("/auth", {
-      email,
-      password,
-    });
+    const { data } = await adminApi.post(
+      "/auth",
+      {
+        email,
+        password,
+      }
+      // { withCredentials: true }
+    );
     return data;
   } catch (error) {
     console.error("Error logging in admin:", error);

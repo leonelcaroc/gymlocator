@@ -6,6 +6,7 @@ import { IoLocationSharp } from "react-icons/io5";
 import { MdPeopleAlt } from "react-icons/md";
 import { FaHourglassHalf } from "react-icons/fa";
 import { FaDollarSign } from "react-icons/fa";
+import { ImCancelCircle } from "react-icons/im";
 import axios from "axios";
 import { useQuery } from "react-query";
 
@@ -94,14 +95,23 @@ const AdminDashboard = () => {
             marginInline="2rem"
           />
         </Flex>
-        <Flex boxShadow="0px 0px 10px rgba(0, 0, 0, 0.1)" padding="1rem">
+        <Flex
+          boxShadow="0px 0px 10px rgba(0, 0, 0, 0.1)"
+          padding="1rem"
+          marginInline="1rem"
+        >
           <Box>
-            <Text marginBottom="0.5rem">PROFIT</Text>
-            <Text fontSize="1.5rem">PHP 1000</Text>
+            <Text marginBottom="0.5rem">GYM REJECTED</Text>
+            <Text fontSize="1.5rem">
+              {
+                data?.filter((owner) => owner.gym.isApproved === "rejected")
+                  .length
+              }
+            </Text>
           </Box>
 
           <Icon
-            as={FaDollarSign}
+            as={ImCancelCircle}
             color="gray"
             fontSize="2.5rem"
             marginInline="2rem"

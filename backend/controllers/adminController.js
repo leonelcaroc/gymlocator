@@ -94,37 +94,54 @@ const getOwners = asyncHandler(async (req, res) => {
 // desc     Update user profile
 // route    PUT /api/users/profile
 // @access  Private
-// const updateUserProfile = asyncHandler(async (req, res) => {
-//   const user = await User.findById(req.user._id);
+const approveGymStatus = asyncHandler(async (req, res) => {
+  const id = req.body.id;
 
-//   if (user) {
-//     user.name = req.body.name || user.name;
-//     user.email = req.body.email || user.email;
+  const user = await GymOwner.findById(id);
 
-//     if (req.body.password) {
-//       user.password = req.body.password;
-//     }
+  if (user) {
+    user.gym.isApproved = "approved";
 
-//     const updatedUser = await user.save();
+    const updatedUser = await user.save();
+    res.status(200).json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      status: updatedUser.gym.isApproved,
+      message: "Gym Status Successfully Changed!!",
+    });
+  } else {
+    res.status(404);
 
-//     res.status(200).json({
-//       _id: updatedUser._id,
-//       name: updatedUser.name,
-//       email: updatedUser.email,
-//     });
-//   } else {
-//     res.status(404);
+    throw new Error("User not found");
+  }
 
-//     throw new Error("User not found");
-//   }
+  res.status(200).json({ user, message: "Gym Status Successful Changed!!" });
+});
 
-//   res.status(200).json({ message: "Update user profile" });
-// });
+const rejectGymStatus = asyncHandler(async (req, res) => {
+  const id = req.body.id;
 
-export {
-  authAdmin,
-  // registerAdmin,
-  logoutAdmin,
-  getOwners,
-  //   updateUserProfile,
-};
+  const user = await GymOwner.findById(id);
+
+  if (user) {
+    user.gym.isApproved = "rejected";
+
+    const updatedUser = await user.save();
+    res.status(200).json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      status: updatedUser.gym.isApproved,
+      message: "Gym Status Successfully Changed!!",
+    });
+  } else {
+    res.status(404);
+
+    throw new Error("User not found");
+  }
+
+  res.status(200).json({ user, message: "Gym Status Successful Changed!!" });
+});
+
+export { authAdmin, logoutAdmin, getOwners, approveGymStatus, rejectGymStatus };

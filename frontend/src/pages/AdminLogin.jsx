@@ -20,10 +20,9 @@ import { IoEyeOff } from "react-icons/io5";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
 
 // import useAdmin from "../store/admin";
-import { useQuery, useMutation, useQueryClient } from "react-query";
-import axios from "axios";
-import { postLoginAdmin } from "../api/adminApi";
-import adminApi from "../api/adminApi";
+import { useMutation, useQueryClient } from "react-query";
+import { postLoginAdmin } from "../api/adminApi/adminApi";
+import TokenService from "../services/token";
 
 const AdminLogin = () => {
   const toast = useToast();
@@ -39,15 +38,12 @@ const AdminLogin = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (localStorage?.getItem("adminInfo")) {
+    if (localStorage.getItem("adminInfo")) {
       navigate("/admin");
     }
   }, [navigate, localStorage.getItem("adminInfo")]);
 
   const queryClient = useQueryClient();
-
-  // -------------------------------------------------------
-  // Login Mutation
 
   const loginMutation = useMutation(
     async (formData) => {
@@ -56,11 +52,10 @@ const AdminLogin = () => {
     {
       onSuccess: (data) => {
         // Save the data to localStorage or perform other actions
-        localStorage.setItem("adminInfo", JSON.stringify(data));
-        console.log(data);
+        TokenService.setLocal("adminInfo", JSON.stringify(data));
+
         toast({
           title: data.message,
-          // description: "We've created your account for you.",
           status: "success",
           duration: 2000,
           position: "bottom-right",

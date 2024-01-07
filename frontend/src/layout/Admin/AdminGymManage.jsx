@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import {
   Button,
   Text,
@@ -12,11 +12,13 @@ import {
   Tr,
   TableContainer,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import AdminManageModal from "../../components/AdminManageModal/AdminManageModal";
 
 import axios from "axios";
-import { useQuery } from "react-query";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import { updateGymStatus } from "../../api/adminApi/privateAdminApi";
 
 const apiUrl =
   import.meta.env.MODE === "production"
@@ -25,8 +27,41 @@ const apiUrl =
 
 const AdminGymManage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedOwner, setSelectedOwner] = useState(null);
 
-  const { data, isLoading, isError } = useQuery(
+  const toast = useToast();
+  const queryClient = useQueryClient();
+
+  const updateGymStatusMutation = useMutation(
+    async (data) => updateGymStatus(data.action, data.id),
+    {
+      onSuccess: (data) => {
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+
+        onClose();
+        refetch();
+
+        // Invalidate and refetch any queries that depend on the user data
+        queryClient.invalidateQueries("ownersList");
+      },
+      onError: (error) => {
+        toast({
+          title: error.response.data.message || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+        console.log(error.response.data.message);
+      },
+    }
+  );
+
+  const { data, isLoading, isError, refetch } = useQuery(
     "ownersList",
     async () => {
       return axios
@@ -39,23 +74,21 @@ const AdminGymManage = () => {
         })
         .then((res) => res.data);
     }
-    // {
-    //   onSuccess: (data) => {
-    //     console.log("Query successful:", data);
-    //     // Your logic for successful response
-    //   },
-    //   onError: (error) => {
-    //     console.error("Query error:", error);
-    //     // Your logic for handling errors
-    //   },
-    // }
   );
 
-  console.log(data);
+  const handleManageClick = (owner) => {
+    setSelectedOwner(owner);
+    onOpen();
+  };
 
   return (
     <Box padding="3rem">
-      <AdminManageModal isOpen={isOpen} onClose={onClose} />
+      <AdminManageModal
+        isOpen={isOpen}
+        onClose={onClose}
+        owner={selectedOwner}
+        updateGymStatusMutation={updateGymStatusMutation}
+      />
       <Text fontSize="2rem" fontWeight="600" marginBottom="1rem">
         Gym Manage
       </Text>
@@ -87,7 +120,7 @@ const AdminGymManage = () => {
                       bgColor="brand.100"
                       color="neutral.100"
                       _hover={{ color: "brand.200", bgColor: "gray.300" }}
-                      onClick={onOpen}
+                      onClick={() => handleManageClick(owner)}
                     >
                       Manage
                     </Button>
@@ -95,24 +128,6 @@ const AdminGymManage = () => {
                 </Tr>
               );
             })}
-
-            {/* <Tr>
-              <Td whiteSpace="normal">Gold's Gym</Td>
-              <Td whiteSpace="normal">Mae Erasga</Td>
-              <Td whiteSpace="normal">Zamboanga City</Td>
-              <Td>09589654715</Td>
-              <Td>Pending</Td>
-              <Td>
-                <Button
-                  bgColor="brand.100"
-                  color="neutral.100"
-                  _hover={{ color: "brand.200", bgColor: "gray.300" }}
-                  onClick={onOpen}
-                >
-                  Manage
-                </Button>
-              </Td>
-            </Tr> */}
           </Tbody>
         </Table>
       </TableContainer>

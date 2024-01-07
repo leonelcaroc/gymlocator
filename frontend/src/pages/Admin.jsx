@@ -1,34 +1,25 @@
 import React from "react";
 import { Box, Text } from "@chakra-ui/react";
-import AdminHeader from "../layout/Header/AdminHeader";
 import { Link as ReachLink } from "react-router-dom";
-import {
-  Link,
-  Center,
-  Flex,
-  Icon,
-  Image,
-  useDisclosure,
-  Stack,
-  Divider,
-} from "@chakra-ui/react";
+import { Link, Center, Flex, Icon, Stack, Divider } from "@chakra-ui/react";
 import { IoLocationSharp } from "react-icons/io5";
 
 import { Outlet, useNavigate } from "react-router-dom";
 
 import { useEffect } from "react";
 
+import TokenService from "../services/token";
+
 const Admin = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const navigate = useNavigate();
 
   const adminInfo = JSON.parse(localStorage.getItem("adminInfo"));
 
-  useEffect(() => {
-    if (!adminInfo) {
-      navigate("/adminlogin");
-    }
-  }, [navigate, localStorage.getItem("adminInfo")]);
+  // useEffect(() => {
+  //   if (!adminInfo) {
+  //     navigate("/adminlogin");
+  //   }
+  // }, [navigate, TokenService.getLocal("adminInfo")]);
 
   return (
     <Flex minHeight="100vh">
@@ -89,7 +80,7 @@ const Admin = () => {
         >
           <Stack direction="row" h="80px" p={4}>
             <Flex alignItems="center" fontSize="1.2rem" cursor="pointer">
-              {adminInfo.firstname}
+              {adminInfo?.firstname}
             </Flex>
             <Divider orientation="vertical" />
 
@@ -99,7 +90,7 @@ const Admin = () => {
               cursor="pointer"
               _hover={{ color: "gray" }}
               onClick={() => {
-                localStorage.removeItem("adminInfo");
+                TokenService.removeLocal("adminInfo");
                 navigate("/adminlogin");
               }}
             >
