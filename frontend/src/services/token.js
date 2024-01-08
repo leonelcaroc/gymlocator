@@ -1,23 +1,9 @@
-import Cookies from "universal-cookie";
-
-const cookies = new Cookies();
-// class TokenService {
-//   getJwt() {
-//     return cookies.get("jwt");
-//   }
-
-//   setJwt(token) {
-//     return cookies.set("jwt", token);
-//   }
-
-//   removeJwt() {
-//     return cookies.remove("jwt");
-//   }a
-// }
+// import Cookies from "universal-cookie";
+// const cookies = new Cookies();
 
 class TokenService {
   getLocal(clientInfo) {
-    return JSON.parse(localStorage.getItem(clientInfo)).token;
+    return localStorage.getItem(clientInfo);
   }
 
   setLocal(clientInfo, token) {

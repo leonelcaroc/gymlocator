@@ -9,7 +9,7 @@ privateAdminApi.interceptors.request.use(
   (config) => {
     // Retrieve the JWT token from your storage (e.g., cookies, localStorage, etc.)
     // const jwtToken = TokenService.getLocal("adminInfo");
-    const jwtToken = TokenService.getLocal("adminInfo");
+    const jwtToken = JSON.parse(TokenService.getLocal("adminInfo")).token;
 
     // If the token is available, add it to the Authorization header
     if (jwtToken) {
