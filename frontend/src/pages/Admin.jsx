@@ -3,23 +3,13 @@ import { Box, Text } from "@chakra-ui/react";
 import { Link as ReachLink } from "react-router-dom";
 import { Link, Center, Flex, Icon, Stack, Divider } from "@chakra-ui/react";
 import { IoLocationSharp } from "react-icons/io5";
-
 import { Outlet, useNavigate } from "react-router-dom";
-
-import { useEffect } from "react";
-
 import TokenService from "../services/token";
 
 const Admin = () => {
   const navigate = useNavigate();
 
   const adminInfo = JSON.parse(localStorage.getItem("adminInfo"));
-
-  // useEffect(() => {
-  //   if (!adminInfo) {
-  //     navigate("/adminlogin");
-  //   }
-  // }, [navigate, TokenService.getLocal("adminInfo")]);
 
   return (
     <Flex minHeight="100vh">
