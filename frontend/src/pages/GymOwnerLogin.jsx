@@ -22,11 +22,6 @@ import TokenService from "../services/token";
 import axios from "axios";
 import { postLoginOwner } from "../api/ownerApi/ownerApi";
 
-// const apiUrl =
-//   import.meta.env.MODE === "production"
-//     ? "https://gymlocator.co/api"
-//     : "http://localhost:5000/api";
-
 const GymOwnerLogin = () => {
   const toast = useToast();
   const [email, setEmail] = useState("");
