@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import {
   Box,
-  Flex,
-  Image,
   Button,
   Input,
   Text,
@@ -18,6 +16,7 @@ import gym from "../assets/images/background.webp";
 import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
+import GoHome from "../components/GoHome/GoHome";
 
 // import useAdmin from "../store/admin";
 import { useMutation, useQueryClient } from "react-query";
@@ -94,6 +93,7 @@ const AdminLogin = () => {
       backgroundPosition="center"
       backgroundRepeat="no-repeat"
       backgroundSize="cover"
+      position="relative"
     >
       <Box width="22rem">
         <Stack spacing="0.5rem" marginBottom="1rem">
@@ -151,6 +151,7 @@ const AdminLogin = () => {
           </Button>
         </form>
       </Box>
+      <GoHome />
     </Center>
   );
 };

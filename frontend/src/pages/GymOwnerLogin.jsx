@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Box,
-  Flex,
-  Image,
   Button,
   Input,
   Text,
@@ -19,6 +17,7 @@ import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "react-query";
+import GoHome from "../components/GoHome/GoHome";
 import axios from "axios";
 const apiUrl =
   import.meta.env.MODE === "production"
@@ -89,6 +88,7 @@ const GymOwnerLogin = () => {
       backgroundPosition="center"
       backgroundRepeat="no-repeat"
       backgroundSize="cover"
+      position="relative"
     >
       <Box width="22rem">
         <Stack spacing="0.5rem" marginBottom="1rem">
@@ -145,6 +145,7 @@ const GymOwnerLogin = () => {
           </Button>
         </form>
       </Box>
+      <GoHome />
     </Center>
   );
 };
