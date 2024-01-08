@@ -9,7 +9,7 @@ import TokenService from "../services/token";
 const Admin = () => {
   const navigate = useNavigate();
 
-  const adminInfo = JSON.parse(TokenService.getLocal("adminInfo"));
+  const adminInfo = JSON.parse(TokenService.getAdminLocal());
 
   return (
     <Flex minHeight="100vh">
@@ -80,7 +80,7 @@ const Admin = () => {
               cursor="pointer"
               _hover={{ color: "gray" }}
               onClick={() => {
-                TokenService.removeLocal("adminInfo");
+                TokenService.removeAdminLocal();
                 navigate("/adminlogin");
               }}
             >

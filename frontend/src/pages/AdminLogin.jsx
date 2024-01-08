@@ -51,7 +51,7 @@ const AdminLogin = () => {
     {
       onSuccess: (data) => {
         // Save the data to localStorage or perform other actions
-        TokenService.setLocal("adminInfo", JSON.stringify(data));
+        TokenService.setAdminLocal(JSON.stringify(data));
 
         toast({
           title: data.message,

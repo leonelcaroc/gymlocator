@@ -2,16 +2,16 @@
 // const cookies = new Cookies();
 
 class TokenService {
-  getLocal(clientInfo) {
-    return localStorage.getItem(clientInfo);
+  getAdminLocal() {
+    return localStorage.getItem("adminInfo");
   }
 
-  setLocal(clientInfo, token) {
-    return localStorage.setItem(clientInfo, token);
+  setAdminLocal(token) {
+    return localStorage.setItem("adminInfo", token);
   }
 
-  removeLocal(clientInfo) {
-    return localStorage.removeItem(clientInfo);
+  removeAdminLocal() {
+    return localStorage.removeItem("adminInfo");
   }
 }
 

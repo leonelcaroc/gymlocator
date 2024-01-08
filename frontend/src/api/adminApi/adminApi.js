@@ -1,6 +1,5 @@
 // adminApi.js
 import axiosInstance from "../axiosConfig";
-import TokenService from "../../services/token";
 
 const adminApi = axiosInstance.create({
   baseURL: `${axiosInstance.defaults.baseURL}/admin`,
