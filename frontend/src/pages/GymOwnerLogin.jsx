@@ -18,11 +18,14 @@ import { IoEyeOff } from "react-icons/io5";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "react-query";
 import GoHome from "../components/GoHome/GoHome";
+import TokenService from "../services/token";
 import axios from "axios";
-const apiUrl =
-  import.meta.env.MODE === "production"
-    ? "https://gymlocator.co/api"
-    : "http://localhost:5000/api";
+import { postLoginOwner } from "../api/ownerApi/ownerApi";
+
+// const apiUrl =
+//   import.meta.env.MODE === "production"
+//     ? "https://gymlocator.co/api"
+//     : "http://localhost:5000/api";
 
 const GymOwnerLogin = () => {
   const toast = useToast();
@@ -36,18 +39,16 @@ const GymOwnerLogin = () => {
 
   const queryClient = useQueryClient();
 
-  const loginMutation = useMutation(
+  const loginOwnerMutation = useMutation(
     async (formData) => {
-      const response = await axios.post(`${apiUrl}/gymowner/auth`, formData);
-      return response.data;
+      return postLoginOwner(formData.email, formData.password);
     },
     {
       onSuccess: (data) => {
         // Save the data to localStorage or perform other actions
-        localStorage.setItem("ownerInfo", JSON.stringify(data));
+        TokenService.setOwnerLocal(JSON.stringify(data));
         toast({
           title: data.message,
-          // description: "We've created your account for you.",
           status: "success",
           duration: 2000,
           position: "bottom-right",
@@ -74,7 +75,7 @@ const GymOwnerLogin = () => {
     e.preventDefault();
 
     try {
-      loginMutation.mutate({ email, password });
+      loginOwnerMutation.mutate({ email, password });
     } catch (error) {
       console.error("Login failed:", error);
     }
@@ -139,7 +140,7 @@ const GymOwnerLogin = () => {
             width="full"
             _hover={{ color: "brand.100", bgColor: "gray.200" }}
             type="submit"
-            isLoading={loginMutation.isLoading}
+            isLoading={loginOwnerMutation.isLoading}
           >
             Login
           </Button>
