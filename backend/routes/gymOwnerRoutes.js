@@ -4,6 +4,7 @@ import {
   authOwner,
   registerOwner,
   logoutOwner,
+  getOwnerDashboard,
   getOwnerProfile,
   updateOwnerProfile,
   getGymDetails,
@@ -46,6 +47,7 @@ const upload = multer({
 router.post("/register", upload.single("file"), registerOwner);
 router.post("/auth", authOwner);
 router.post("/logout", logoutOwner);
+router.route("/dashboard").get(protectOwner, getOwnerDashboard);
 router
   .route("/gymdetails")
   .get(protectOwner, getGymDetails)

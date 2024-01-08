@@ -32,6 +32,20 @@ const GymOwnerDashboard = () => {
           </Box>
 
           <Icon
+            as={MdPeopleAlt}
+            color="gray"
+            fontSize="2.5rem"
+            marginInline="2rem"
+          />
+        </Flex>
+
+        <Flex boxShadow="0px 0px 10px rgba(0, 0, 0, 0.1)" padding="1rem">
+          <Box>
+            <Text marginBottom="0.5rem">PENDING REQUESTS</Text>
+            <Text fontSize="1.5rem">0</Text>
+          </Box>
+
+          <Icon
             as={FaHourglassHalf}
             color="gray"
             fontSize="2.5rem"
@@ -47,19 +61,6 @@ const GymOwnerDashboard = () => {
             <Text marginBottom="0.5rem">EARNINGS</Text>
             <Text fontSize="1.5rem">PHP 1000</Text>
           </Box>
-          <Icon
-            as={MdPeopleAlt}
-            color="gray"
-            fontSize="2.5rem"
-            marginInline="2rem"
-          />
-        </Flex>
-        <Flex boxShadow="0px 0px 10px rgba(0, 0, 0, 0.1)" padding="1rem">
-          <Box>
-            <Text marginBottom="0.5rem">PENDING REQUESTS</Text>
-            <Text fontSize="1.5rem">0</Text>
-          </Box>
-
           <Icon
             as={FaDollarSign}
             color="gray"

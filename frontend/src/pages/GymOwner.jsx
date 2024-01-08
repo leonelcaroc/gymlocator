@@ -31,6 +31,8 @@ const GymOwner = () => {
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
   const navigate = useNavigate();
 
+  const ownerInfo = JSON.parse(TokenService.getOwnerLocal());
+
   return (
     <Flex minHeight="100vh">
       <Box bgColor="brand.100" minW="20rem">
@@ -136,7 +138,7 @@ const GymOwner = () => {
         >
           <Stack direction="row" h="80px" p={4}>
             <Flex alignItems="center" fontSize="1.2rem" cursor="pointer">
-              Mary
+              {ownerInfo.firstname}
             </Flex>
             <Divider orientation="vertical" />
 

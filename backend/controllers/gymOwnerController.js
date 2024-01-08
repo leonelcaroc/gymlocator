@@ -173,6 +173,21 @@ const logoutOwner = asyncHandler(async (req, res) => {
 // desc     Get user profile
 // route    GET /api/users/profile
 // @access  Private
+const getOwnerDashboard = asyncHandler(async (req, res) => {
+  // const user = {
+  //   _id: req.user._id,
+  //   firstname: req.user.firstname,
+  //   lastname: req.user.lastname,
+  //   email: req.user.email,
+  // };
+
+  // res.status(200).json({ message: "Owner's Dashboard" });
+  res.status(200).json(req.user);
+});
+
+// desc     Get user profile
+// route    GET /api/users/profile
+// @access  Private
 const getOwnerProfile = asyncHandler(async (req, res) => {
   const user = {
     _id: req.user._id,
@@ -181,7 +196,7 @@ const getOwnerProfile = asyncHandler(async (req, res) => {
     email: req.user.email,
   };
 
-  res.status(200).json(user);
+  res.status(200).json({ message: "Owner's Profile" });
 });
 
 // desc     Update user profile
@@ -714,6 +729,7 @@ export {
   authOwner,
   registerOwner,
   logoutOwner,
+  getOwnerDashboard,
   getOwnerProfile,
   updateOwnerProfile,
   getGymDetails,
