@@ -9,7 +9,7 @@ import TokenService from "../services/token";
 const Admin = () => {
   const navigate = useNavigate();
 
-  const adminInfo = JSON.parse(localStorage.getItem("adminInfo"));
+  const adminInfo = JSON.parse(TokenService.getLocal("adminInfo"));
 
   return (
     <Flex minHeight="100vh">
