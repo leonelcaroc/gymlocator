@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import { Text, Box, Button, Flex, Input, useToast } from "@chakra-ui/react";
+import {
+  Text,
+  Box,
+  Button,
+  Flex,
+  Input,
+  Spinner,
+  useToast,
+} from "@chakra-ui/react";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import {
   getOwnerProfile,
@@ -62,12 +70,14 @@ const GymOwnerProfile = () => {
         queryClient.invalidateQueries("ownerProfile");
       },
       onError: (error) => {
+        setProfileData(originalData);
         toast({
-          title: error.response.data.message || "Something went wrong",
+          title: error.response.data.error || "Something went wrong",
           status: "error",
           duration: 2000,
           position: "bottom-right",
         });
+        console.log(error);
       },
     }
   );
@@ -95,95 +105,111 @@ const GymOwnerProfile = () => {
         Gym Owner Profile
       </Text>
 
-      <Flex marginBottom="1rem">
-        <Box marginRight="10rem">
-          <Text color="gray" fontSize="1.3rem">
-            Firstname
-          </Text>
-
-          {isEditing ? (
-            <Input
-              maxWidth="15rem"
-              fontSize="1.3rem"
-              value={profileData?.firstname}
-              onChange={(e) =>
-                setProfileData((prevData) => ({
-                  ...prevData,
-                  firstname: e.target.value,
-                }))
-              }
-            />
-          ) : (
-            <Text color="brand.200" fontSize="1.3rem">
-              {profileData?.firstname}
-            </Text>
-          )}
-        </Box>
-        <Box>
-          <Text color="gray" fontSize="1.3rem">
-            Lastname
-          </Text>
-          {isEditing ? (
-            <Input
-              maxWidth="15rem"
-              fontSize="1.3rem"
-              value={profileData?.lastname}
-              onChange={(e) =>
-                setProfileData((prevData) => ({
-                  ...prevData,
-                  lastname: e.target.value,
-                }))
-              }
-            />
-          ) : (
-            <Text color="brand.200" fontSize="1.3rem">
-              {profileData?.lastname}
-            </Text>
-          )}
-        </Box>
-      </Flex>
-      <Box marginBottom="2rem">
-        <Text color="gray" fontSize="1.3rem">
-          Email Address
-        </Text>
-        {isEditing ? (
-          <Input
-            maxWidth="15rem"
-            fontSize="1.3rem"
-            value={profileData?.email}
-            onChange={(e) =>
-              setProfileData((prevData) => ({
-                ...prevData,
-                email: e.target.value,
-              }))
-            }
-          />
-        ) : (
-          <Text color="brand.200" fontSize="1.3rem">
-            {profileData?.email}
-          </Text>
-        )}
-      </Box>
-
-      {isEditing ? (
-        <>
-          <Button
-            onClick={handleSaveClick}
-            isLoading={updateOwnerMutation.isLoading}
-            colorScheme="green"
-            size="sm"
-            ml={2}
-          >
-            Save
-          </Button>
-          <Button onClick={handleCloseClick} colorScheme="red" size="sm" ml={2}>
-            Close
-          </Button>
-        </>
+      {isLoading ? (
+        <Spinner size="lg" />
       ) : (
-        <Button onClick={handleEditClick} colorScheme="blue" size="sm" ml={2}>
-          Edit
-        </Button>
+        <>
+          <Flex marginBottom="1rem">
+            <Box marginRight="10rem">
+              <Text color="gray" fontSize="1.3rem">
+                Firstname
+              </Text>
+
+              {isEditing ? (
+                <Input
+                  maxWidth="15rem"
+                  fontSize="1.3rem"
+                  value={profileData?.firstname}
+                  onChange={(e) =>
+                    setProfileData((prevData) => ({
+                      ...prevData,
+                      firstname: e.target.value,
+                    }))
+                  }
+                />
+              ) : (
+                <Text color="brand.200" fontSize="1.3rem">
+                  {profileData?.firstname}
+                </Text>
+              )}
+            </Box>
+            <Box>
+              <Text color="gray" fontSize="1.3rem">
+                Lastname
+              </Text>
+              {isEditing ? (
+                <Input
+                  maxWidth="15rem"
+                  fontSize="1.3rem"
+                  value={profileData?.lastname}
+                  onChange={(e) =>
+                    setProfileData((prevData) => ({
+                      ...prevData,
+                      lastname: e.target.value,
+                    }))
+                  }
+                />
+              ) : (
+                <Text color="brand.200" fontSize="1.3rem">
+                  {profileData?.lastname}
+                </Text>
+              )}
+            </Box>
+          </Flex>
+          <Box marginBottom="2rem">
+            <Text color="gray" fontSize="1.3rem">
+              Email Address
+            </Text>
+            {isEditing ? (
+              <Input
+                maxWidth="15rem"
+                fontSize="1.3rem"
+                value={profileData?.email}
+                onChange={(e) =>
+                  setProfileData((prevData) => ({
+                    ...prevData,
+                    email: e.target.value,
+                  }))
+                }
+              />
+            ) : (
+              <Text color="brand.200" fontSize="1.3rem">
+                {profileData?.email}
+              </Text>
+            )}
+          </Box>
+
+          {isEditing ? (
+            <>
+              <Button
+                onClick={handleSaveClick}
+                isLoading={updateOwnerMutation.isLoading}
+                colorScheme="green"
+                size="md"
+                ml={2}
+              >
+                Save
+              </Button>
+              <Button
+                onClick={handleCloseClick}
+                colorScheme="red"
+                size="md"
+                ml={2}
+              >
+                Close
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={handleEditClick}
+              colorScheme="blue"
+              size="md"
+              ml={2}
+            >
+              Edit
+            </Button>
+          )}
+        </>
       )}
     </Box>
   );

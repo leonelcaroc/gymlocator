@@ -73,6 +73,7 @@ const GymOwnerPlans = () => {
             <Tr>
               <Th whiteSpace="normal">Plan Name</Th>
               <Th>Duration (in days)</Th>
+              <Th>Amount</Th>
               <Th>Action</Th>
             </Tr>
           </Thead>
@@ -80,6 +81,8 @@ const GymOwnerPlans = () => {
             <Tr>
               <Td whiteSpace="normal">Regular</Td>
               <Td whiteSpace="normal">30</Td>
+              <Td whiteSpace="normal">Php 5,000.00</Td>
+
               <Td display="flex" gap="0.5rem">
                 <Button bgColor="blue" color="neutral.100" marginBottom="1rem">
                   Edit

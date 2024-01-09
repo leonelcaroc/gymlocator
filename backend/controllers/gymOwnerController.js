@@ -211,9 +211,20 @@ const getOwnerProfile = asyncHandler(async (req, res) => {
 const updateOwnerProfile = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
 
+  const trimmedFirstName = validator.trim(req.body.firstname);
+  const trimmedLastName = validator.trim(req.body.lastname);
+
+  if (!trimmedFirstName || !trimmedLastName) {
+    return res.status(400).json({ error: "Invalid input data" });
+  }
+
+  if (!validator.isEmail(req.body.email)) {
+    return res.status(400).json({ error: "Invalid email address" });
+  }
+
   if (user) {
-    user.firstname = req.body.firstname || user.firstname;
-    user.lastname = req.body.lastname || user.lastname;
+    user.firstname = trimmedFirstName || user.firstname;
+    user.lastname = trimmedLastName || user.lastname;
     user.email = req.body.email || user.email;
 
     const updatedUser = await user.save();

@@ -9,12 +9,7 @@ const GymOwnerDetails = () => {
       </Text>
 
       <Box maxWidth="800px">
-        <Grid
-          templateColumns="repeat(2, 1fr)"
-          // rowGap="0.2rem"
-          columnGap="1rem"
-          margin="auto"
-        >
+        <Grid templateColumns="repeat(2, 1fr)" columnGap="1rem" margin="auto">
           <Box p="10px 0">
             <Text color="gray" fontSize="1rem">
               Gym Name
