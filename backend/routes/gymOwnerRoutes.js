@@ -44,46 +44,51 @@ const upload = multer({
   storage: storage,
 });
 
-router.post("/register", upload.single("file"), registerOwner);
+router.post(
+  "/register",
+  // upload.single("file"),
+  registerOwner
+);
 router.post("/auth", authOwner);
-router.post("/logout", logoutOwner);
+// router.post("/logout", logoutOwner);
 router.route("/dashboard").get(protectOwner, getOwnerDashboard);
-router
-  .route("/gymdetails")
-  .get(protectOwner, getGymDetails)
-  .put(protectOwner, updateGymDetails);
-router
-  .route("/equipments")
-  .get(protectOwner, getGymEquipments)
-  .put(protectOwner, addGymEquipments);
-router
-  .route("/plans")
-  .get(protectOwner, getGymPlans)
-  .put(protectOwner, addGymPlans);
-router
-  .route("/services")
-  .get(protectOwner, getGymServices)
-  .put(protectOwner, addGymServices);
-router
-  .route("/trainers")
-  .get(protectOwner, getGymTrainers)
-  .put(protectOwner, addGymTrainers);
-router
-  .route("/amenity")
-  .get(protectOwner, getGymAmenities)
-  .put(protectOwner, addGymAmenities);
-router
-  .route("/announcement")
-  .get(protectOwner, getGymAnnouncement)
-  .put(protectOwner, addGymAnnouncement);
-router
-  .route("/classes")
-  .get(protectOwner, getGymClasses)
-  .put(protectOwner, addGymClasses);
 router
   .route("/profile")
   .get(protectOwner, getOwnerProfile)
   .put(protectOwner, updateOwnerProfile);
-router.route("/prices").get(protectOwner, getStripePrices);
+router
+  .route("/gymdetails")
+  .get(protectOwner, getGymDetails)
+  .put(protectOwner, updateGymDetails);
+
+// router
+//   .route("/equipments")
+//   .get(protectOwner, getGymEquipments)
+//   .put(protectOwner, addGymEquipments);
+// router
+//   .route("/plans")
+//   .get(protectOwner, getGymPlans)
+//   .put(protectOwner, addGymPlans);
+// router
+//   .route("/services")
+//   .get(protectOwner, getGymServices)
+//   .put(protectOwner, addGymServices);
+// router
+//   .route("/trainers")
+//   .get(protectOwner, getGymTrainers)
+//   .put(protectOwner, addGymTrainers);
+// router
+//   .route("/amenity")
+//   .get(protectOwner, getGymAmenities)
+//   .put(protectOwner, addGymAmenities);
+// router
+//   .route("/announcement")
+//   .get(protectOwner, getGymAnnouncement)
+//   .put(protectOwner, addGymAnnouncement);
+// router
+//   .route("/classes")
+//   .get(protectOwner, getGymClasses)
+//   .put(protectOwner, addGymClasses);
+// router.route("/prices").get(protectOwner, getStripePrices);
 
 export default router;

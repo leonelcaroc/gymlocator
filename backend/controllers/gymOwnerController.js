@@ -174,29 +174,35 @@ const logoutOwner = asyncHandler(async (req, res) => {
 // route    GET /api/users/profile
 // @access  Private
 const getOwnerDashboard = asyncHandler(async (req, res) => {
-  // const user = {
-  //   _id: req.user._id,
-  //   firstname: req.user.firstname,
-  //   lastname: req.user.lastname,
-  //   email: req.user.email,
-  // };
+  const user = await GymOwner.findById(req.user._id);
 
-  // res.status(200).json({ message: "Owner's Dashboard" });
-  res.status(200).json(req.user);
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json({
+    members: user.gym.members,
+  });
 });
 
 // desc     Get user profile
 // route    GET /api/users/profile
 // @access  Private
 const getOwnerProfile = asyncHandler(async (req, res) => {
-  const user = {
-    _id: req.user._id,
-    firstname: req.user.firstname,
-    lastname: req.user.lastname,
-    email: req.user.email,
-  };
+  const user = await GymOwner.findById(req.user._id);
 
-  res.status(200).json({ message: "Owner's Profile" });
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json({
+    firstname: user.firstname,
+    lastname: user.lastname,
+    email: user.email,
+    // message: "Owner's Profile",
+  });
 });
 
 // desc     Update user profile
@@ -208,18 +214,15 @@ const updateOwnerProfile = asyncHandler(async (req, res) => {
   if (user) {
     user.firstname = req.body.firstname || user.firstname;
     user.lastname = req.body.lastname || user.lastname;
-
-    // if (req.body.password) {
-    //   user.password = req.body.password;
-    // }
+    user.email = req.body.email || user.email;
 
     const updatedUser = await user.save();
 
     res.status(200).json({
-      _id: updatedUser._id,
       firstname: updatedUser.firstname,
       lastname: updatedUser.lastname,
       email: updatedUser.email,
+      message: "Successfuly updated user profile!",
     });
   } else {
     res.status(404);
@@ -227,9 +230,9 @@ const updateOwnerProfile = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  res.status(200).json({
-    message: "Updated user profile",
-  });
+  // res.status(200).json({
+  //   ,
+  // });
 });
 
 const getGymDetails = asyncHandler(async (req, res) => {

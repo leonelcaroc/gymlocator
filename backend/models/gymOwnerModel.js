@@ -1,6 +1,61 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
+const memberPlanSchema = mongoose.Schema({
+  plan: {
+    type: String,
+    required: true,
+  },
+  amount: {
+    type: String,
+    required: true,
+  },
+  planstatus: {
+    type: String,
+    enum: ["active", "expired", "pending", "cancelled"],
+    default: "pending",
+  },
+});
+
+const memberSchema = mongoose.Schema({
+  firstname: {
+    type: String,
+    required: true,
+  },
+  middlename: {
+    type: String,
+    required: true,
+  },
+  lastname: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
+  contact: {
+    type: String,
+    required: true,
+  },
+  address: {
+    type: String,
+    required: true,
+  },
+  dateOfBirth: {
+    type: Date,
+    required: true,
+  },
+  gender: {
+    type: String,
+    required: true,
+  },
+  plan: {
+    type: memberPlanSchema,
+    required: true,
+  },
+});
+
 const trainerSchema = mongoose.Schema({
   firstname: {
     type: String,
@@ -223,6 +278,10 @@ const gymSchema = mongoose.Schema({
     enum: ["approved", "rejected", "pending"],
     default: "pending",
   },
+  members: {
+    type: [memberSchema],
+    default: [],
+  },
 });
 
 const gymOwnerSchema = mongoose.Schema(
@@ -264,7 +323,7 @@ gymOwnerSchema.pre("save", async function (next) {
   }
 
   const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  this.password = bcrypt.hash(this.password, salt);
 });
 
 gymOwnerSchema.methods.matchPassword = async function (enteredPassword) {
