@@ -1,7 +1,69 @@
-import React from "react";
-import { Text, Box, Flex, Button, Grid } from "@chakra-ui/react";
+import { useState, useEffect } from "react";
+import {
+  Text,
+  Box,
+  Flex,
+  Button,
+  Grid,
+  Input,
+  Spinner,
+  useToast,
+} from "@chakra-ui/react";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import { getGymDetails } from "../../api/ownerApi/privateOwnerApi";
 
 const GymOwnerDetails = () => {
+  const toast = useToast();
+  const queryClient = useQueryClient();
+  const [isEditing, setIsEditing] = useState(false);
+  const [gymData, setGymData] = useState(null);
+  const [originalData, setOriginalData] = useState(null);
+
+  const { data, isLoading, isError } = useQuery(
+    "gymDetails",
+    async () => getGymDetails(),
+    {
+      refetchOnWindowFocus: false,
+      onSuccess: (item) => {
+        // setOriginalData(item);
+        // setProfileData(item);
+        console.log(item);
+      },
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  useEffect(() => {
+    // if (data) {
+    //   setProfileData(data);
+    // }
+    console.log(data);
+  }, [data]);
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleSaveClick = () => {
+    setIsEditing(false);
+
+    // console.log("Edited Data:", profileData);
+    // updateOwnerMutation.mutate(profileData);
+  };
+
+  const handleCloseClick = () => {
+    setIsEditing(false);
+    // Reset the edited data to the original data or fetch from your backend
+    // setProfileData(originalData);
+  };
+
   return (
     <Box padding="2rem">
       <Text color="brand.200" fontSize="2rem" marginBottom="0.5rem">
@@ -84,7 +146,36 @@ const GymOwnerDetails = () => {
         </Grid>
 
         <Flex p="10px 0">
-          <Button bgColor="brand.100">Edit Profile</Button>
+          {isEditing ? (
+            <>
+              <Button
+                onClick={handleSaveClick}
+                // isLoading={updateOwnerMutation.isLoading}
+                colorScheme="green"
+                size="md"
+                ml={2}
+              >
+                Save
+              </Button>
+              <Button
+                onClick={handleCloseClick}
+                colorScheme="red"
+                size="md"
+                ml={2}
+              >
+                Close
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={handleEditClick}
+              colorScheme="blue"
+              size="md"
+              ml={2}
+            >
+              Edit
+            </Button>
+          )}
         </Flex>
       </Box>
     </Box>

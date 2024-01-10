@@ -34,7 +34,7 @@ const GymOwnerProfile = () => {
       },
       onError: (error) => {
         toast({
-          title: error.response.data.message || "Something went wrong",
+          title: error.response.data.error || "Something went wrong",
           status: "error",
           duration: 2000,
           position: "bottom-right",
@@ -89,7 +89,7 @@ const GymOwnerProfile = () => {
   const handleSaveClick = () => {
     setIsEditing(false);
 
-    console.log("Edited Data:", profileData);
+    // console.log("Edited Data:", profileData);
     updateOwnerMutation.mutate(profileData);
   };
 

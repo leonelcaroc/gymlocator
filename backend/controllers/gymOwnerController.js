@@ -211,6 +211,11 @@ const getOwnerProfile = asyncHandler(async (req, res) => {
 const updateOwnerProfile = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
 
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
   const trimmedFirstName = validator.trim(req.body.firstname);
   const trimmedLastName = validator.trim(req.body.lastname);
 
@@ -247,16 +252,21 @@ const updateOwnerProfile = asyncHandler(async (req, res) => {
 });
 
 const getGymDetails = asyncHandler(async (req, res) => {
-  const user = {
-    _id: req.user._id,
-    gymname: req.user.gym.gymname,
-    contact: req.user.gym.contact,
-    address: req.user.gym.address,
-    description: req.user.gym.description,
-    schedule: req.user.gym.schedule,
-  };
+  const user = await GymOwner.findById(req.user._id);
 
-  res.status(200).json(user);
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json({
+    gymname: user.gym.gymname,
+    address: user.gym.address,
+    contact: user.gym.contact,
+    description: user.gym.description,
+    schedule: user.gym.schedule,
+    time: user.gym.time,
+  });
 });
 
 const updateGymDetails = asyncHandler(async (req, res) => {

@@ -24,16 +24,6 @@ privateOwnerApi.interceptors.request.use(
   }
 );
 
-// export const getAdminProfile = async () => {
-//   try {
-//     const { data } = await privateAdminApi.get("/");
-//     return data;
-//   } catch (error) {
-//     console.error("Error fetching admin profile:", error);
-//     throw error;
-//   }
-// };
-
 export const getOwnerProfile = async () => {
   try {
     const { data } = await privateOwnerApi.get("/profile");
@@ -64,6 +54,16 @@ export const getMembers = async () => {
     return data;
   } catch (error) {
     console.error("Error getting members:", error);
+    throw error;
+  }
+};
+
+export const getGymDetails = async () => {
+  try {
+    const { data } = await privateOwnerApi.get("/gymdetails");
+    return data;
+  } catch (error) {
+    console.error("Error getting gym details:", error);
     throw error;
   }
 };

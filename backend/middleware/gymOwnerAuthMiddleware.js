@@ -15,9 +15,6 @@ const protectOwner = asyncHandler(async (req, res, next) => {
       const { _id } = jwt.verify(token, process.env.JWT_SECRET);
 
       req.user = await GymOwner.findById(_id).select("_id");
-      // .select("_id");
-
-      // .select("-password");
 
       next();
     } catch (error) {

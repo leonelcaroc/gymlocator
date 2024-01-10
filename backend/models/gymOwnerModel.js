@@ -205,7 +205,7 @@ const equipmentSchema = mongoose.Schema({
   },
 });
 
-const scheduleSchema = new mongoose.Schema({
+const scheduleSchema = mongoose.Schema({
   days: {
     type: Array,
     required: true,
@@ -323,7 +323,7 @@ gymOwnerSchema.pre("save", async function (next) {
   }
 
   const salt = await bcrypt.genSalt(10);
-  this.password = bcrypt.hash(this.password, salt);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 gymOwnerSchema.methods.matchPassword = async function (enteredPassword) {
@@ -333,8 +333,3 @@ gymOwnerSchema.methods.matchPassword = async function (enteredPassword) {
 const GymOwner = mongoose.model("Gymowners", gymOwnerSchema);
 
 export default GymOwner;
-
-// [
-//   { owner: 1, pricing: { monthly: 5000, annual: 10000 } },
-//   { owner: 2, pricing: { semiannual: 8000, annual: 15000 } },
-// ];

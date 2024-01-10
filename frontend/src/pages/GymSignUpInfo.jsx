@@ -203,7 +203,7 @@ const GymSignUpInfo = ({ setState, signUpForm, setForm }) => {
                 description: gymDescription,
                 startday: daysOpen,
                 endday: daysClose,
-                openttime: openingTime,
+                opentime: openingTime,
                 closetime: closingTime,
                 address: address,
               });
