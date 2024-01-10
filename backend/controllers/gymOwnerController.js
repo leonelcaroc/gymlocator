@@ -144,7 +144,12 @@ const registerOwner = asyncHandler(async (req, res) => {
       address: trimmedAddress,
       gymLocation: gymLocation,
       permitBase64: base64Data,
-      schedule: { days: [startday, endday], time: [opentime, closetime] },
+      schedule: {
+        startday: startday,
+        endday: endday,
+        opentime: opentime,
+        closetime: closetime,
+      },
     },
   });
 

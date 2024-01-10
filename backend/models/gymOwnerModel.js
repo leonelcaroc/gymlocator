@@ -206,12 +206,20 @@ const equipmentSchema = mongoose.Schema({
 });
 
 const scheduleSchema = mongoose.Schema({
-  days: {
-    type: Array,
+  startday: {
+    type: String,
     required: true,
   },
-  time: {
-    type: Array,
+  endday: {
+    type: String,
+    required: true,
+  },
+  opentime: {
+    type: String,
+    required: true,
+  },
+  closetime: {
+    type: String,
     required: true,
   },
 });

@@ -6,11 +6,13 @@ import {
   Button,
   Grid,
   Input,
+  Select,
   Spinner,
   useToast,
 } from "@chakra-ui/react";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import { getGymDetails } from "../../api/ownerApi/privateOwnerApi";
+import { parse, format } from "date-fns";
 
 const GymOwnerDetails = () => {
   const toast = useToast();
@@ -25,8 +27,8 @@ const GymOwnerDetails = () => {
     {
       refetchOnWindowFocus: false,
       onSuccess: (item) => {
-        // setOriginalData(item);
-        // setProfileData(item);
+        setOriginalData(item);
+        setGymData(item);
         console.log(item);
       },
       onError: (error) => {
@@ -41,11 +43,19 @@ const GymOwnerDetails = () => {
   );
 
   useEffect(() => {
-    // if (data) {
-    //   setProfileData(data);
-    // }
-    console.log(data);
+    if (data) {
+      setGymData(data);
+    }
   }, [data]);
+
+  const formattedTime = (time) => {
+    const parsedTime = format(
+      parse(time || "00:00", "HH:mm", new Date()),
+      "h:mm a"
+    );
+
+    return parsedTime;
+  };
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -70,114 +80,272 @@ const GymOwnerDetails = () => {
         Gym Details
       </Text>
 
-      <Box maxWidth="800px">
-        <Grid templateColumns="repeat(2, 1fr)" columnGap="1rem" margin="auto">
-          <Box p="10px 0">
-            <Text color="gray" fontSize="1rem">
-              Gym Name
-            </Text>
-            <Text color="brand.200" fontSize="1rem">
-              Dolby Fitness
-            </Text>
-          </Box>
+      {isLoading ? (
+        <Spinner size="lg" />
+      ) : (
+        <Box maxWidth="800px">
+          <Grid templateColumns="repeat(2, 1fr)" columnGap="1rem" margin="auto">
+            <Box p="10px 0">
+              <Text color="gray" fontSize="1rem">
+                Gym Name
+              </Text>
 
-          <Box p="10px 0">
-            <Text color="gray" fontSize="1rem">
-              Address
-            </Text>
-            <Text color="brand.200" fontSize="1rem">
-              Caragasan Beach, Zamboanga West Coastal Road, Zamboanga, Zamboanga
-              del Sur, Philippines
-            </Text>
-          </Box>
+              {isEditing ? (
+                <Input
+                  maxWidth="13rem"
+                  color="brand.200"
+                  fontSize="1rem"
+                  value={gymData?.gymname}
+                  onChange={(e) =>
+                    setGymData((prevData) => ({
+                      ...prevData,
+                      gymname: e.target.value,
+                    }))
+                  }
+                />
+              ) : (
+                <Text color="brand.200" fontSize="1rem">
+                  {gymData?.gymname}
+                </Text>
+              )}
+            </Box>
 
-          <Box p="10px 0">
-            <Text color="gray" fontSize="1rem">
-              Contact
-            </Text>
-            <Text color="brand.200" fontSize="1rem">
-              09458963214
-            </Text>
-          </Box>
+            <Box p="10px 0">
+              <Text color="gray" fontSize="1rem">
+                Address
+              </Text>
+              {isEditing ? (
+                <Input
+                  maxWidth="25rem"
+                  color="brand.200"
+                  fontSize="1rem"
+                  value={gymData?.address}
+                  onChange={(e) =>
+                    setGymData((prevData) => ({
+                      ...prevData,
+                      address: e.target.value,
+                    }))
+                  }
+                />
+              ) : (
+                <Text color="brand.200" fontSize="1rem">
+                  {gymData?.address}
+                </Text>
+              )}
+            </Box>
+            <Box p="10px 0">
+              <Text color="gray" fontSize="1rem">
+                Contact
+              </Text>
+              {isEditing ? (
+                <Input
+                  maxWidth="13rem"
+                  color="brand.200"
+                  fontSize="1rem"
+                  value={gymData?.contact}
+                  onChange={(e) =>
+                    setGymData((prevData) => ({
+                      ...prevData,
+                      contact: e.target.value,
+                    }))
+                  }
+                />
+              ) : (
+                <Text color="brand.200" fontSize="1rem">
+                  {gymData?.contact}
+                </Text>
+              )}
+            </Box>
 
-          <Box p="10px 0">
-            <Text color="gray" fontSize="1rem">
-              Description
-            </Text>
-            <Text color="brand.200" fontSize="1rem">
-              Sample description
-            </Text>
-          </Box>
-          <Box p="10px 0">
-            <Text color="gray" fontSize="1rem">
-              Days Open
-            </Text>
-            <Text color="brand.200" fontSize="1rem">
-              Monday
-            </Text>
-          </Box>
+            <Box p="10px 0">
+              <Text color="gray" fontSize="1rem">
+                Description
+              </Text>
+              {isEditing ? (
+                <Input
+                  maxWidth="25rem"
+                  color="brand.200"
+                  fontSize="1rem"
+                  value={gymData?.description}
+                  onChange={(e) =>
+                    setGymData((prevData) => ({
+                      ...prevData,
+                      description: e.target.value,
+                    }))
+                  }
+                />
+              ) : (
+                <Text color="brand.200" fontSize="1rem">
+                  {gymData?.description}
+                </Text>
+              )}
+            </Box>
+            <Box p="10px 0">
+              <Text color="gray" fontSize="1rem">
+                Days Open
+              </Text>
+              {isEditing ? (
+                <Select
+                  placeholder={gymData?.schedule.startday}
+                  maxWidth="13rem"
+                  color="brand.200"
+                  fontSize="1rem"
+                  onChange={(e) =>
+                    setGymData((prevData) => ({
+                      ...prevData,
+                      schedule: {
+                        ...prevData.schedule,
+                        startday: e.target.value,
+                      },
+                    }))
+                  }
+                  value={gymData?.schedule.startday}
+                >
+                  <option value="Monday">Monday</option>
+                  <option value="Tuesday">Tuesday</option>
+                  <option value="Wednesday">Wednesday</option>
+                  <option value="Thursday">Thursday</option>
+                  <option value="Friday">Friday</option>
+                  <option value="Saturday">Saturday</option>
+                  <option value="Sunday">Sunday</option>
+                </Select>
+              ) : (
+                <Text color="brand.200" fontSize="1rem">
+                  {gymData?.schedule.startday}
+                </Text>
+              )}
+            </Box>
 
-          <Box p="10px 0">
-            <Text color="gray" fontSize="1rem">
-              To
-            </Text>
-            <Text color="brand.200" fontSize="1rem">
-              Friday
-            </Text>
-          </Box>
+            <Box p="10px 0">
+              <Text color="gray" fontSize="1rem">
+                To
+              </Text>
 
-          <Box p="10px 0">
-            <Text color="gray" fontSize="1rem">
-              Time Open
-            </Text>
-            <Text color="brand.200" fontSize="1rem">
-              8:00AM
-            </Text>
-          </Box>
+              {isEditing ? (
+                <Select
+                  placeholder={gymData?.schedule.endday}
+                  maxWidth="13rem"
+                  color="brand.200"
+                  fontSize="1rem"
+                  onChange={(e) =>
+                    setGymData((prevData) => ({
+                      ...prevData,
+                      schedule: {
+                        ...prevData.schedule,
+                        endday: e.target.value,
+                      },
+                    }))
+                  }
+                  value={gymData?.schedule.endday}
+                >
+                  <option value="Monday">Monday</option>
+                  <option value="Tuesday">Tuesday</option>
+                  <option value="Wednesday">Wednesday</option>
+                  <option value="Thursday">Thursday</option>
+                  <option value="Friday">Friday</option>
+                  <option value="Saturday">Saturday</option>
+                  <option value="Sunday">Sunday</option>
+                </Select>
+              ) : (
+                <Text color="brand.200" fontSize="1rem">
+                  {gymData?.schedule.endday}
+                </Text>
+              )}
+            </Box>
 
-          <Box p="10px 0">
-            <Text color="gray" fontSize="1rem">
-              Time Close
-            </Text>
-            <Text color="brand.200" fontSize="1rem">
-              7:00PM
-            </Text>
-          </Box>
-        </Grid>
+            <Box p="10px 0">
+              <Text color="gray" fontSize="1rem">
+                Time Open
+              </Text>
 
-        <Flex p="10px 0">
-          {isEditing ? (
-            <>
+              {isEditing ? (
+                <Input
+                  type="time"
+                  maxWidth="13rem"
+                  color="brand.200"
+                  fontSize="1rem"
+                  value={gymData?.schedule.opentime}
+                  onChange={(e) =>
+                    setGymData((prevData) => ({
+                      ...prevData,
+                      schedule: {
+                        ...prevData.schedule,
+                        opentime: e.target.value,
+                      },
+                    }))
+                  }
+                />
+              ) : (
+                <Text color="brand.200" fontSize="1rem">
+                  {formattedTime(gymData?.schedule.opentime)}
+                </Text>
+              )}
+            </Box>
+
+            <Box p="10px 0">
+              <Text color="gray" fontSize="1rem">
+                Time Close
+              </Text>
+
+              {isEditing ? (
+                <Input
+                  type="time"
+                  maxWidth="13rem"
+                  color="brand.200"
+                  fontSize="1rem"
+                  value={gymData?.schedule.closetime}
+                  onChange={(e) =>
+                    setGymData((prevData) => ({
+                      ...prevData,
+                      schedule: {
+                        ...prevData.schedule,
+                        closetime: e.target.value,
+                      },
+                    }))
+                  }
+                />
+              ) : (
+                <Text color="brand.200" fontSize="1rem">
+                  {formattedTime(gymData?.schedule.closetime)}
+                </Text>
+              )}
+            </Box>
+          </Grid>
+
+          <Flex p="10px 0">
+            {isEditing ? (
+              <>
+                <Button
+                  onClick={handleSaveClick}
+                  // isLoading={updateOwnerMutation.isLoading}
+                  colorScheme="green"
+                  size="md"
+                  ml={2}
+                >
+                  Save
+                </Button>
+                <Button
+                  onClick={handleCloseClick}
+                  colorScheme="red"
+                  size="md"
+                  ml={2}
+                >
+                  Close
+                </Button>
+              </>
+            ) : (
               <Button
-                onClick={handleSaveClick}
-                // isLoading={updateOwnerMutation.isLoading}
-                colorScheme="green"
+                onClick={handleEditClick}
+                colorScheme="blue"
                 size="md"
                 ml={2}
               >
-                Save
+                Edit
               </Button>
-              <Button
-                onClick={handleCloseClick}
-                colorScheme="red"
-                size="md"
-                ml={2}
-              >
-                Close
-              </Button>
-            </>
-          ) : (
-            <Button
-              onClick={handleEditClick}
-              colorScheme="blue"
-              size="md"
-              ml={2}
-            >
-              Edit
-            </Button>
-          )}
-        </Flex>
-      </Box>
+            )}
+          </Flex>
+        </Box>
+      )}
     </Box>
   );
 };
