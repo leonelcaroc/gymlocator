@@ -290,17 +290,6 @@ const updateGymDetails = asyncHandler(async (req, res) => {
     closetime,
   } = req.body;
 
-  // res.status(200).json({
-  //   gymname: gymname,
-  //   address: address,
-  //   contact: contact,
-  //   description: description,
-  //   startday: startday,
-  //   endday: endday,
-  //   opentime: opentime,
-  //   closetime: closetime,
-  // });
-
   const trimmedGymName = validator.trim(gymname);
   const trimmedAddress = validator.trim(address);
   const trimmedContact = validator.trim(contact);
