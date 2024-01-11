@@ -42,7 +42,7 @@ const authOwner = asyncHandler(async (req, res) => {
       token,
     });
   } else {
-    res.status(401).json({ message: "Invalid email or password" });
+    res.status(401).json({ error: "Invalid email or password" });
 
     throw new Error("Invalid email or password.");
   }
@@ -129,7 +129,7 @@ const registerOwner = asyncHandler(async (req, res) => {
   const userExists = await GymOwner.findOne({ email });
 
   if (userExists) {
-    res.status(400);
+    res.status(400).json({ error: "User already exists." });
     throw new Error("User already exists.");
   }
   const user = await GymOwner.create({
@@ -159,7 +159,7 @@ const registerOwner = asyncHandler(async (req, res) => {
       message: "Account Created Successfully!",
     });
   } else {
-    res.status(400);
+    res.status(400).json({ error: "Invalid user data." });
     throw new Error("Invalid user data.");
   }
 });
@@ -176,14 +176,13 @@ const logoutOwner = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "User logged out" });
 });
 
-// desc     Get user profile
-// route    GET /api/users/profile
-// @access  Private
+// GYM OWNER DASHBOARD  //
+
 const getOwnerDashboard = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
 
   if (!user) {
-    res.status(404);
+    res.status(404).json({ error: "User not found" });
     throw new Error("User not found");
   }
 
@@ -192,9 +191,8 @@ const getOwnerDashboard = asyncHandler(async (req, res) => {
   });
 });
 
-// desc     Get user profile
-// route    GET /api/users/profile
-// @access  Private
+// GYM OWNER PROFILE //
+
 const getOwnerProfile = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
 
@@ -207,13 +205,9 @@ const getOwnerProfile = asyncHandler(async (req, res) => {
     firstname: user.firstname,
     lastname: user.lastname,
     email: user.email,
-    // message: "Owner's Profile",
   });
 });
 
-// desc     Update user profile
-// route    PUT /api/users/profile
-// @access  Private
 const updateOwnerProfile = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
 
@@ -252,6 +246,8 @@ const updateOwnerProfile = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 });
+
+// GYM DETAILS //
 
 const getGymDetails = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
@@ -349,6 +345,196 @@ const updateGymDetails = asyncHandler(async (req, res) => {
   }
 });
 
+// SERVICES //
+
+const getGymServices = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json({ services: user.gym.services });
+});
+
+const addGymServices = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  // Extract the new equipment data from the request body
+  const { serviceName, description, base64Data } = req.body;
+
+  const trimmedServiceName = validator.trim(serviceName);
+  const trimmedDescription = validator.trim(description);
+
+  if (!validator.isLength(trimmedServiceName, { min: 1 })) {
+    return res.status(400).json({ error: "Service name is invalid." });
+  }
+
+  if (!validator.isLength(trimmedDescription, { min: 1 })) {
+    return res.status(400).json({ error: "Service description is invalid." });
+  }
+
+  const newService = {
+    serviceName: trimmedServiceName,
+    description: trimmedDescription,
+    serviceImage: base64Data,
+  };
+
+  // Add the new service to the existing service list
+  user.gym.services.push(newService);
+
+  // Save the updated user with the new service
+  await user.save();
+
+  // Respond with the updated user profile
+  res.status(200).json({
+    message: "Successfully added new service",
+  });
+});
+
+const updateGymServices = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  const { id, serviceName, description, base64Data } = req.body;
+
+  const trimmedServiceName = validator.trim(serviceName);
+  const trimmedServiceDescription = validator.trim(description);
+
+  if (!validator.isLength(trimmedServiceName, { min: 1 })) {
+    return res.status(400).json({ error: "Service name is invalid." });
+  }
+
+  if (!validator.isLength(trimmedServiceDescription, { min: 1 })) {
+    return res.status(400).json({ error: "Service description is invalid." });
+  }
+
+  const index = user.gym.services.findIndex((service) => service.id === id);
+
+  if (index !== -1) {
+    // Update the service at the found index
+    user.gym.services[index] = {
+      id,
+      serviceName: trimmedServiceName,
+      description: trimmedServiceDescription,
+      serviceImage: base64Data,
+    };
+
+    // Save the updated user
+    // const updatedService = await user.save();
+    await user.save();
+
+    res.status(200).json({ message: "Successfully updated a service!" });
+  } else {
+    res.status(404).json({ error: "Service not found" });
+  }
+});
+
+const deleteGymServices = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
+  const { id } = req.body;
+
+  if (!user) {
+    res.status(404).json({ error: "User not found." });
+  }
+
+  const serviceToRemove = user.gym.services.find(
+    (service) => service.id === id
+  );
+
+  if (!serviceToRemove) {
+    res.status(404).json({ error: "Service not found." });
+  }
+
+  const remainingServices = user.gym.services.filter(
+    (service) => service.id !== id
+  );
+
+  user.gym.services = [...remainingServices];
+
+  await user.save();
+
+  res.status(200).json(remainingServices);
+});
+
+// AMENITIES //
+
+const getGymAmenities = asyncHandler(async (req, res) => {
+  const user = {
+    amenities: req.user.gym.amenities,
+  };
+
+  res.status(200).json(user);
+});
+
+const addGymAmenities = asyncHandler(async (req, res) => {
+  try {
+    const user = await GymOwner.findById(req.user._id);
+
+    if (!user) {
+      res.status(404);
+      throw new Error("User not found");
+    }
+
+    // Extract the new equipment data from the request body
+    const { amenity, description, amenityImage } = req.body;
+
+    const trimmedAmenity = validator.trim(amenity);
+    const trimmedDescription = validator.trim(description);
+
+    if (!validator.isLength(trimmedAmenity, { min: 1 })) {
+      return res.status(400).json({ error: "Amenity name is required." });
+    }
+
+    if (!validator.isLength(trimmedDescription, { min: 1 })) {
+      return res
+        .status(400)
+        .json({ error: "Amenity description is required." });
+    }
+
+    const newAmenity = {
+      amenity: trimmedAmenity,
+      description: trimmedDescription,
+      amenityImage: amenityImage,
+    };
+
+    // Add the new service to the existing service list
+    user.gym.amenities.push(newAmenity);
+
+    // Save the updated user with the new service
+    await user.save();
+
+    // Respond with the updated user profile
+    res.status(200).json({
+      message: "Successfully added new amenity",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// EQUIPMENTS //
+
+const getGymEquipments = asyncHandler(async (req, res) => {
+  const user = {
+    _id: req.user._id,
+    equipments: req.user.gym.equipments,
+  };
+
+  res.status(200).json(user);
+});
+
 const addGymEquipments = asyncHandler(async (req, res) => {
   try {
     const user = await GymOwner.findById(req.user._id);
@@ -392,15 +578,6 @@ const addGymEquipments = asyncHandler(async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
-});
-
-const getGymEquipments = asyncHandler(async (req, res) => {
-  const user = {
-    _id: req.user._id,
-    equipments: req.user.gym.equipments,
-  };
-
-  res.status(200).json(user);
 });
 
 const addGymPlans = asyncHandler(async (req, res) => {
@@ -456,61 +633,6 @@ const addGymPlans = asyncHandler(async (req, res) => {
 const getGymPlans = asyncHandler(async (req, res) => {
   const user = {
     plans: req.user.gym.plans,
-  };
-
-  res.status(200).json(user);
-});
-
-const addGymServices = asyncHandler(async (req, res) => {
-  try {
-    const user = await GymOwner.findById(req.user._id);
-
-    if (!user) {
-      res.status(404);
-      throw new Error("User not found");
-    }
-
-    // Extract the new equipment data from the request body
-    const { service, description, base64Data } = req.body;
-
-    const trimmedService = validator.trim(service);
-    const trimmedDescription = validator.trim(description);
-
-    if (!validator.isLength(trimmedService, { min: 1 })) {
-      return res.status(400).json({ error: "Service name is required." });
-    }
-
-    if (!validator.isLength(trimmedDescription, { min: 1 })) {
-      return res
-        .status(400)
-        .json({ error: "Service description is required." });
-    }
-
-    const newService = {
-      service: trimmedService,
-      description: trimmedDescription,
-      serviceImage: base64Data,
-    };
-
-    // Add the new service to the existing service list
-    user.gym.services.push(newService);
-
-    // Save the updated user with the new service
-    await user.save();
-
-    // Respond with the updated user profile
-    res.status(200).json({
-      message: "Successfully added new service",
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-const getGymServices = asyncHandler(async (req, res) => {
-  const user = {
-    services: req.user.gym.services,
   };
 
   res.status(200).json(user);
@@ -606,61 +728,6 @@ const addGymTrainers = asyncHandler(async (req, res) => {
 const getGymTrainers = asyncHandler(async (req, res) => {
   const user = {
     trainers: req.user.gym.trainers,
-  };
-
-  res.status(200).json(user);
-});
-
-const addGymAmenities = asyncHandler(async (req, res) => {
-  try {
-    const user = await GymOwner.findById(req.user._id);
-
-    if (!user) {
-      res.status(404);
-      throw new Error("User not found");
-    }
-
-    // Extract the new equipment data from the request body
-    const { amenity, description, amenityImage } = req.body;
-
-    const trimmedAmenity = validator.trim(amenity);
-    const trimmedDescription = validator.trim(description);
-
-    if (!validator.isLength(trimmedAmenity, { min: 1 })) {
-      return res.status(400).json({ error: "Amenity name is required." });
-    }
-
-    if (!validator.isLength(trimmedDescription, { min: 1 })) {
-      return res
-        .status(400)
-        .json({ error: "Amenity description is required." });
-    }
-
-    const newAmenity = {
-      amenity: trimmedAmenity,
-      description: trimmedDescription,
-      amenityImage: amenityImage,
-    };
-
-    // Add the new service to the existing service list
-    user.gym.amenities.push(newAmenity);
-
-    // Save the updated user with the new service
-    await user.save();
-
-    // Respond with the updated user profile
-    res.status(200).json({
-      message: "Successfully added new amenity",
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-const getGymAmenities = asyncHandler(async (req, res) => {
-  const user = {
-    amenities: req.user.gym.amenities,
   };
 
   res.status(200).json(user);
@@ -800,12 +867,14 @@ export {
   updateOwnerProfile,
   getGymDetails,
   updateGymDetails,
+  getGymServices,
+  addGymServices,
+  updateGymServices,
+  deleteGymServices,
   addGymEquipments,
   getGymEquipments,
   addGymPlans,
   getGymPlans,
-  addGymServices,
-  getGymServices,
   addGymTrainers,
   getGymTrainers,
   getStripePrices,

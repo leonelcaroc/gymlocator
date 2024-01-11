@@ -9,12 +9,14 @@ import {
   updateOwnerProfile,
   getGymDetails,
   updateGymDetails,
+  deleteGymServices,
   addGymEquipments,
   getGymEquipments,
   addGymPlans,
   getGymPlans,
   addGymServices,
   getGymServices,
+  updateGymServices,
   addGymTrainers,
   getGymTrainers,
   getStripePrices,
@@ -60,7 +62,12 @@ router
   .route("/gymdetails")
   .get(protectOwner, getGymDetails)
   .put(protectOwner, updateGymDetails);
-
+router
+  .route("/services")
+  .get(protectOwner, getGymServices)
+  .post(protectOwner, addGymServices)
+  .put(protectOwner, updateGymServices)
+  .delete(protectOwner, deleteGymServices);
 // router
 //   .route("/equipments")
 //   .get(protectOwner, getGymEquipments)
@@ -69,10 +76,7 @@ router
 //   .route("/plans")
 //   .get(protectOwner, getGymPlans)
 //   .put(protectOwner, addGymPlans);
-// router
-//   .route("/services")
-//   .get(protectOwner, getGymServices)
-//   .put(protectOwner, addGymServices);
+
 // router
 //   .route("/trainers")
 //   .get(protectOwner, getGymTrainers)

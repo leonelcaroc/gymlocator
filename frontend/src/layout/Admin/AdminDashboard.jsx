@@ -28,17 +28,17 @@ const AdminDashboard = () => {
           },
         })
         .then((res) => res.data);
+    },
+    {
+      onSuccess: (data) => {
+        console.log("Query successful:", data);
+        // Your logic for successful response
+      },
+      onError: (error) => {
+        console.error("Query error:", error);
+        // Your logic for handling errors
+      },
     }
-    // {
-    //   onSuccess: (data) => {
-    //     console.log("Query successful:", data);
-    //     // Your logic for successful response
-    //   },
-    //   onError: (error) => {
-    //     console.error("Query error:", error);
-    //     // Your logic for handling errors
-    //   },
-    // }
   );
 
   return (

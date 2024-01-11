@@ -25,9 +25,7 @@ const authAdmin = asyncHandler(async (req, res) => {
       token,
     });
   } else {
-    res.status(401).json({ message: "Invalid email or password" });
-
-    throw new Error("Invalid email or password.");
+    res.status(401).json({ error: "Invalid email or password" });
   }
 });
 
@@ -87,7 +85,6 @@ const logoutAdmin = asyncHandler(async (req, res) => {
 const getOwners = asyncHandler(async (req, res) => {
   const user = await GymOwner.find({});
 
-  // res.status(200).json(user);
   res.status(200).json(user);
 });
 
@@ -100,20 +97,22 @@ const approveGymStatus = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(id);
 
   if (user) {
-    user.gym.isApproved = "approved";
+    try {
+      user.gym.isApproved = "approved";
 
-    const updatedUser = await user.save();
-    res.status(200).json({
-      _id: updatedUser._id,
-      name: updatedUser.name,
-      email: updatedUser.email,
-      status: updatedUser.gym.isApproved,
-      message: "Gym Status Successfully Changed!!",
-    });
+      const updatedUser = await user.save();
+      res.status(200).json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        status: updatedUser.gym.isApproved,
+        message: "Gym Status Successfully Changed!!",
+      });
+    } catch (error) {
+      res.status(400).json({ error: "Failed to update gym status" });
+    }
   } else {
-    res.status(404);
-
-    throw new Error("User not found");
+    res.status(404).json({ error: "User not found" });
   }
 
   res.status(200).json({ user, message: "Gym Status Successful Changed!!" });
@@ -125,16 +124,20 @@ const rejectGymStatus = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(id);
 
   if (user) {
-    user.gym.isApproved = "rejected";
+    try {
+      user.gym.isApproved = "rejected";
 
-    const updatedUser = await user.save();
-    res.status(200).json({
-      _id: updatedUser._id,
-      name: updatedUser.name,
-      email: updatedUser.email,
-      status: updatedUser.gym.isApproved,
-      message: "Gym Status Successfully Changed!!",
-    });
+      const updatedUser = await user.save();
+      res.status(200).json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        status: updatedUser.gym.isApproved,
+        message: "Gym Status Successfully Changed!!",
+      });
+    } catch (error) {
+      res.status(400).json({ error: "Failed to update gym status" });
+    }
   } else {
     res.status(404);
 

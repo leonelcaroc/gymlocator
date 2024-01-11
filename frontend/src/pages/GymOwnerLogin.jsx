@@ -15,11 +15,10 @@ import {
 import gym from "../assets/images/background.webp";
 import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
-import { Link as ReachLink, useNavigate } from "react-router-dom";
-import { useQuery, useQueryClient, useMutation } from "react-query";
+import { useNavigate } from "react-router-dom";
+import { useQueryClient, useMutation } from "react-query";
 import GoHome from "../components/GoHome/GoHome";
 import TokenService from "../services/token";
-import axios from "axios";
 import { postLoginOwner } from "../api/ownerApi/ownerApi";
 
 const GymOwnerLogin = () => {
@@ -56,7 +55,7 @@ const GymOwnerLogin = () => {
       },
       onError: (error) => {
         toast({
-          title: error.response.data.message || "Something went wrong",
+          title: error.response.data.error || "Something went wrong",
           status: "error",
           duration: 2000,
           position: "bottom-right",

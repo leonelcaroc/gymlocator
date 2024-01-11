@@ -97,4 +97,28 @@ export const updateGymDetails = async (
   }
 };
 
+export const getGymServices = async () => {
+  try {
+    const { data } = await privateOwnerApi.get("/services");
+    return data;
+  } catch (error) {
+    console.error("Error getting gym services:", error);
+    throw error;
+  }
+};
+
+export const updateGymServices = async (gymname, address, contact) => {
+  try {
+    const { data } = await privateOwnerApi.put("/services", {
+      gymname: gymname,
+      address: address,
+      contact: contact,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error updating status:", error);
+    throw error;
+  }
+};
+
 export default privateOwnerApi;

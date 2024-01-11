@@ -165,7 +165,7 @@ const amenitySchema = mongoose.Schema({
 });
 
 const serviceSchema = mongoose.Schema({
-  service: {
+  serviceName: {
     type: String,
     required: true,
   },

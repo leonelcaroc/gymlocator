@@ -65,12 +65,12 @@ const AdminLogin = () => {
       },
       onError: (error) => {
         toast({
-          title: error.response.data.message || "Something went wrong",
+          title: error.response.data.error || "Something went wrong",
           status: "error",
           duration: 2000,
           position: "bottom-right",
         });
-        console.log(error.response.data.message);
+        console.log(error);
       },
     }
   );
@@ -81,7 +81,7 @@ const AdminLogin = () => {
     try {
       loginMutation.mutate({ email, password });
     } catch (error) {
-      console.error("Login failed:", error.message);
+      console.error("Login failed:", error);
     }
   };
 

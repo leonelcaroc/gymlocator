@@ -92,7 +92,6 @@ const GymSignUpPermit = ({ setState, signUpForm, setForm }) => {
         // Save the data to localStorage or perform other actions
         toast({
           title: data.message,
-          // description: "We've created your account for you.",
           status: "success",
           duration: 3000,
           position: "bottom-right",
@@ -110,10 +109,7 @@ const GymSignUpPermit = ({ setState, signUpForm, setForm }) => {
       },
       onError: (error) => {
         toast({
-          title:
-            error.response.data.message ||
-            error.response.data.error ||
-            "Something went wrong",
+          title: error.response.data.error || "Something went wrong",
           status: "error",
           duration: 2000,
           position: "bottom-right",

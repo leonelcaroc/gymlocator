@@ -51,12 +51,11 @@ const AdminGymManage = () => {
       },
       onError: (error) => {
         toast({
-          title: error.response.data.message || "Something went wrong",
+          title: error.response.data.error || "Something went wrong",
           status: "error",
           duration: 2000,
           position: "bottom-right",
         });
-        console.log(error.response.data.message);
       },
     }
   );
