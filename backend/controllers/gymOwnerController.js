@@ -4,6 +4,7 @@ import validator from "validator";
 import GymOwner from "../models/gymOwnerModel.js";
 import multer from "multer";
 import createToken from "../utils/createToken.js";
+import isValid24HourTime from "../utils/validateTime.js";
 
 // const storage = multer.diskStorage({
 //   destination: function (req, file, cb) {
@@ -243,17 +244,13 @@ const updateOwnerProfile = asyncHandler(async (req, res) => {
       firstname: updatedUser.firstname,
       lastname: updatedUser.lastname,
       email: updatedUser.email,
-      message: "Successfuly updated user profile!",
+      message: "Successfuly updated owner profile!",
     });
   } else {
     res.status(404);
 
     throw new Error("User not found");
   }
-
-  // res.status(200).json({
-  //   ,
-  // });
 });
 
 const getGymDetails = asyncHandler(async (req, res) => {
@@ -277,39 +274,90 @@ const getGymDetails = asyncHandler(async (req, res) => {
 const updateGymDetails = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
 
-  if (user) {
-    user.gym.gymname = req.body.gymname || user.gym.gymname;
-    user.gym.contact = req.body.contact || user.gym.contact;
-    user.gym.address = req.body.address || user.gym.address;
-    user.gym.description = req.body.description || user.gym.description;
-    user.gym.schedule.days[0] = req.body.startday || user.gym.schedule.days[0];
-    user.gym.schedule.days[1] = req.body.endday || user.gym.schedule.days[1];
-    user.gym.schedule.time[0] = req.body.opentime || user.gym.schedule.time[0];
-    user.gym.schedule.time[1] = req.body.closetime || user.gym.schedule.time[1];
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
 
-    // if (req.body.password) {
-    //   user.password = req.body.password;
-    // }
+  const {
+    gymname,
+    address,
+    contact,
+    description,
+    startday,
+    endday,
+    opentime,
+    closetime,
+  } = req.body;
+
+  // res.status(200).json({
+  //   gymname: gymname,
+  //   address: address,
+  //   contact: contact,
+  //   description: description,
+  //   startday: startday,
+  //   endday: endday,
+  //   opentime: opentime,
+  //   closetime: closetime,
+  // });
+
+  const trimmedGymName = validator.trim(gymname);
+  const trimmedAddress = validator.trim(address);
+  const trimmedContact = validator.trim(contact);
+  const trimmedDescription = validator.trim(description);
+
+  if (!validator.isLength(trimmedGymName, { min: 1 })) {
+    return res.status(400).json({ error: "Gym name is required." });
+  }
+
+  if (!validator.isLength(trimmedAddress, { min: 1 })) {
+    return res.status(400).json({ error: "Gym address is required." });
+  }
+
+  if (!validator.isLength(trimmedContact, { min: 1 })) {
+    return res.status(400).json({ error: "Gym contact is required." });
+  }
+
+  if (!validator.isLength(trimmedDescription, { min: 1 })) {
+    return res.status(400).json({ error: "Gym description is required." });
+  }
+
+  if (!isValid24HourTime(opentime)) {
+    res.status(400).json({ message: `${opentime} is not a valid time.` });
+  }
+
+  if (!isValid24HourTime(closetime)) {
+    res.status(400).json({ message: `${closetime} is not a valid time.` });
+  }
+
+  if (user) {
+    user.gym.gymname = trimmedGymName || user.gym.gymname;
+    user.gym.address = trimmedAddress || user.gym.address;
+    user.gym.contact = trimmedContact || user.gym.contact;
+    user.gym.description = trimmedDescription || user.gym.description;
+    user.gym.schedule.startday = startday || user.gym.schedule.startday;
+    user.gym.schedule.endday = endday || user.gym.schedule.endday;
+    user.gym.schedule.opentime = opentime || user.gym.schedule.opentime;
+    user.gym.schedule.closetime = closetime || user.gym.schedule.closetime;
 
     const updatedUser = await user.save();
 
     res.status(200).json({
-      _id: updatedUser._id,
       gymname: updatedUser.gym.gymname,
-      contact: updatedUser.gym.contact,
       address: updatedUser.gym.address,
+      contact: updatedUser.gym.contact,
       description: updatedUser.gym.description,
-      schedule: updatedUser.gym.schedule,
+      startday: updatedUser.gym.schedule.startday,
+      endday: updatedUser.gym.schedule.endday,
+      opentime: updatedUser.gym.schedule.opentime,
+      closetime: updatedUser.gym.schedule.closetime,
+      message: "Successfuly updated gym details!",
     });
   } else {
     res.status(404);
 
     throw new Error("User not found");
   }
-
-  res.status(200).json({
-    message: "Updated user profile",
-  });
 });
 
 const addGymEquipments = asyncHandler(async (req, res) => {

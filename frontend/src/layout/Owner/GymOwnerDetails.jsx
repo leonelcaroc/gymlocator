@@ -11,8 +11,11 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import { getGymDetails } from "../../api/ownerApi/privateOwnerApi";
-import { parse, format } from "date-fns";
+import {
+  getGymDetails,
+  updateGymDetails,
+} from "../../api/ownerApi/privateOwnerApi";
+import { formattedTime } from "../../utils/convertToAmericanTime";
 
 const GymOwnerDetails = () => {
   const toast = useToast();
@@ -48,14 +51,43 @@ const GymOwnerDetails = () => {
     }
   }, [data]);
 
-  const formattedTime = (time) => {
-    const parsedTime = format(
-      parse(time || "00:00", "HH:mm", new Date()),
-      "h:mm a"
-    );
+  const updateGymDetailsMutation = useMutation(
+    async (formData) => {
+      return updateGymDetails(
+        formData.gymname,
+        formData.address,
+        formData.contact,
+        formData.description,
+        formData.schedule.startday,
+        formData.schedule.endday,
+        formData.schedule.opentime,
+        formData.schedule.closetime
+      );
+    },
+    {
+      onSuccess: (data) => {
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
 
-    return parsedTime;
-  };
+        // Invalidate and refetch any queries that depend on the user data
+        queryClient.invalidateQueries("gymDetails");
+      },
+      onError: (error) => {
+        setGymData(originalData);
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+        console.log(error);
+      },
+    }
+  );
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -65,13 +97,13 @@ const GymOwnerDetails = () => {
     setIsEditing(false);
 
     // console.log("Edited Data:", profileData);
-    // updateOwnerMutation.mutate(profileData);
+    updateGymDetailsMutation.mutate(gymData);
   };
 
   const handleCloseClick = () => {
     setIsEditing(false);
     // Reset the edited data to the original data or fetch from your backend
-    // setProfileData(originalData);
+    setGymData(originalData);
   };
 
   return (
@@ -317,7 +349,6 @@ const GymOwnerDetails = () => {
               <>
                 <Button
                   onClick={handleSaveClick}
-                  // isLoading={updateOwnerMutation.isLoading}
                   colorScheme="green"
                   size="md"
                   ml={2}
@@ -335,6 +366,7 @@ const GymOwnerDetails = () => {
               </>
             ) : (
               <Button
+                isLoading={updateGymDetailsMutation.isLoading}
                 onClick={handleEditClick}
                 colorScheme="blue"
                 size="md"

@@ -1,5 +1,6 @@
 import axiosInstance from "../axiosConfig";
 import TokenService from "../../services/token";
+import { add } from "date-fns";
 
 const privateOwnerApi = axiosInstance.create({
   baseURL: `${axiosInstance.defaults.baseURL}/gymowner`,
@@ -64,6 +65,34 @@ export const getGymDetails = async () => {
     return data;
   } catch (error) {
     console.error("Error getting gym details:", error);
+    throw error;
+  }
+};
+
+export const updateGymDetails = async (
+  gymname,
+  address,
+  contact,
+  description,
+  startday,
+  endday,
+  opentime,
+  closetime
+) => {
+  try {
+    const { data } = await privateOwnerApi.put("/gymdetails", {
+      gymname: gymname,
+      address: address,
+      contact: contact,
+      description: description,
+      startday: startday,
+      endday: endday,
+      opentime: opentime,
+      closetime: closetime,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error updating status:", error);
     throw error;
   }
 };

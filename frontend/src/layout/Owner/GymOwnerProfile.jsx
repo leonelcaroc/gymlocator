@@ -183,7 +183,6 @@ const GymOwnerProfile = () => {
             <>
               <Button
                 onClick={handleSaveClick}
-                isLoading={updateOwnerMutation.isLoading}
                 colorScheme="green"
                 size="md"
                 ml={2}
@@ -201,6 +200,7 @@ const GymOwnerProfile = () => {
             </>
           ) : (
             <Button
+              isLoading={updateOwnerMutation.isLoading}
               onClick={handleEditClick}
               colorScheme="blue"
               size="md"
