@@ -528,7 +528,7 @@ const updateGymServices = asyncHandler(async (req, res) => {
   if (index !== -1) {
     // Update the service at the found index
     user.gym.services[index] = {
-      id: id,
+      ...user.gym.services[index],
       serviceName: trimmedServiceName,
       description: trimmedServiceDescription,
       serviceImage: serviceImage,
@@ -980,52 +980,116 @@ const getGymTrainers = asyncHandler(async (req, res) => {
   res.status(200).json(user);
 });
 
+// Gym Announcements
+
+const getGymAnnouncement = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
+
+  if (!user) {
+    res.status(404).json({ error: "User not found" });
+    throw new Error("User not found");
+  }
+
+  res.status(200).json(user.gym.announcements);
+});
+
 const addGymAnnouncement = asyncHandler(async (req, res) => {
-  try {
-    const user = await GymOwner.findById(req.user._id);
+  const user = await GymOwner.findById(req.user._id);
 
-    if (!user) {
-      res.status(404);
-      throw new Error("User not found");
-    }
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
 
-    // Extract the new equipment data from the request body
-    const { description } = req.body;
+  // Extract the new equipment data from the request body
+  const { announcement } = req.body;
 
-    const trimmedDescription = validator.trim(description);
+  const trimmedAnnouncement = validator.trim(announcement);
 
-    if (!validator.isLength(trimmedDescription, { min: 1 })) {
-      return res
-        .status(400)
-        .json({ error: "Amenity description is required." });
-    }
+  if (!validator.isLength(trimmedAnnouncement, { min: 1 })) {
+    return res
+      .status(400)
+      .json({ error: "Announcement description is required." });
+  }
 
-    const newAnnoucement = {
-      description: trimmedDescription,
+  const newAnnoucement = {
+    announcement: trimmedAnnouncement,
+  };
+
+  // Add the new service to the existing service list
+  user.gym.announcements.push(newAnnoucement);
+
+  // Save the updated user with the new service
+  await user.save();
+
+  // Respond with the updated user profile
+  res.status(200).json({
+    message: "Successfully added new announcement",
+  });
+});
+
+const updateGymAnnouncement = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  const { id, announcement } = req.body;
+
+  const trimmedAnnouncement = validator.trim(announcement);
+
+  if (!validator.isLength(trimmedAnnouncement, { min: 1 })) {
+    return res.status(400).json({ error: "Announcement is required." });
+  }
+
+  const index = user.gym.announcements.findIndex(
+    (announcement) => announcement.id === id
+  );
+
+  if (index !== -1) {
+    // Update the service at the found index
+    user.gym.announcements[index] = {
+      id: id,
+      announcement: trimmedAnnouncement,
     };
 
-    // Add the new service to the existing service list
-    user.gym.announcements.push(newAnnoucement);
-
-    // Save the updated user with the new service
+    // Save the updated user
+    // const updatedService = await user.save();
     await user.save();
 
-    // Respond with the updated user profile
-    res.status(200).json({
-      message: "Successfully added new announcement",
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(200).json({ message: "Successfully updated announcement!" });
+  } else {
+    res.status(404).json({ error: "Announcement not found" });
   }
 });
 
-const getGymAnnouncement = asyncHandler(async (req, res) => {
-  const user = {
-    announcements: req.user.gym.announcements,
-  };
+const deleteGymAnnouncement = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
+  const { id } = req.body;
 
-  res.status(200).json(user);
+  if (!user) {
+    res.status(404).json({ error: "User not found." });
+  }
+
+  const announcementToRemove = user.gym.announcements.find(
+    (announcement) => announcement.id === id
+  );
+
+  if (!announcementToRemove) {
+    res.status(404).json({ error: "Announcement not found." });
+  }
+
+  const remainingAnnouncements = user.gym.announcements.filter(
+    (announcement) => announcement.id !== id
+  );
+
+  user.gym.announcements = [...remainingAnnouncements];
+
+  await user.save();
+
+  res.status(200).json({ message: "Successfully deleted announcement" });
 });
 
 const addGymClasses = asyncHandler(async (req, res) => {
@@ -1131,8 +1195,10 @@ export {
   addGymTrainers,
   getGymTrainers,
   getStripePrices,
-  addGymAnnouncement,
   getGymAnnouncement,
+  addGymAnnouncement,
+  updateGymAnnouncement,
+  deleteGymAnnouncement,
   addGymClasses,
   getGymClasses,
 };

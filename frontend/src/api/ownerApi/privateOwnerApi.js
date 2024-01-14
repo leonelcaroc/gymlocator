@@ -271,4 +271,53 @@ export const deleteGymEquipment = async (id) => {
   }
 };
 
+// Announcement API
+
+export const getGymAnnouncements = async () => {
+  try {
+    const { data } = await privateOwnerApi.get("/announcements");
+    return data;
+  } catch (error) {
+    console.error("Error getting gym announcements:", error);
+    throw error;
+  }
+};
+
+export const addGymAnnouncements = async (announcement) => {
+  try {
+    const { data } = await privateOwnerApi.post("/announcements", {
+      announcement: announcement,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error adding announcement:", error);
+    throw error;
+  }
+};
+
+export const updateGymAnnouncements = async (announcement, id) => {
+  try {
+    const { data } = await privateOwnerApi.put("/announcements", {
+      announcement: announcement,
+      id: id,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error updating announcement:", error);
+    throw error;
+  }
+};
+
+export const deleteGymAnnouncement = async (id) => {
+  try {
+    const { data } = await privateOwnerApi.delete("/announcements", {
+      data: { id },
+    });
+    return data;
+  } catch (error) {
+    console.error("Error deleting equipment:", error);
+    throw error;
+  }
+};
+
 export default privateOwnerApi;

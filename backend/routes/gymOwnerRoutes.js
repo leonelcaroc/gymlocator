@@ -29,6 +29,8 @@ import {
   getStripePrices,
   addGymAnnouncement,
   getGymAnnouncement,
+  updateGymAnnouncement,
+  deleteGymAnnouncement,
   addGymClasses,
   getGymClasses,
 } from "../controllers/gymOwnerController.js";
@@ -101,25 +103,26 @@ router
   .put(protectOwner, updateGymEquipments)
   .delete(protectOwner, deleteGymEquipment);
 
-// .put(protectOwner, addGymEquipments);
-// router
-//   .route("/plans")
-//   .get(protectOwner, getGymPlans)
-//   .put(protectOwner, addGymPlans);
-
 // router
 //   .route("/trainers")
 //   .get(protectOwner, getGymTrainers)
 //   .put(protectOwner, addGymTrainers);
 
 // router
-//   .route("/announcement")
-//   .get(protectOwner, getGymAnnouncement)
-//   .put(protectOwner, addGymAnnouncement);
-// router
 //   .route("/classes")
 //   .get(protectOwner, getGymClasses)
 //   .put(protectOwner, addGymClasses);
+router
+  .route("/announcements")
+  .get(protectOwner, getGymAnnouncement)
+  .post(protectOwner, addGymAnnouncement)
+  .put(protectOwner, updateGymAnnouncement)
+  .delete(protectOwner, deleteGymAnnouncement);
+
 // router.route("/prices").get(protectOwner, getStripePrices);
+// router
+//   .route("/plans")
+//   .get(protectOwner, getGymPlans)
+//   .put(protectOwner, addGymPlans);
 
 export default router;
