@@ -1,24 +1,193 @@
-import React from "react";
+import { useState } from "react";
 import {
-  Heading,
-  Text,
   Box,
-  Flex,
   Button,
+  Divider,
+  Flex,
+  Heading,
   Input,
   Stack,
+  Spinner,
   Textarea,
   TableContainer,
   Table,
+  Text,
   Thead,
   Td,
   Th,
   Tr,
   Tbody,
-  Divider,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import {
+  getGymEquipments,
+  addGymEquipments,
+  updateGymEquipments,
+  deleteGymEquipment,
+} from "../../api/ownerApi/privateOwnerApi";
 
 const GymOwnerEquipments = () => {
+  const toast = useToast();
+  const queryClient = useQueryClient();
+
+  const [newEquipment, setNewEquipment] = useState({
+    equipmentName: "",
+    description: "",
+    equipmentImage: null,
+  });
+  const [selectedEquipment, setSelectedEquipment] = useState(null);
+  const [selectedDeleteEquipment, setSelectedDeleteEquipment] = useState(null);
+
+  const {
+    isOpen: isAddEquipmentOpen,
+    onOpen: openAddEquipment,
+    onClose: closeAddEquipment,
+  } = useDisclosure();
+  const {
+    isOpen: isEditEquipmentOpen,
+    onOpen: openEditEquipment,
+    onClose: closeEditEquipment,
+  } = useDisclosure();
+  const {
+    isOpen: isDeleteEquipmentOpen,
+    onOpen: openDeleteEquipment,
+    onClose: closeDeleteEquipment,
+  } = useDisclosure();
+
+  const { data, isLoading, isError } = useQuery(
+    "equipmentData",
+    async () => {
+      return getGymEquipments();
+    },
+    {
+      refetchOnWindowFocus: false,
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  const updateEquipmentMutation = useMutation(
+    async (formData) => {
+      return updateGymEquipments(
+        formData._id,
+        formData.equipmentName,
+        formData.description,
+        formData.equipmentImage
+      );
+    },
+    {
+      onSuccess: (data) => {
+        setSelectedEquipment(null);
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+
+        // Invalidate and refetch any queries that depend on the user data
+        queryClient.invalidateQueries("equipmentData");
+      },
+      onError: (error) => {
+        setSelectedEquipment(null);
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  const deleteEquipmentMutation = useMutation(
+    async (formData) => {
+      return deleteGymEquipment(formData._id);
+    },
+    {
+      onSuccess: (data) => {
+        setSelectedDeleteEquipment(null);
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+
+        // Invalidate and refetch any queries that depend on the user data
+        queryClient.invalidateQueries("equipmentData");
+      },
+      onError: (error) => {
+        setSelectedDeleteEquipment(null);
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  const handleCloseNewEquipment = () => {
+    setEquipment({
+      equipmentName: "",
+      description: "",
+      equipmentImage: null,
+    });
+
+    closeAddEquipment();
+  };
+
+  const handleOpenEdit = (equipment) => {
+    setSelectedEquipment(equipment);
+    openEditEquipment();
+  };
+
+  const handleSaveEdit = () => {
+    updateEquipmentMutation.mutate(selectedEquipment);
+    setSelectedEquipment(null);
+    closeEditEquipment();
+  };
+
+  const handleCloseEdit = () => {
+    setSelectedEquipment(null);
+    closeEditEquipment();
+    // Reset the edited data to the original data or fetch from your backend
+  };
+
+  const handleOpenDelete = (equipment) => {
+    setSelectedDeleteEquipment(equipment);
+    openDeleteEquipment();
+  };
+
+  const handleDeleteEquipment = () => {
+    deleteEquipmentMutation.mutate(selectedDeleteEquipment);
+    setSelectedDeleteEquipment(null);
+    closeDeleteEquipment();
+  };
+
+  const handleCloseDelete = () => {
+    setSelectedDeleteEquipment(null);
+    closeDeleteEquipment();
+    // Reset the edited data to the original data or fetch from your backend
+  };
+
   const handleFileChange = (event) => {
     const file = event.target.files[0];
 
@@ -34,76 +203,252 @@ const GymOwnerEquipments = () => {
 
   return (
     <Box padding="2rem">
-      <Text color="brand.200" fontSize="2rem" marginBottom="2rem">
-        Gym Equipments
-      </Text>
-      <Stack spacing="2rem">
-        <Flex flexDirection="column" gap="0.5rem">
-          <Text fontWeight="bold">Equipment Name</Text>
-          <Input type="text" placeholder="Equipment Name" />
-        </Flex>
-        <Flex flexDirection="column" gap="0.5rem">
-          <Text fontWeight="bold">Description</Text>
-          <Textarea placeholder="Type your equipment description here" />
-        </Flex>
-        <Flex flexDirection="column" gap="0.5rem">
-          <Text fontWeight="bold">Upload Equipment Image:</Text>
-          <Input
-            id="upload-equipment"
-            type="file"
-            display="none"
-            onChange={handleFileChange}
-          />
-          <Text
-            id="upload-equipment-image"
-            as="label"
-            htmlFor="upload-equipment"
-            marginInline="0.8rem 1.2rem"
-            width="fit-content"
-          >
-            Choose file
-          </Text>
-        </Flex>
+      {/* Add Amenity */}
 
-        <Button bgColor="brand.100" color="neutral.100" width="fit-content">
-          Add Equipment
-        </Button>
-      </Stack>
-      <Divider marginBlock="2rem" borderWidth="1px" borderColor="gray.400" />
-      <TableContainer marginTop="1.5rem">
-        <Heading as="h3" size="lg" marginBottom="1rem">
-          List of Equipments
-        </Heading>
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th>Equipment Name</Th>
-              <Th>Description</Th>
-              <Th>Image</Th>
-              <Th>Action</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>Resistance Band</Td>
-              <Td>This is for stretching</Td>
-              <Td color="brand.100">
-                <Text _hover={{ textDecoration: "underline" }} cursor="pointer">
-                  resistance_band.jpg
-                </Text>
-              </Td>
-              <Td display="flex" gap="0.5rem">
-                <Button bgColor="blue" color="neutral.100" marginBottom="1rem">
-                  Edit
-                </Button>
-                <Button bgColor="red" color="white">
-                  Delete
-                </Button>
-              </Td>
-            </Tr>
-          </Tbody>
-        </Table>
-      </TableContainer>
+      <Modal isOpen={isAddEquipmentOpen} onClose={handleCloseNewEquipment}>
+        <ModalOverlay />
+        <ModalContent paddingInline="2rem" maxWidth="35rem">
+          <ModalHeader>Add Equipment</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Stack spacing="1rem">
+              <Box>
+                <Text fontWeight="bold">Equipment Name</Text>
+                <Input
+                  onChange={(e) =>
+                    setNewEquipment({
+                      ...newEquipment,
+                      equipmentName: e.target.value,
+                    })
+                  }
+                  type="text"
+                  placeholder="Equipment Name"
+                />
+              </Box>
+              <Box>
+                <Text fontWeight="bold">Description</Text>
+                <Textarea
+                  onChange={(e) =>
+                    setNewEquipment({
+                      ...newEquipment,
+                      description: e.target.value,
+                    })
+                  }
+                  placeholder="Type your equipment description here..."
+                />
+              </Box>
+              <Box>
+                <Flex flexDirection="column" gap="0.5rem">
+                  <Text fontWeight="bold">Upload Equipment Image:</Text>
+                  <Input
+                    id="upload-equipment"
+                    type="file"
+                    display="none"
+                    // onChange={handleFileChange}
+                  />
+                  <Text
+                    id="upload-equipment-image"
+                    as="label"
+                    htmlFor="upload-equipment"
+                    marginInline="0.8rem 1.2rem"
+                    width="fit-content"
+                  >
+                    Choose file
+                  </Text>
+                </Flex>
+              </Box>
+            </Stack>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              // onClick={handleCloseNewService}
+            >
+              Close
+            </Button>
+            <Button
+              bgColor="brand.100"
+              color="neutral.100"
+              // onClick={handleSubmitNewService}
+            >
+              Add Service
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Edit Amenity */}
+
+      <Modal isOpen={isEditEquipmentOpen} onClose={handleCloseEdit}>
+        <ModalOverlay />
+        <ModalContent paddingInline="2rem" maxWidth="35rem">
+          <ModalHeader>Edit Equipment</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Stack spacing="1rem">
+              <Box>
+                <Text fontWeight="bold">Equipment Name</Text>
+                <Input
+                  spellCheck={false}
+                  value={selectedEquipment?.equipmentName}
+                  onChange={(e) =>
+                    setSelectedEquipment({
+                      ...selectedEquipment,
+                      equipmentName: e.target.value,
+                    })
+                  }
+                  type="text"
+                  placeholder="Equipment Name"
+                />
+              </Box>
+              <Box>
+                <Text fontWeight="bold">Description</Text>
+                <Textarea
+                  spellCheck={false}
+                  value={selectedEquipment?.description}
+                  onChange={(e) =>
+                    setSelectedEquipment({
+                      ...selectedEquipment,
+                      description: e.target.value,
+                    })
+                  }
+                  placeholder="Type your equipment description here..."
+                />
+              </Box>
+              <Box>
+                <Flex flexDirection="column" gap="0.5rem">
+                  <Text fontWeight="bold">Upload Equipment Image:</Text>
+                  <Input
+                    id="upload-edit-equipment"
+                    type="file"
+                    display="none"
+                    // onChange={handleFileChange}
+                  />
+                  <Text
+                    id="upload-edit-equipment-image"
+                    as="label"
+                    htmlFor="upload-edit-equipment"
+                    marginInline="0.8rem 1.2rem"
+                    width="fit-content"
+                  >
+                    Choose file
+                  </Text>
+                </Flex>
+              </Box>
+            </Stack>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handleCloseEdit}>
+              Close
+            </Button>
+            <Button
+              bgColor="brand.100"
+              color="neutral.100"
+              onClick={handleSaveEdit}
+            >
+              Save
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Delete Amenity*/}
+
+      <Modal isOpen={isDeleteEquipmentOpen} onClose={handleOpenDelete}>
+        <ModalOverlay />
+        <ModalContent paddingInline="2rem" maxWidth="35rem">
+          <ModalHeader>Delete Equipment</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>
+              Are you sure you want to delete{" "}
+              {selectedDeleteEquipment?.equipmentName}?
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="gray" mr={3} onClick={handleCloseDelete}>
+              No
+            </Button>
+            <Button
+              bgColor="red"
+              color="neutral.100"
+              onClick={handleDeleteEquipment}
+            >
+              Yes
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Text color="brand.200" fontSize="2rem" marginBottom="1rem">
+        Equipments
+      </Text>
+      <Button
+        bgColor="brand.100"
+        color="neutral.100"
+        onClick={openAddEquipment}
+      >
+        Add Equipment
+      </Button>
+      <Box>
+        {isLoading ? (
+          <Spinner size="lg" mt="4rem" />
+        ) : (
+          <TableContainer marginTop="1.5rem">
+            <Heading as="h3" size="lg" marginBottom="1rem">
+              List of Equipments
+            </Heading>
+            <Table variant="simple">
+              <Thead>
+                <Tr>
+                  <Th>Equipment Name</Th>
+                  <Th>Description</Th>
+                  <Th>Image</Th>
+                  <Th>Action</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {data?.map((item) => (
+                  <Tr key={item._id}>
+                    <Td>{item.equipmentName}</Td>
+                    <Td>{item.description}</Td>
+                    <Td color="brand.100">
+                      <Text
+                        _hover={{ textDecoration: "underline" }}
+                        cursor="pointer"
+                      >
+                        {item.equipmentImage}
+                      </Text>
+                    </Td>
+                    <Td display="flex" gap="0.5rem">
+                      <Button
+                        bgColor="blue"
+                        color="neutral.100"
+                        marginBottom="1rem"
+                        onClick={() => handleOpenEdit(item)}
+                        isLoading={
+                          updateEquipmentMutation.isLoading &&
+                          updateEquipmentMutation.variables?._id === item._id
+                        }
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        bgColor="red"
+                        color="white"
+                        onClick={() => handleOpenDelete(item)}
+                      >
+                        Delete
+                      </Button>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        )}
+      </Box>
     </Box>
   );
 };

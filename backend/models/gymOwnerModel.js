@@ -191,7 +191,7 @@ const planSchema = mongoose.Schema({
 });
 
 const equipmentSchema = mongoose.Schema({
-  equipment: {
+  equipmentName: {
     type: String,
     required: true,
   },
@@ -199,7 +199,7 @@ const equipmentSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  base64Data: {
+  equipmentImage: {
     type: String,
     required: true,
   },

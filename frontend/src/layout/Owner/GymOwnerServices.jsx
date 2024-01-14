@@ -3,8 +3,9 @@ import {
   Text,
   Textarea,
   Box,
-  Flex,
   Button,
+  Flex,
+  Heading,
   Input,
   Table,
   TableContainer,
@@ -452,6 +453,9 @@ const GymOwnerServices = () => {
           <Spinner size="lg" mt="4rem" />
         ) : (
           <TableContainer marginTop="2rem">
+            <Heading as="h3" size="lg" marginBottom="1rem">
+              List of Services
+            </Heading>
             <Table variant="simple">
               <Thead>
                 <Tr>

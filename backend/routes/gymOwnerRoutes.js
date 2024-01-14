@@ -20,6 +20,8 @@ import {
   deleteGymAmenities,
   getGymEquipments,
   addGymEquipments,
+  updateGymEquipments,
+  deleteGymEquipment,
   addGymPlans,
   getGymPlans,
   addGymTrainers,
@@ -92,7 +94,13 @@ router
   .post(protectOwner, addGymAmenities)
   .put(protectOwner, updateGymAmenities)
   .delete(protectOwner, deleteGymAmenities);
-router.route("/equipments").get(protectOwner, getGymEquipments);
+router
+  .route("/equipments")
+  .get(protectOwner, getGymEquipments)
+  .post(protectOwner, addGymEquipments)
+  .put(protectOwner, updateGymEquipments)
+  .delete(protectOwner, deleteGymEquipment);
+
 // .put(protectOwner, addGymEquipments);
 // router
 //   .route("/plans")

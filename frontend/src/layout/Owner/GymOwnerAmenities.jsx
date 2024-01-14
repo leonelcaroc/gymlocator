@@ -170,8 +170,8 @@ const GymOwnerAmenities = () => {
     // Reset the edited data to the original data or fetch from your backend
   };
 
-  const handleOpenDelete = (service) => {
-    setSelectedDeleteAmenity(service);
+  const handleOpenDelete = (amenity) => {
+    setSelectedDeleteAmenity(amenity);
     openDeleteAmenity();
   };
 
@@ -271,7 +271,7 @@ const GymOwnerAmenities = () => {
               color="neutral.100"
               // onClick={handleSubmitNewService}
             >
-              Add Service
+              Add Amenity
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -298,7 +298,7 @@ const GymOwnerAmenities = () => {
                     })
                   }
                   type="text"
-                  placeholder="Service Name"
+                  placeholder="Amenity Name"
                 />
               </Box>
               <Box>
@@ -312,12 +312,12 @@ const GymOwnerAmenities = () => {
                       description: e.target.value,
                     })
                   }
-                  placeholder="Type your service description here..."
+                  placeholder="Type your equipment description here..."
                 />
               </Box>
               <Box>
                 <Flex flexDirection="column" gap="0.5rem">
-                  <Text fontWeight="bold">Upload Service Image:</Text>
+                  <Text fontWeight="bold">Upload Amenity Image:</Text>
                   <Input
                     id="upload-edit-amenity"
                     type="file"
@@ -387,58 +387,64 @@ const GymOwnerAmenities = () => {
         Add Amenity
       </Button>
 
-      <TableContainer marginTop="1.5rem">
-        <Heading as="h3" size="lg" marginBottom="1rem">
-          List of Amenities
-        </Heading>
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th>Amenity Name</Th>
-              <Th>Description</Th>
-              <Th>Image</Th>
-              <Th>Action</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {data?.map((item) => (
-              <Tr key={item._id}>
-                <Td>{item.amenityName}</Td>
-                <Td>{item.description}</Td>
-                <Td color="brand.100">
-                  <Text
-                    _hover={{ textDecoration: "underline" }}
-                    cursor="pointer"
-                  >
-                    {item.amenityImage}
-                  </Text>
-                </Td>
-                <Td display="flex" gap="0.5rem">
-                  <Button
-                    bgColor="blue"
-                    color="neutral.100"
-                    marginBottom="1rem"
-                    onClick={() => handleOpenEdit(item)}
-                    isLoading={
-                      updateAmenityMutation.isLoading &&
-                      updateAmenityMutation.variables?._id === item._id
-                    }
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    bgColor="red"
-                    color="white"
-                    onClick={() => handleOpenDelete(item)}
-                  >
-                    Delete
-                  </Button>
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      </TableContainer>
+      <Box>
+        {isLoading ? (
+          <Spinner size="lg" mt="4rem" />
+        ) : (
+          <TableContainer marginTop="1.5rem">
+            <Heading as="h3" size="lg" marginBottom="1rem">
+              List of Amenities
+            </Heading>
+            <Table variant="simple">
+              <Thead>
+                <Tr>
+                  <Th>Amenity Name</Th>
+                  <Th>Description</Th>
+                  <Th>Image</Th>
+                  <Th>Action</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {data?.map((item) => (
+                  <Tr key={item._id}>
+                    <Td>{item.amenityName}</Td>
+                    <Td>{item.description}</Td>
+                    <Td color="brand.100">
+                      <Text
+                        _hover={{ textDecoration: "underline" }}
+                        cursor="pointer"
+                      >
+                        {item.amenityImage}
+                      </Text>
+                    </Td>
+                    <Td display="flex" gap="0.5rem">
+                      <Button
+                        bgColor="blue"
+                        color="neutral.100"
+                        marginBottom="1rem"
+                        onClick={() => handleOpenEdit(item)}
+                        isLoading={
+                          updateAmenityMutation.isLoading &&
+                          updateAmenityMutation.variables?._id === item._id
+                        }
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        bgColor="red"
+                        color="white"
+                        onClick={() => handleOpenDelete(item)}
+                      >
+                        Delete
+                      </Button>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        )}
+      </Box>
     </Box>
   );
 };
