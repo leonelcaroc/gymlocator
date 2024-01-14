@@ -7,9 +7,9 @@ body {
   min-height: 100vh;
 }
 
-li {
+/* li {
   list-style: none;
-}
+} */
 
 #upload-permit-id,
 #upload-equipment-image,
