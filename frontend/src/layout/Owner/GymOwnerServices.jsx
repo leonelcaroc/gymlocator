@@ -31,7 +31,7 @@ import {
   getGymServices,
   addGymServices,
   updateGymServices,
-  deleteGymServices,
+  deleteGymService,
 } from "../../api/ownerApi/privateOwnerApi";
 
 const GymOwnerServices = () => {
@@ -88,7 +88,7 @@ const GymOwnerServices = () => {
         setNewService({
           serviceName: "",
           description: "",
-          serviceImage: {},
+          serviceImage: null,
         });
         toast({
           title: data.message,
@@ -104,7 +104,7 @@ const GymOwnerServices = () => {
         setNewService({
           serviceName: "",
           description: "",
-          serviceImage: {},
+          serviceImage: null,
         });
         toast({
           title: error.response.data.error || "Something went wrong",
@@ -152,7 +152,7 @@ const GymOwnerServices = () => {
 
   const deleteServiceMutation = useMutation(
     async (formData) => {
-      return deleteGymServices(formData._id);
+      return deleteGymService(formData._id);
     },
     {
       onSuccess: (data) => {
@@ -200,7 +200,7 @@ const GymOwnerServices = () => {
     setNewService({
       serviceName: "",
       description: "",
-      serviceImage: {},
+      serviceImage: null,
     });
 
     closeAddservice();
@@ -213,6 +213,7 @@ const GymOwnerServices = () => {
 
   const handleSaveEdit = () => {
     updateServiceMutation.mutate(selectedService);
+    setSelectedService(null);
     closeEditService();
   };
 
@@ -266,6 +267,8 @@ const GymOwnerServices = () => {
 
   return (
     <Box padding="2rem">
+      {/* Add Service */}
+
       <Modal isOpen={isAddServiceOpen} onClose={handleCloseNewService}>
         <ModalOverlay />
         <ModalContent paddingInline="2rem" maxWidth="35rem">
@@ -377,15 +380,15 @@ const GymOwnerServices = () => {
                 <Flex flexDirection="column" gap="0.5rem">
                   <Text fontWeight="bold">Upload Service Image:</Text>
                   <Input
-                    id="upload-equipment"
+                    id="upload-edit-service"
                     type="file"
                     display="none"
                     // onChange={handleFileChange}
                   />
                   <Text
-                    id="upload-equipment-image"
+                    id="upload-edit-service-image"
                     as="label"
-                    htmlFor="upload-equipment"
+                    htmlFor="upload-edit-service"
                     marginInline="0.8rem 1.2rem"
                     width="fit-content"
                   >
@@ -477,7 +480,10 @@ const GymOwnerServices = () => {
                         color="neutral.100"
                         marginBottom="1rem"
                         onClick={() => handleOpenEdit(item)}
-                        isLoading={updateServiceMutation.isLoading}
+                        isLoading={
+                          updateServiceMutation.isLoading &&
+                          updateServiceMutation.variables?._id === item._id
+                        }
                         width="5rem"
                       >
                         Edit

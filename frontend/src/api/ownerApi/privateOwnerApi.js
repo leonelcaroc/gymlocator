@@ -143,7 +143,7 @@ export const updateGymServices = async (
   }
 };
 
-export const deleteGymServices = async (id) => {
+export const deleteGymService = async (id) => {
   try {
     const { data } = await privateOwnerApi.delete("/services", {
       data: { id },
@@ -151,6 +151,64 @@ export const deleteGymServices = async (id) => {
     return data;
   } catch (error) {
     console.error("Error deleting service:", error);
+    throw error;
+  }
+};
+
+// Amenities API
+
+export const getGymAmenities = async () => {
+  try {
+    const { data } = await privateOwnerApi.get("/amenity");
+    return data;
+  } catch (error) {
+    console.error("Error getting gym amenities:", error);
+    throw error;
+  }
+};
+
+export const addGymAmenities = async (formData) => {
+  try {
+    const { data } = await privateOwnerApi.post("/amenity", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return data;
+  } catch (error) {
+    console.error("Error adding amenity:", error);
+    throw error;
+  }
+};
+
+export const updateGymAmenities = async (
+  id,
+  amenityName,
+  description,
+  amenityImage
+) => {
+  try {
+    const { data } = await privateOwnerApi.put("/amenity", {
+      id: id,
+      amenityName: amenityName,
+      description: description,
+      amenityImage: amenityImage,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error updating amenity:", error);
+    throw error;
+  }
+};
+
+export const deleteGymAmenity = async (id) => {
+  try {
+    const { data } = await privateOwnerApi.delete("/amenity", {
+      data: { id },
+    });
+    return data;
+  } catch (error) {
+    console.error("Error deleting amenity:", error);
     throw error;
   }
 };

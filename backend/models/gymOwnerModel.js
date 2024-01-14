@@ -150,7 +150,7 @@ const announcementSchema = mongoose.Schema({
 });
 
 const amenitySchema = mongoose.Schema({
-  amenity: {
+  amenityName: {
     type: String,
     required: true,
   },
