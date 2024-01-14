@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 const router = express.Router();
 import {
   authOwner,
@@ -30,21 +31,32 @@ import {
 import { protectOwner } from "../middleware/gymOwnerAuthMiddleware.js";
 import multer from "multer";
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "backend/uploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
+const multerUpload = (pathFolder) => {
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      const destinationPath = `backend/uploads/${req.user._id}/${pathFolder}`;
 
-const upload = multer({
-  storage: storage,
-});
+      console.log(req.user._id);
+      console.log(req.body.serviceName);
+      console.log(req.body.description);
+      console.log(file);
+
+      // cb(null, destinationPath);
+    },
+    filename: (req, file, cb) => {
+      cb(
+        null,
+        file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+      );
+    },
+  });
+
+  const upload = multer({
+    storage: storage,
+  });
+
+  return upload;
+};
 
 router.post(
   "/register",
@@ -65,7 +77,11 @@ router
 router
   .route("/services")
   .get(protectOwner, getGymServices)
-  .post(protectOwner, addGymServices)
+  .post(
+    protectOwner,
+    // multerUpload("services").single("serviceImage"),
+    addGymServices
+  )
   .put(protectOwner, updateGymServices)
   .delete(protectOwner, deleteGymServices);
 // router

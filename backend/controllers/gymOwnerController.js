@@ -2,25 +2,16 @@ import asyncHandler from "express-async-handler";
 import generateToken from "../utils/generateToken.js";
 import validator from "validator";
 import GymOwner from "../models/gymOwnerModel.js";
-import multer from "multer";
+import formidable from "formidable";
+
 import createToken from "../utils/createToken.js";
 import isValid24HourTime from "../utils/validateTime.js";
-
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "backend/uploads/");
-//   },
-//   filename: function (req, file, cb) {
-//     cb(
-//       null,
-//       file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-//     );
-//   },
-// });
-
-// const upload = multer({
-//   storage: storage,
-// });
+import fs from "fs";
+import path from "path";
+import multer from "multer";
+// import mongoose from "mongoose";
+import { ObjectId } from "mongodb";
+import { multerUpload } from "../utils/multerUpload.js";
 
 // desc     Auth user/set token
 // route    POST /api/users/auth
@@ -49,6 +40,7 @@ const authOwner = asyncHandler(async (req, res) => {
 });
 
 const registerOwner = asyncHandler(async (req, res) => {
+  const newMongoDbUserId = new ObjectId();
   const {
     firstname,
     middlename,
@@ -132,7 +124,8 @@ const registerOwner = asyncHandler(async (req, res) => {
     res.status(400).json({ error: "User already exists." });
     throw new Error("User already exists.");
   }
-  const user = await GymOwner.create({
+  const newUser = await GymOwner.create({
+    _id: newMongoDbUserId,
     firstname: trimmedFirstName,
     middlename: trimmedMiddleName,
     lastname: trimmedLastName,
@@ -154,10 +147,40 @@ const registerOwner = asyncHandler(async (req, res) => {
     },
   });
 
-  if (user) {
-    res.status(201).json({
-      message: "Account Created Successfully!",
-    });
+  if (newUser) {
+    const mainFolderPath = path.join(
+      process.cwd(),
+      "backend",
+      "uploads",
+      newMongoDbUserId.toString()
+    );
+
+    const subfolders = ["permit", "services", "amenities", "equipments"];
+
+    try {
+      // Create the main folder if it doesn't exist
+      if (!fs.existsSync(mainFolderPath)) {
+        await fs.promises.mkdir(mainFolderPath);
+
+        // Create subfolders
+        for (const subfolder of subfolders) {
+          const subfolderPath = path.join(mainFolderPath, subfolder);
+          await fs.promises.mkdir(subfolderPath);
+          // Additional logic for each subfolder can be added here
+        }
+
+        res.status(201).json({
+          message: "Account Created Successfully!",
+        });
+      } else {
+        res.status(400).json({ error: "Folder is already existing." });
+        throw new Error("Folder is already existing.");
+      }
+    } catch (error) {
+      // Handle the error appropriately
+      console.error("Error creating folders:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   } else {
     res.status(400).json({ error: "Invalid user data." });
     throw new Error("Invalid user data.");
@@ -351,62 +374,143 @@ const getGymServices = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
 
   if (!user) {
-    res.status(404);
+    res.status(404).json({ error: "User not found" });
     throw new Error("User not found");
   }
 
-  res.status(200).json({ services: user.gym.services });
+  res.status(200).json(user.gym.services);
 });
 
 const addGymServices = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
 
-  if (!user) {
-    res.status(404);
-    throw new Error("User not found");
-  }
+  // const form = formidable({ multiples: true });
 
-  // Extract the new equipment data from the request body
-  const { serviceName, description, base64Data } = req.body;
+  // form.uploadDir = path.join(
+  //   __dirname,
+  //   `backend/uploads/${req.user._id}/services`
+  // );
 
-  const trimmedServiceName = validator.trim(serviceName);
-  const trimmedDescription = validator.trim(description);
+  // form.parse(req, (err, fields, files) => {
+  //   if (err) {
+  //     console.error("Error parsing form data:", err);
+  //     res.status(500).send("Internal Server Error");
+  //     return;
+  //   }
 
-  if (!validator.isLength(trimmedServiceName, { min: 1 })) {
-    return res.status(400).json({ error: "Service name is invalid." });
-  }
+  //   // Extract values from req.body
+  //   const { serviceName, description } = fields;
+  //   const serviceImage = files.serviceImage;
 
-  if (!validator.isLength(trimmedDescription, { min: 1 })) {
-    return res.status(400).json({ error: "Service description is invalid." });
-  }
+  //   // if (serviceName[0] === "King") {
+  //   //   uploadFile();
+  //   // }
+  //   // -----------------------
+  //   const newFilePath = path.join(__dirname, "uploads", serviceImage.name);
+  //   fs.rename(serviceImage.path, newFilePath, (err) => {
+  //     if (err) {
+  //       console.error("Error moving file:", err);
+  //       res.status(500).send("Internal Server Error");
+  //       return;
+  //     }
 
-  const newService = {
-    serviceName: trimmedServiceName,
-    description: trimmedDescription,
-    serviceImage: base64Data,
-  };
+  //     console.log("File uploaded successfully:", newFilePath);
 
-  // Add the new service to the existing service list
-  user.gym.services.push(newService);
+  //     // Continue with your processing logic
+  //     // ...
 
-  // Save the updated user with the new service
-  await user.save();
+  //     res.status(200).send("File uploaded successfully");
+  //   });
 
-  // Respond with the updated user profile
-  res.status(200).json({
-    message: "Successfully added new service",
-  });
+  //   res.status(200).send("Received form data successfully");
+  // });
+
+  // -------------------------------------------------------
+
+  // Upload Service Image
+
+  // multerUpload("services").single("serviceImage")(req, res, async (err) => {
+  //   if (err) {
+  //     // Handle multer errors
+  //     console.error("Multer error:", err);
+  //     return res.status(400).json({ error: "File upload failed" });
+  //   }
+  // });
+
+  // -----------------------
+
+  // throw new Error("You failed");
+
+  // Extract the new service data from the request body
+  // const { serviceName, description } = req.body;
+  // const serviceImage = req.file;
+
+  // if (!user) {
+  //   res.status(404).json({ error: "User not found" });
+  //   throw new Error("User not found");
+  // }
+
+  // console.log(serviceName);
+  // console.log(serviceImage);
+
+  // if (!serviceImage) {
+  //   res.status(400).json({ error: "No file uploaded" });
+  //   throw new Error("No file uploaded");
+  // } else {
+  //   res.status(200).json({ message: "File is uploaded" });
+  // }
+
+  // console.log({
+  //   serviceName: serviceName,
+  //   description: description,
+  //   serviceImage: serviceImage,
+  //   serviceType: "services",
+  // });
+
+  // throw new Error("You failed");
+
+  // console.log(req.file);
+
+  // ----------------
+
+  // const trimmedServiceName = validator.trim(serviceName);
+  // const trimmedDescription = validator.trim(description);
+
+  // if (!validator.isLength(trimmedServiceName, { min: 1 })) {
+  //   return res.status(400).json({ error: "Service name is invalid." });
+  // }
+
+  // if (!validator.isLength(trimmedDescription, { min: 1 })) {
+  //   return res.status(400).json({ error: "Service description is invalid." });
+  // }
+
+  // const newService = {
+  //   serviceName: trimmedServiceName,
+  //   description: trimmedDescription,
+  //   serviceImage: serviceImage,
+  // };
+
+  // // Add the new service to the existing service list
+  // user.gym.services.push(newService);
+
+  // // Save the updated user with the new service
+  // await user.save();
+
+  // // Respond with the updated user profile
+  // res.status(200).json({
+  //   message: "Successfully added new service",
+  // });
 });
 
 const updateGymServices = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
 
   if (!user) {
-    res.status(404);
+    res.status(404).json({ error: "User not found" });
     throw new Error("User not found");
   }
 
-  const { id, serviceName, description, base64Data } = req.body;
+  const { id, serviceName, description, serviceImage } = req.body;
 
   const trimmedServiceName = validator.trim(serviceName);
   const trimmedServiceDescription = validator.trim(description);
@@ -424,10 +528,10 @@ const updateGymServices = asyncHandler(async (req, res) => {
   if (index !== -1) {
     // Update the service at the found index
     user.gym.services[index] = {
-      id,
+      id: id,
       serviceName: trimmedServiceName,
       description: trimmedServiceDescription,
-      serviceImage: base64Data,
+      serviceImage: serviceImage,
     };
 
     // Save the updated user
@@ -464,7 +568,7 @@ const deleteGymServices = asyncHandler(async (req, res) => {
 
   await user.save();
 
-  res.status(200).json(remainingServices);
+  res.status(200).json({ message: "Successfully deleted service" });
 });
 
 // AMENITIES //

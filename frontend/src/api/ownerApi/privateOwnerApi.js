@@ -97,6 +97,8 @@ export const updateGymDetails = async (
   }
 };
 
+// Gym Services API //
+
 export const getGymServices = async () => {
   try {
     const { data } = await privateOwnerApi.get("/services");
@@ -107,16 +109,48 @@ export const getGymServices = async () => {
   }
 };
 
-export const updateGymServices = async (gymname, address, contact) => {
+export const addGymServices = async (formData) => {
   try {
-    const { data } = await privateOwnerApi.put("/services", {
-      gymname: gymname,
-      address: address,
-      contact: contact,
+    const { data } = await privateOwnerApi.post("/services", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     });
     return data;
   } catch (error) {
-    console.error("Error updating status:", error);
+    console.error("Error adding service:", error);
+    throw error;
+  }
+};
+
+export const updateGymServices = async (
+  id,
+  serviceName,
+  description,
+  serviceImage
+) => {
+  try {
+    const { data } = await privateOwnerApi.put("/services", {
+      id: id,
+      serviceName: serviceName,
+      description: description,
+      serviceImage: serviceImage,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error updating service:", error);
+    throw error;
+  }
+};
+
+export const deleteGymServices = async (id) => {
+  try {
+    const { data } = await privateOwnerApi.delete("/services", {
+      data: { id },
+    });
+    return data;
+  } catch (error) {
+    console.error("Error deleting service:", error);
     throw error;
   }
 };
