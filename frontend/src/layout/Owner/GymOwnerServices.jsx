@@ -41,7 +41,7 @@ const GymOwnerServices = () => {
   const {
     isOpen: isAddServiceOpen,
     onOpen: openAddService,
-    onClose: closeAddservice,
+    onClose: closeAddService,
   } = useDisclosure();
   const {
     isOpen: isEditServiceOpen,
@@ -204,7 +204,7 @@ const GymOwnerServices = () => {
       serviceImage: null,
     });
 
-    closeAddservice();
+    closeAddService();
   };
 
   const handleOpenEdit = (service) => {

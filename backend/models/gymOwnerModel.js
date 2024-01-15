@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
 const memberPlanSchema = mongoose.Schema({
-  plan: {
+  planName: {
     type: String,
     required: true,
   },
@@ -10,7 +10,7 @@ const memberPlanSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  planstatus: {
+  planStatus: {
     type: String,
     enum: ["active", "expired", "pending", "cancelled"],
     default: "pending",
@@ -58,6 +58,10 @@ const memberSchema = mongoose.Schema({
 
 const trainerSchema = mongoose.Schema({
   firstname: {
+    type: String,
+    required: true,
+  },
+  middlename: {
     type: String,
     required: true,
   },
@@ -180,12 +184,16 @@ const serviceSchema = mongoose.Schema({
 });
 
 const planSchema = mongoose.Schema({
-  plan: {
+  planName: {
     type: String,
     required: true,
   },
+  duration: {
+    type: Number,
+    required: true,
+  },
   amount: {
-    type: String,
+    type: Number,
     required: true,
   },
 });

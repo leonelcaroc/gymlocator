@@ -320,4 +320,57 @@ export const deleteGymAnnouncement = async (id) => {
   }
 };
 
+// Plans API
+
+export const getGymPlans = async () => {
+  try {
+    const { data } = await privateOwnerApi.get("/plans");
+    return data;
+  } catch (error) {
+    console.error("Error getting gym plans:", error);
+    throw error;
+  }
+};
+
+export const addGymPlans = async (planName, duration, amount) => {
+  try {
+    const { data } = await privateOwnerApi.post("/plans", {
+      planName: planName,
+      duration: duration,
+      amount: amount,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error adding plan:", error);
+    throw error;
+  }
+};
+
+export const updateGymPlans = async (id, planName, duration, amount) => {
+  try {
+    const { data } = await privateOwnerApi.put("/plans", {
+      id: id,
+      planName: planName,
+      duration: duration,
+      amount: amount,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error updating plan:", error);
+    throw error;
+  }
+};
+
+export const deleteGymPlan = async (id) => {
+  try {
+    const { data } = await privateOwnerApi.delete("/plans", {
+      data: { id },
+    });
+    return data;
+  } catch (error) {
+    console.error("Error deleting plan:", error);
+    throw error;
+  }
+};
+
 export default privateOwnerApi;

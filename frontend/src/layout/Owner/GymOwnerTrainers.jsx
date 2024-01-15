@@ -330,7 +330,7 @@ const GymOwnerTrainers = () => {
                   onChange={(e) =>
                     setNewTrainer({
                       ...newTrainer,
-                      yearsOfExperience: parseInt(e.target.value, 10),
+                      yearsOfExperience: e.target.value,
                     })
                   }
                   onKeyDown={(e) => {

@@ -354,7 +354,7 @@ const GymOwnerAmenities = () => {
 
       {/* Delete Amenity*/}
 
-      <Modal isOpen={isDeleteAmenityOpen} onClose={handleOpenDelete}>
+      <Modal isOpen={isDeleteAmenityOpen} onClose={handleCloseDelete}>
         <ModalOverlay />
         <ModalContent paddingInline="2rem" maxWidth="35rem">
           <ModalHeader>Delete Amenity</ModalHeader>

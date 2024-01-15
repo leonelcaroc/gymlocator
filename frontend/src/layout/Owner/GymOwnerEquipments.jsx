@@ -355,7 +355,7 @@ const GymOwnerEquipments = () => {
 
       {/* Delete Amenity*/}
 
-      <Modal isOpen={isDeleteEquipmentOpen} onClose={handleOpenDelete}>
+      <Modal isOpen={isDeleteEquipmentOpen} onClose={handleCloseDelete}>
         <ModalOverlay />
         <ModalContent paddingInline="2rem" maxWidth="35rem">
           <ModalHeader>Delete Equipment</ModalHeader>

@@ -289,7 +289,7 @@ const GymOwnerAnnouncement = () => {
 
       {/* Delete Announcement*/}
 
-      <Modal isOpen={isDeleteAnnouncementOpen} onClose={handleOpenDelete}>
+      <Modal isOpen={isDeleteAnnouncementOpen} onClose={handleCloseDelete}>
         <ModalOverlay />
         <ModalContent paddingInline="2rem" maxWidth="35rem">
           <ModalHeader>Delete Amenity</ModalHeader>

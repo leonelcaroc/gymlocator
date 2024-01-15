@@ -827,62 +827,161 @@ const deleteGymEquipment = asyncHandler(async (req, res) => {
 
 // Gym Plans
 
+const getGymPlans = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
+
+  if (!user) {
+    res.status(404).json({ error: "User not found" });
+    throw new Error("User not found");
+  }
+
+  res.status(200).json(user.gym.plans);
+});
+
 const addGymPlans = asyncHandler(async (req, res) => {
-  try {
-    const user = await GymOwner.findById(req.user._id);
+  const user = await GymOwner.findById(req.user._id);
 
-    if (!user) {
-      res.status(404);
-      throw new Error("User not found");
-    }
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
 
-    // Extract the new equipment data from the request body
-    const { plan, amount } = req.body;
+  // Extract the new equipment data from the request body
+  const { planName, duration, amount } = req.body;
 
-    if (!validator.isNumeric(amount)) {
-      return res.status(400).json({ error: "Amount must be a valid number." });
-    }
+  const trimmedPlanName = validator.trim(planName);
 
-    const validPlans = ["annual", "semi-annual", "monthly"];
-    if (!validPlans.includes(plan)) {
-      return res.status(400).json({
-        error: "Invalid plan. Valid plans are: annual, semi-annual, monthly",
-      });
-    }
+  if (!validator.isLength(trimmedPlanName, { min: 1 })) {
+    return res.status(400).json({ error: "Plan name is required." });
+  }
 
-    const isPlanAlreadyAdded = user.gym.plans.some(
-      (existingPlan) => existingPlan.plan === plan
-    );
+  if (!validator.isNumeric(duration)) {
+    return res.status(400).json({ error: "Duration must be a valid number." });
+  }
 
-    if (isPlanAlreadyAdded) {
-      return res.status(400).json({ error: "Plan is already present." });
-    }
+  const numericDuration = parseFloat(duration);
 
-    // Add the new equipment to the existing equipment list
-    user.gym.plans.push({
-      plan: plan,
+  if (numericDuration === 0) {
+    return res.status(400).json({ error: "Duration must not be zero." });
+  }
+
+  if (!validator.isNumeric(amount)) {
+    return res.status(400).json({ error: "Amount must be a valid number." });
+  }
+
+  const numericAmount = parseFloat(amount);
+
+  if (numericAmount === 0) {
+    return res.status(400).json({ error: "Amount must not be zero." });
+  }
+
+  // const validPlans = ["annual", "semi-annual", "monthly"];
+  // if (!validPlans.includes(plan)) {
+  //   return res.status(400).json({
+  //     error: "Invalid plan. Valid plans are: annual, semi-annual, monthly",
+  //   });
+  // }
+
+  // const isPlanAlreadyAdded = user.gym.plans.some(
+  //   (existingPlan) => existingPlan.plan === plan
+  // );
+
+  // if (isPlanAlreadyAdded) {
+  //   return res.status(400).json({ error: "Plan is already present." });
+  // }
+
+  const newOwnerPlan = {
+    planName: trimmedPlanName,
+    duration: duration,
+    amount: amount,
+  };
+
+  // Add the new plan to the existing equipment list
+  user.gym.plans.push(newOwnerPlan);
+
+  // Save the updated user with the new equipment
+  await user.save();
+
+  // Respond with the updated user profile
+  res.status(200).json({
+    message: "Successfully added new plan",
+  });
+});
+
+const updateGymPlans = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
+
+  if (!user) {
+    res.status(404).json({ error: "User not found" });
+    throw new Error("User not found");
+  }
+
+  const { id, planName, duration, amount } = req.body;
+
+  const trimmedPlanName = validator.trim(planName);
+
+  if (!validator.isLength(trimmedPlanName, { min: 1 })) {
+    return res.status(400).json({ error: "Plan name is invalid." });
+  }
+
+  if (!validator.isInt(String(duration))) {
+    return res.status(400).json({ error: "Duration must be a valid number." });
+  }
+
+  if (duration === 0) {
+    return res.status(400).json({ error: "Duration must not be zero." });
+  }
+
+  if (!validator.isInt(String(amount))) {
+    return res.status(400).json({ error: "Amount must be a valid number." });
+  }
+
+  if (amount === 0) {
+    return res.status(400).json({ error: "Amount must not be zero." });
+  }
+
+  const index = user.gym.plans.findIndex((plan) => plan.id === id);
+
+  if (index !== -1) {
+    // Update the service at the found index
+    user.gym.plans[index] = {
+      id: id,
+      planName: trimmedPlanName,
+      duration: duration,
       amount: amount,
-    });
+    };
 
-    // Save the updated user with the new equipment
+    // Save the updated user
+    // const updatedService = await user.save();
     await user.save();
 
-    // Respond with the updated user profile
-    res.status(200).json({
-      message: "Successfully added new plan",
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(200).json({ message: "Successfully updated plan!" });
+  } else {
+    res.status(404).json({ error: "Plan not found" });
   }
 });
 
-const getGymPlans = asyncHandler(async (req, res) => {
-  const user = {
-    plans: req.user.gym.plans,
-  };
+const deleteGymPlan = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
+  const { id } = req.body;
 
-  res.status(200).json(user);
+  if (!user) {
+    res.status(404).json({ error: "User not found." });
+  }
+
+  const planToRemove = user.gym.plans.find((plan) => plan.id === id);
+
+  if (!planToRemove) {
+    res.status(404).json({ error: "Plan not found." });
+  }
+
+  const remainingPlans = user.gym.plans.filter((plan) => plan.id !== id);
+
+  user.gym.plans = [...remainingPlans];
+
+  await user.save();
+
+  res.status(200).json({ message: "Successfully deleted plan" });
 });
 
 const addGymTrainers = asyncHandler(async (req, res) => {
@@ -1190,8 +1289,10 @@ export {
   addGymEquipments,
   updateGymEquipments,
   deleteGymEquipment,
-  addGymPlans,
   getGymPlans,
+  addGymPlans,
+  updateGymPlans,
+  deleteGymPlan,
   addGymTrainers,
   getGymTrainers,
   getStripePrices,
