@@ -373,4 +373,42 @@ export const deleteGymPlan = async (id) => {
   }
 };
 
+// Trainers API
+
+export const addGymTrainers = async (
+  firstname,
+  middlename,
+  lastname,
+  email,
+  contact,
+  address,
+  dateOfBirth,
+  gender,
+  certifications,
+  specialties,
+  yearsOfExperience,
+  biography
+) => {
+  try {
+    const { data } = await privateOwnerApi.post("/trainers", {
+      firstname: firstname,
+      middlename: middlename,
+      lastname: lastname,
+      email: email,
+      contact: contact,
+      address: address,
+      dateOfBirth: dateOfBirth,
+      gender: gender,
+      certifications: certifications,
+      specialties: specialties,
+      yearsOfExperience: yearsOfExperience,
+      biography: biography,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error adding trainer:", error);
+    throw error;
+  }
+};
+
 export default privateOwnerApi;

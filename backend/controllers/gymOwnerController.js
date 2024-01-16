@@ -984,91 +984,119 @@ const deleteGymPlan = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Successfully deleted plan" });
 });
 
+// const addGymTrainers = asyncHandler(async (req, res) => {
+//   const user = await GymOwner.findById(req.user._id);
+
+//   if (!user) {
+//     res.status(404);
+//     throw new Error("User not found");
+//   }
+
+//   const { certifications } = req.body;
+
+//   res.status(200).json({ certifications: certifications });
+// });
+
 const addGymTrainers = asyncHandler(async (req, res) => {
-  try {
-    const user = await GymOwner.findById(req.user._id);
+  const user = await GymOwner.findById(req.user._id);
 
-    if (!user) {
-      res.status(404);
-      throw new Error("User not found");
-    }
-
-    // Extract the new equipment data from the request body
-    const {
-      firstname,
-      lastname,
-      email,
-      contact,
-      address,
-      birthdate,
-      gender,
-      certifications,
-      specialties,
-      experience,
-      biography,
-    } = req.body;
-
-    const trimmedFirstname = validator.trim(firstname);
-    const trimmedLastname = validator.trim(lastname);
-    const trimmedAddress = validator.trim(address);
-    const trimmedBiography = validator.trim(biography);
-
-    if (!validator.isEmail(email)) {
-      return res.status(400).json({ error: "Invalid email address" });
-    }
-
-    if (!validator.isLength(trimmedFirstname, { min: 1 })) {
-      return res.status(400).json({ error: "First name is required." });
-    }
-
-    if (!validator.isLength(trimmedLastname, { min: 1 })) {
-      return res.status(400).json({ error: "Last name is required." });
-    }
-
-    if (!validator.isLength(trimmedAddress, { min: 1 })) {
-      return res.status(400).json({ error: "Address is required." });
-    }
-
-    if (!validator.isLength(trimmedBiography, { min: 1 })) {
-      return res.status(400).json({ error: "Biography is required." });
-    }
-
-    if (!validator.isLength(contact, { min: 11, max: 11 })) {
-      return res.status(400).json({ error: "Contact is invalid." });
-    }
-
-    if (!validator.isNumeric(experience, { min: 11, max: 11 })) {
-      return res.status(400).json({ error: "Experience is invalid." });
-    }
-
-    const newTrainer = {
-      firstname: trimmedFirstname,
-      lastname: trimmedLastname,
-      email: email,
-      contact: contact,
-      address: trimmedAddress,
-      dateOfBirth: birthdate,
-      gender: gender,
-      certifications: certifications,
-      specialties: specialties,
-      experience: experience,
-      biography: trimmedBiography,
-    };
-
-    // Add the new service to the existing service list
-    user.gym.trainers.push(newTrainer);
-
-    // Save the updated user with the new service
-    await user.save();
-
-    // Respond with the updated user profile
-    res.status(200).json({
-      message: "Successfully added new trainer",
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
   }
+
+  const {
+    firstname,
+    middlename,
+    lastname,
+    email,
+    contact,
+    address,
+    dateOfBirth,
+    gender,
+    certifications,
+    specialties,
+    yearsOfExperience,
+    biography,
+  } = req.body;
+
+  const trimmedFirstname = validator.trim(firstname);
+  const trimmedMiddlename = validator.trim(middlename);
+  const trimmedLastname = validator.trim(lastname);
+  const trimmedAddress = validator.trim(address);
+  const trimmedContact = validator.trim(contact);
+  const trimmedExperience = validator.trim(yearsOfExperience);
+  const trimmedBiography = validator.trim(biography);
+
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ error: "Invalid email address" });
+  }
+
+  if (!validator.isLength(trimmedFirstname, { min: 1 })) {
+    return res.status(400).json({ error: "First name is required." });
+  }
+
+  if (!validator.isLength(trimmedMiddlename, { min: 1 })) {
+    return res.status(400).json({ error: "Middle name is required." });
+  }
+
+  if (!validator.isLength(trimmedLastname, { min: 1 })) {
+    return res.status(400).json({ error: "Last name is required." });
+  }
+
+  if (!validator.isLength(trimmedAddress, { min: 1 })) {
+    return res.status(400).json({ error: "Address is required." });
+  }
+
+  if (dateOfBirth === null) {
+    return res.status(400).json({ error: "Date of birth is required." });
+  }
+
+  if (!validator.isLength(trimmedContact, { min: 1 })) {
+    return res.status(400).json({ error: "Contact is required." });
+  }
+
+  if (!validator.isNumeric(trimmedExperience, { min: 1 })) {
+    return res.status(400).json({ error: "Experience is required." });
+  }
+
+  if (!validator.isLength(trimmedBiography, { min: 1 })) {
+    return res.status(400).json({ error: "Biography is required." });
+  }
+
+  const newTrainer = {
+    firstname: trimmedFirstname,
+    middlename: trimmedMiddlename,
+    lastname: trimmedLastname,
+    email: email,
+    contact: trimmedContact,
+    address: trimmedAddress,
+    dateOfBirth: dateOfBirth,
+    gender: gender,
+    certifications: certifications.map((item) => ({
+      // _id: new ObjectId(),
+      certificateName: item.certificateName,
+    })),
+    specialties: specialties.map((item) => ({
+      // _id: new ObjectId(),
+      specialtyName: item.specialtyName,
+    })),
+    yearsOfExperience: yearsOfExperience,
+    biography: trimmedBiography,
+  };
+
+  // res.status(200).json(newTrainer);
+
+  // Add the new service to the existing service list
+  user.gym.trainers.push(newTrainer);
+
+  // Save the updated user with the new service
+  await user.save();
+
+  // Respond with the updated user profile
+  res.status(200).json({
+    message: "Successfully added new trainer",
+  });
 });
 
 const getGymTrainers = asyncHandler(async (req, res) => {

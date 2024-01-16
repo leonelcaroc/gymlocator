@@ -1,7 +1,5 @@
 import { useState } from "react";
 import {
-  Checkbox,
-  CheckboxGroup,
   CloseButton,
   Box,
   Flex,
@@ -31,10 +29,16 @@ import {
   OrderedList,
   UnorderedList,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { v4 as uuidv4 } from "uuid";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import { addGymTrainers } from "../../api/ownerApi/privateOwnerApi";
 
 const GymOwnerTrainers = () => {
+  const toast = useToast();
+  const queryClient = useQueryClient();
+
   const newUniqueId = uuidv4();
   const {
     isOpen: isAddNewTrainerOpen,
@@ -60,9 +64,49 @@ const GymOwnerTrainers = () => {
     gender: "",
     certifications: [],
     specialties: [],
-    yearsOfExperience: 0,
+    yearsOfExperience: "",
     biography: "",
   });
+
+  const addGymTrainerMutation = useMutation(
+    async (formData) => {
+      return addGymTrainers(
+        formData.firstname,
+        formData.middlename,
+        formData.lastname,
+        formData.email,
+        formData.contact,
+        formData.address,
+        formData.dateOfBirth,
+        formData.gender,
+        formData.certifications,
+        formData.specialties,
+        formData.yearsOfExperience,
+        formData.biography
+      );
+    },
+    {
+      onSuccess: (data) => {
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+
+        // Invalidate and refetch any queries that depend on the user data
+        queryClient.invalidateQueries("trainerData");
+      },
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
 
   const handleDeleteCertification = (index) => {
     setNewTrainer((prevTrainer) => {
@@ -77,22 +121,23 @@ const GymOwnerTrainers = () => {
   };
 
   const handleSubmitNewTrainer = () => {
-    console.log(newTrainer);
-    setNewTrainer({
-      firstname: "",
-      middlename: "",
-      lastname: "",
-      email: "",
-      contact: "",
-      address: "",
-      dateOfBirth: null,
-      gender: "",
-      certifications: [],
-      specialties: [],
-      yearsOfExperience: 0,
-      biography: "",
-    });
-    closeAddNewTrainer();
+    addGymTrainerMutation.mutate(newTrainer);
+    // console.log(newTrainer);
+    // setNewTrainer({
+    //   firstname: "",
+    //   middlename: "",
+    //   lastname: "",
+    //   email: "",
+    //   contact: "",
+    //   address: "",
+    //   dateOfBirth: null,
+    //   gender: "",
+    //   certifications: [],
+    //   specialties: [],
+    //   yearsOfExperience: "",
+    //   biography: "",
+    // });
+    // closeAddNewTrainer();
   };
 
   const handleCloseNewTrainer = () => {
@@ -107,7 +152,7 @@ const GymOwnerTrainers = () => {
       gender: "",
       certifications: [],
       specialties: [],
-      yearsOfExperience: 0,
+      yearsOfExperience: "",
       biography: "",
     });
     closeAddNewTrainer();
@@ -231,6 +276,7 @@ const GymOwnerTrainers = () => {
                 <Text fontWeight="bold">Certifications</Text>
                 <InputGroup>
                   <Input
+                    placeholder="Type your certification"
                     value={newCertificate.certificateName}
                     onChange={(e) =>
                       setNewCertificate({
@@ -281,6 +327,7 @@ const GymOwnerTrainers = () => {
                 <Text fontWeight="bold">Specialties</Text>
                 <InputGroup>
                   <Input
+                    placeholder="Type your specialty"
                     value={newSpecialty.specialtyName}
                     onChange={(e) =>
                       setNewSpecialty({
@@ -335,11 +382,18 @@ const GymOwnerTrainers = () => {
                   }
                   onKeyDown={(e) => {
                     const isNumeric = /^[0-9\b]+$/.test(e.key);
-                    if (!isNumeric) {
+
+                    // Allow Backspace (keyCode 8) and Tab (keyCode 9)
+                    if (
+                      !isNumeric &&
+                      e.key !== "Backspace" &&
+                      e.key !== "Tab"
+                    ) {
                       e.preventDefault();
                     }
                   }}
                   type="number"
+                  placeholder="Type your experience"
                 />
               </Box>
               <Box>
@@ -352,6 +406,7 @@ const GymOwnerTrainers = () => {
                     })
                   }
                   type="text"
+                  placeholder="Type your biography"
                 />
               </Box>
             </Stack>

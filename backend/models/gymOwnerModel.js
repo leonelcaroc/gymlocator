@@ -56,6 +56,20 @@ const memberSchema = mongoose.Schema({
   },
 });
 
+const specialtySchema = mongoose.Schema({
+  specialtyName: {
+    type: String,
+    required: true,
+  },
+});
+
+const certificationSchema = mongoose.Schema({
+  certificateName: {
+    type: String,
+    required: true,
+  },
+});
+
 const trainerSchema = mongoose.Schema({
   firstname: {
     type: String,
@@ -90,15 +104,15 @@ const trainerSchema = mongoose.Schema({
     required: true,
   },
   certifications: {
-    type: Array,
+    type: [certificationSchema],
     default: [],
   },
   specialties: {
-    type: Array,
+    type: [specialtySchema],
     default: [],
   },
-  experience: {
-    type: Number,
+  yearsOfExperience: {
+    type: String,
     required: true,
   },
   biography: {

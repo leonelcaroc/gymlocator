@@ -105,10 +105,10 @@ router
   .put(protectOwner, updateGymEquipments)
   .delete(protectOwner, deleteGymEquipment);
 
-// router
-//   .route("/trainers")
-//   .get(protectOwner, getGymTrainers)
-//   .put(protectOwner, addGymTrainers);
+router
+  .route("/trainers")
+  // .get(protectOwner, getGymTrainers)
+  .post(protectOwner, addGymTrainers);
 
 // router
 //   .route("/classes")
