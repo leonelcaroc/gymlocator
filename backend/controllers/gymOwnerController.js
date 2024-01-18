@@ -984,18 +984,18 @@ const deleteGymPlan = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Successfully deleted plan" });
 });
 
-// const addGymTrainers = asyncHandler(async (req, res) => {
-//   const user = await GymOwner.findById(req.user._id);
+// Gym Trainers
 
-//   if (!user) {
-//     res.status(404);
-//     throw new Error("User not found");
-//   }
+const getGymTrainers = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
 
-//   const { certifications } = req.body;
+  if (!user) {
+    res.status(404).json({ error: "User not found" });
+    throw new Error("User not found");
+  }
 
-//   res.status(200).json({ certifications: certifications });
-// });
+  res.status(200).json(user.gym.trainers);
+});
 
 const addGymTrainers = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
@@ -1074,20 +1074,15 @@ const addGymTrainers = asyncHandler(async (req, res) => {
     dateOfBirth: dateOfBirth,
     gender: gender,
     certifications: certifications.map((item) => ({
-      // _id: new ObjectId(),
       certificateName: item.certificateName,
     })),
     specialties: specialties.map((item) => ({
-      // _id: new ObjectId(),
       specialtyName: item.specialtyName,
     })),
     yearsOfExperience: yearsOfExperience,
     biography: trimmedBiography,
   };
 
-  // res.status(200).json(newTrainer);
-
-  // Add the new service to the existing service list
   user.gym.trainers.push(newTrainer);
 
   // Save the updated user with the new service
@@ -1097,14 +1092,6 @@ const addGymTrainers = asyncHandler(async (req, res) => {
   res.status(200).json({
     message: "Successfully added new trainer",
   });
-});
-
-const getGymTrainers = asyncHandler(async (req, res) => {
-  const user = {
-    trainers: req.user.gym.trainers,
-  };
-
-  res.status(200).json(user);
 });
 
 // Gym Announcements

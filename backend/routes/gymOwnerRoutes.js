@@ -26,8 +26,8 @@ import {
   addGymPlans,
   updateGymPlans,
   deleteGymPlan,
-  addGymTrainers,
   getGymTrainers,
+  addGymTrainers,
   getStripePrices,
   addGymAnnouncement,
   getGymAnnouncement,
@@ -107,7 +107,7 @@ router
 
 router
   .route("/trainers")
-  // .get(protectOwner, getGymTrainers)
+  .get(protectOwner, getGymTrainers)
   .post(protectOwner, addGymTrainers);
 
 // router

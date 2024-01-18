@@ -375,6 +375,16 @@ export const deleteGymPlan = async (id) => {
 
 // Trainers API
 
+export const getGymTrainers = async () => {
+  try {
+    const { data } = await privateOwnerApi.get("/trainers");
+    return data;
+  } catch (error) {
+    console.error("Error getting gym trainers:", error);
+    throw error;
+  }
+};
+
 export const addGymTrainers = async (
   firstname,
   middlename,

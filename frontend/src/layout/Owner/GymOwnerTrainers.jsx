@@ -26,25 +26,25 @@ import {
   ModalCloseButton,
   Select,
   Stack,
-  OrderedList,
   UnorderedList,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import { v4 as uuidv4 } from "uuid";
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import { addGymTrainers } from "../../api/ownerApi/privateOwnerApi";
+import {
+  addGymTrainers,
+  getGymTrainers,
+} from "../../api/ownerApi/privateOwnerApi";
 
 const GymOwnerTrainers = () => {
   const toast = useToast();
   const queryClient = useQueryClient();
 
   const newUniqueId = uuidv4();
-  const {
-    isOpen: isAddNewTrainerOpen,
-    onOpen: openAddNewTrainer,
-    onClose: closeAddNewTrainer,
-  } = useDisclosure();
+
+  const [selectedTrainer, setSelectedTrainer] = useState(null);
+  const [selectedDeleteTrainer, setSelectedDeleteTrainer] = useState(null);
   const [newCertificate, setNewCertificate] = useState({
     certificateName: "",
     key: "",
@@ -67,6 +67,40 @@ const GymOwnerTrainers = () => {
     yearsOfExperience: "",
     biography: "",
   });
+
+  const {
+    isOpen: isAddNewTrainerOpen,
+    onOpen: openAddNewTrainer,
+    onClose: closeAddNewTrainer,
+  } = useDisclosure();
+  const {
+    isOpen: isEditTrainerOpen,
+    onOpen: openEditTrainer,
+    onClose: closeEditTrainer,
+  } = useDisclosure();
+  const {
+    isOpen: isDeleteTrainerOpen,
+    onOpen: openDeleteTrainer,
+    onClose: closeDeleteTrainer,
+  } = useDisclosure();
+
+  const { data, isLoading, isError } = useQuery(
+    "trainerData",
+    async () => {
+      return getGymTrainers();
+    },
+    {
+      refetchOnWindowFocus: false,
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
 
   const addGymTrainerMutation = useMutation(
     async (formData) => {
@@ -122,22 +156,21 @@ const GymOwnerTrainers = () => {
 
   const handleSubmitNewTrainer = () => {
     addGymTrainerMutation.mutate(newTrainer);
-    // console.log(newTrainer);
-    // setNewTrainer({
-    //   firstname: "",
-    //   middlename: "",
-    //   lastname: "",
-    //   email: "",
-    //   contact: "",
-    //   address: "",
-    //   dateOfBirth: null,
-    //   gender: "",
-    //   certifications: [],
-    //   specialties: [],
-    //   yearsOfExperience: "",
-    //   biography: "",
-    // });
-    // closeAddNewTrainer();
+    setNewTrainer({
+      firstname: "",
+      middlename: "",
+      lastname: "",
+      email: "",
+      contact: "",
+      address: "",
+      dateOfBirth: null,
+      gender: "",
+      certifications: [],
+      specialties: [],
+      yearsOfExperience: "",
+      biography: "",
+    });
+    closeAddNewTrainer();
   };
 
   const handleCloseNewTrainer = () => {
@@ -158,8 +191,45 @@ const GymOwnerTrainers = () => {
     closeAddNewTrainer();
   };
 
+  // const handleOpenEdit = (trainer) => {
+  //   setSelectedTrainer(trainer);
+  //   openEditTrainer();
+  // };
+
+  // const handleSaveEdit = () => {
+  //   updateTrainerMutation.mutate(selectedTrainer);
+  //   setSelectedTrainer(null);
+  //   closeEditTrainer();
+  // };
+
+  // const handleCloseEdit = () => {
+  //   setSelectedTrainer(null);
+  //   closeEditTrainer();
+  //   // Reset the edited data to the original data or fetch from your backend
+  // };
+
+  const handleOpenDelete = (trainer) => {
+    setSelectedDeleteTrainer(trainer);
+    openDeleteTrainer();
+  };
+
+  const handleDeleteTrainer = () => {
+    // deleteTrainerMutation.mutate(selectedDeleteTrainer);
+    // setSelectedDeleteTrainer(null);
+    console.log(selectedDeleteTrainer);
+    // closeDeleteTrainer();
+  };
+
+  const handleCloseDelete = () => {
+    setSelectedDeleteTrainer(null);
+    closeDeleteTrainer();
+    // Reset the edited data to the original data or fetch from your backend
+  };
+
   return (
     <Box padding="2rem">
+      {/* New Trainer  */}
+
       <Modal isOpen={isAddNewTrainerOpen} onClose={handleCloseNewTrainer}>
         <ModalOverlay />
         <ModalContent paddingInline="2rem" maxWidth="35rem">
@@ -425,6 +495,37 @@ const GymOwnerTrainers = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* Edit Trainer */}
+
+      {/* Delete Trainer */}
+
+      <Modal isOpen={isDeleteTrainerOpen} onClose={handleCloseDelete}>
+        <ModalOverlay />
+        <ModalContent paddingInline="2rem" maxWidth="35rem">
+          <ModalHeader>Delete Trainer</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>
+              Are you sure you want to delete {selectedDeleteTrainer?.firstname}{" "}
+              {selectedDeleteTrainer?.lastname}?
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="gray" mr={3} onClick={handleCloseDelete}>
+              No
+            </Button>
+            <Button
+              bgColor="red"
+              color="neutral.100"
+              onClick={handleDeleteTrainer}
+            >
+              Yes
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
       <Text color="brand.200" fontSize="2rem" marginBottom="2rem">
         Trainers
       </Text>
@@ -432,6 +533,7 @@ const GymOwnerTrainers = () => {
         bgColor="brand.100"
         color="neutral.100"
         onClick={openAddNewTrainer}
+        isLoading={addGymTrainerMutation.isLoading}
       >
         Add Trainer
       </Button>
@@ -441,27 +543,51 @@ const GymOwnerTrainers = () => {
             <Tr>
               <Th>First Name</Th>
               <Th>Last Name</Th>
-              <Th>Address</Th>
+              <Th>Certifications</Th>
+              <Th>Specialties</Th>
               <Th>Action</Th>
             </Tr>
           </Thead>
           <Tbody>
-            <Tr>
-              <Td whiteSpace="normal">Mae</Td>
-              <Td whiteSpace="normal">Erasga</Td>
-              <Td whiteSpace="normal">Dona Martina Drive Caragasan, Maasin</Td>
+            {data?.map((item) => (
+              <Tr key={item._id}>
+                <Td whiteSpace="normal">{item.firstname}</Td>
+                <Td whiteSpace="normal">{item.lastname}</Td>
+                <Td whiteSpace="normal">
+                  {item.certifications.reduce(
+                    (acc, curr) =>
+                      acc + (acc ? ", " : "") + curr.certificateName,
+                    ""
+                  )}
+                </Td>
+                <Td whiteSpace="normal">
+                  {" "}
+                  {item.specialties.reduce(
+                    (acc, curr) => acc + (acc ? ", " : "") + curr.specialtyName,
+                    ""
+                  )}
+                </Td>
 
-              <Td>
-                <Flex gap="1rem">
-                  <Button bgColor="blue" color="neutral.100">
-                    Edit
-                  </Button>
-                  <Button bgColor="red" color="white">
-                    Delete
-                  </Button>
-                </Flex>
-              </Td>
-            </Tr>
+                <Td>
+                  <Flex gap="1rem">
+                    {/* <Button
+                      bgColor="blue"
+                      color="neutral.100"
+                      onClick={() => handleOpenEdit(item)}
+                    >
+                      Edit
+                    </Button> */}
+                    <Button
+                      bgColor="red"
+                      color="white"
+                      onClick={() => handleOpenDelete(item)}
+                    >
+                      Delete
+                    </Button>
+                  </Flex>
+                </Td>
+              </Tr>
+            ))}
           </Tbody>
         </Table>
       </TableContainer>
