@@ -580,18 +580,22 @@ const GymOwnerTrainers = () => {
                 <Td whiteSpace="normal">{item.firstname}</Td>
                 <Td whiteSpace="normal">{item.lastname}</Td>
                 <Td whiteSpace="normal">
-                  {item.certifications.reduce(
-                    (acc, curr) =>
-                      acc + (acc ? ", " : "") + curr.certificateName,
-                    ""
-                  )}
+                  {item.certifications.length !== 0
+                    ? item.certifications.reduce(
+                        (acc, curr) =>
+                          acc + (acc ? ", " : "") + curr.certificateName,
+                        ""
+                      )
+                    : "n/a"}
                 </Td>
                 <Td whiteSpace="normal">
-                  {" "}
-                  {item.specialties.reduce(
-                    (acc, curr) => acc + (acc ? ", " : "") + curr.specialtyName,
-                    ""
-                  )}
+                  {item.specialties.length !== 0
+                    ? item.specialties.reduce(
+                        (acc, curr) =>
+                          acc + (acc ? ", " : "") + curr.specialtyName,
+                        ""
+                      )
+                    : "n/a"}
                 </Td>
 
                 <Td>
