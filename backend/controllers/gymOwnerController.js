@@ -951,8 +951,6 @@ const updateGymPlans = asyncHandler(async (req, res) => {
       amount: amount,
     };
 
-    // Save the updated user
-    // const updatedService = await user.save();
     await user.save();
 
     res.status(200).json({ message: "Successfully updated plan!" });
@@ -984,7 +982,7 @@ const deleteGymPlan = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Successfully deleted plan" });
 });
 
-// Gym Trainers
+// GYM TRAINERS
 
 const getGymTrainers = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
@@ -1094,7 +1092,32 @@ const addGymTrainers = asyncHandler(async (req, res) => {
   });
 });
 
-// Gym Announcements
+const deleteGymTrainer = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
+  const { id } = req.body;
+
+  if (!user) {
+    res.status(404).json({ error: "User not found." });
+  }
+
+  const trainerToRemove = user.gym.trainers.find(
+    (trainer) => trainer.id === id
+  );
+
+  if (!trainerToRemove) {
+    res.status(404).json({ error: "Trainer not found." });
+  }
+
+  const remainingTrainers = user.gym.trainers.filter((item) => item.id !== id);
+
+  user.gym.trainers = [...remainingTrainers];
+
+  await user.save();
+
+  res.status(200).json({ message: "Successfully deleted trainer" });
+});
+
+// GYM ANNOUNCEMENTS
 
 const getGymAnnouncement = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
@@ -1206,6 +1229,19 @@ const deleteGymAnnouncement = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Successfully deleted announcement" });
 });
 
+// GYM CLASSES
+
+const getGymClasses = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
+
+  if (!user) {
+    res.status(404).json({ error: "User not found" });
+    throw new Error("User not found");
+  }
+
+  res.status(200).json(user.gym.classes);
+});
+
 const addGymClasses = asyncHandler(async (req, res) => {
   try {
     const user = await GymOwner.findById(req.user._id);
@@ -1266,13 +1302,7 @@ const addGymClasses = asyncHandler(async (req, res) => {
   }
 });
 
-const getGymClasses = asyncHandler(async (req, res) => {
-  const user = {
-    classes: req.user.gym.classes,
-  };
-
-  res.status(200).json(user);
-});
+// Payment Stripe
 
 const getStripePrices = asyncHandler(async (req, res) => {
   const prices = await stripe.prices.list({
@@ -1308,29 +1338,14 @@ export {
   addGymPlans,
   updateGymPlans,
   deleteGymPlan,
-  addGymTrainers,
   getGymTrainers,
+  addGymTrainers,
+  deleteGymTrainer,
   getStripePrices,
   getGymAnnouncement,
   addGymAnnouncement,
   updateGymAnnouncement,
   deleteGymAnnouncement,
-  addGymClasses,
   getGymClasses,
+  addGymClasses,
 };
-
-// user: {
-//   _id: new ObjectId("6562e1b22670ffadafc8ff70"),
-//   firstname: 'John',
-//   lastname: 'Doe',
-//   email: 'johndoe@gmail.com',
-//   gym: {
-//     gymname: 'Carlo Gym',
-//     contact: '12345678910',
-//     description: 'Hello welcome to my gym',
-//     address: 'USA',
-//     schedule: [Object],
-//     permitBase64: Binary.createFromBase64("MTIzNDU2", 0),
-//     _id: new ObjectId("6562e1b22670ffadafc8ff71")
-//   }
-// }

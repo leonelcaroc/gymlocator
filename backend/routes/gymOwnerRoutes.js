@@ -28,6 +28,7 @@ import {
   deleteGymPlan,
   getGymTrainers,
   addGymTrainers,
+  deleteGymTrainer,
   getStripePrices,
   addGymAnnouncement,
   getGymAnnouncement,
@@ -108,12 +109,11 @@ router
 router
   .route("/trainers")
   .get(protectOwner, getGymTrainers)
-  .post(protectOwner, addGymTrainers);
+  .post(protectOwner, addGymTrainers)
+  .delete(protectOwner, deleteGymTrainer);
 
-// router
-//   .route("/classes")
-//   .get(protectOwner, getGymClasses)
-//   .put(protectOwner, addGymClasses);
+router.route("/classes").get(protectOwner, getGymClasses);
+// .post(protectOwner, addGymClasses);
 router
   .route("/announcements")
   .get(protectOwner, getGymAnnouncement)

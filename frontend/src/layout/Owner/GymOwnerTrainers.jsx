@@ -35,6 +35,7 @@ import { useQuery, useMutation, useQueryClient } from "react-query";
 import {
   addGymTrainers,
   getGymTrainers,
+  deleteGymTrainer,
 } from "../../api/ownerApi/privateOwnerApi";
 
 const GymOwnerTrainers = () => {
@@ -142,6 +143,33 @@ const GymOwnerTrainers = () => {
     }
   );
 
+  const deleteGymTrainerMutation = useMutation(
+    async (formData) => {
+      return deleteGymTrainer(formData._id);
+    },
+    {
+      onSuccess: (data) => {
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+
+        // Invalidate and refetch any queries that depend on the user data
+        queryClient.invalidateQueries("trainerData");
+      },
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
   const handleDeleteCertification = (index) => {
     setNewTrainer((prevTrainer) => {
       const updatedCertifications = [...prevTrainer.certifications];
@@ -214,16 +242,14 @@ const GymOwnerTrainers = () => {
   };
 
   const handleDeleteTrainer = () => {
-    // deleteTrainerMutation.mutate(selectedDeleteTrainer);
-    // setSelectedDeleteTrainer(null);
-    console.log(selectedDeleteTrainer);
-    // closeDeleteTrainer();
+    deleteGymTrainerMutation.mutate(selectedDeleteTrainer);
+    setSelectedDeleteTrainer(null);
+    closeDeleteTrainer();
   };
 
   const handleCloseDelete = () => {
     setSelectedDeleteTrainer(null);
     closeDeleteTrainer();
-    // Reset the edited data to the original data or fetch from your backend
   };
 
   return (

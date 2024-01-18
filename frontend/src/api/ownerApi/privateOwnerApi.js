@@ -421,4 +421,18 @@ export const addGymTrainers = async (
   }
 };
 
+export const deleteGymTrainer = async (id) => {
+  try {
+    const { data } = await privateOwnerApi.delete("/trainers", {
+      data: { id },
+    });
+    return data;
+  } catch (error) {
+    console.error("Error deleting trainer:", error);
+    throw error;
+  }
+};
+
+// Classes API
+
 export default privateOwnerApi;
