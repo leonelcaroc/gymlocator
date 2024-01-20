@@ -187,11 +187,12 @@ const GymOwnerServices = () => {
     newServiceFormData.append("serviceName", newService.serviceName);
     newServiceFormData.append("description", newService.description);
     newServiceFormData.append("serviceImage", newService.serviceImage);
+    // addServiceMutation.mutate(newServiceFormData);
 
     // console.log(newServiceFormData.serviceName);
     // console.log(newServiceFormData.description);
     // console.log(newServiceFormData.serviceImage);
-    addServiceMutation.mutate(newServiceFormData);
+
     // console.log(newService.serviceName);
     // console.log(newService.description);
     // console.log(newService.serviceImage);
