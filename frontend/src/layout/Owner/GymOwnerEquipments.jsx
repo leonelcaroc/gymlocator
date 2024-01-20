@@ -145,7 +145,7 @@ const GymOwnerEquipments = () => {
   );
 
   const handleCloseNewEquipment = () => {
-    setEquipment({
+    setNewEquipment({
       equipmentName: "",
       description: "",
       equipmentImage: null,

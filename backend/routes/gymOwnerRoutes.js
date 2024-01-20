@@ -34,8 +34,8 @@ import {
   getGymAnnouncement,
   updateGymAnnouncement,
   deleteGymAnnouncement,
-  addGymClasses,
   getGymClasses,
+  addGymClasses,
 } from "../controllers/gymOwnerController.js";
 import { protectOwner } from "../middleware/gymOwnerAuthMiddleware.js";
 import multer from "multer";
@@ -112,8 +112,10 @@ router
   .post(protectOwner, addGymTrainers)
   .delete(protectOwner, deleteGymTrainer);
 
-router.route("/classes").get(protectOwner, getGymClasses);
-// .post(protectOwner, addGymClasses);
+router
+  .route("/classes")
+  .get(protectOwner, getGymClasses)
+  .post(protectOwner, addGymClasses);
 router
   .route("/announcements")
   .get(protectOwner, getGymAnnouncement)

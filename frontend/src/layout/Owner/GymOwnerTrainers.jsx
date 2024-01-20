@@ -44,7 +44,7 @@ const GymOwnerTrainers = () => {
 
   const newUniqueId = uuidv4();
 
-  const [selectedTrainer, setSelectedTrainer] = useState(null);
+  // const [selectedTrainer, setSelectedTrainer] = useState(null);
   const [selectedDeleteTrainer, setSelectedDeleteTrainer] = useState(null);
   const [newCertificate, setNewCertificate] = useState({
     certificateName: "",

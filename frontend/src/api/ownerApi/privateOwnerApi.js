@@ -435,4 +435,14 @@ export const deleteGymTrainer = async (id) => {
 
 // Classes API
 
+export const getGymClasses = async () => {
+  try {
+    const { data } = await privateOwnerApi.get("/classes");
+    return data;
+  } catch (error) {
+    console.error("Error getting gym classes:", error);
+    throw error;
+  }
+};
+
 export default privateOwnerApi;
