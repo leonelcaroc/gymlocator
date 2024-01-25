@@ -1312,6 +1312,19 @@ const getStripePrices = asyncHandler(async (req, res) => {
   res.status(200).json(prices);
 });
 
+// Other Public Route (Get Gym)
+
+// const getGyms = asyncHandler(async (req, res) => {
+//   const user = await GymOwner.findById(req.user._id);
+
+//   if (!user) {
+//     res.status(404).json({ error: "User not found" });
+//     throw new Error("User not found");
+//   }
+
+//   res.status(200).json(user.gym.classes);
+// });
+
 export {
   // upload,
   authOwner,

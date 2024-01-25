@@ -312,6 +312,10 @@ const gymSchema = mongoose.Schema({
     type: [memberSchema],
     default: [],
   },
+  reviews: {
+    type: Array,
+    default: [],
+  },
 });
 
 const gymOwnerSchema = mongoose.Schema(

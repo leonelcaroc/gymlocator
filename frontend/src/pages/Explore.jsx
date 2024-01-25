@@ -1,12 +1,5 @@
 import { Outlet } from "react-router-dom";
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   Flex,
   Box,
   Text,
@@ -16,8 +9,12 @@ import {
   Button,
   useDisclosure,
 } from "@chakra-ui/react";
+
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import { getGymOwners } from "../api/publicApi/publicApi";
 import Header from "../layout/Header/Header";
 import ExploreBox from "../components/ExploreBox/ExploreBox";
+import UserSignUpModal from "../components/UserSignUpModal/UserSignUpModal";
 import backgroundImage from "../assets/images/gym-sample.jpg";
 import {
   MapContainer,
@@ -83,7 +80,16 @@ function MapLocate({ location }) {
 // }
 
 const Explore = () => {
+  const [exploreState, setExploreState] = useState("explore");
+  const [selectedGym, setSelectedGym] = useState(null);
+
   // ----------------------------------------
+
+  const {
+    isOpen: isUserSignUpOpen,
+    onOpen: openUserSignUp,
+    onClose: closeUserSignUp,
+  } = useDisclosure();
 
   // const [location, setLocation] = useState([]);
   const [position, setPosition] = useState([
@@ -92,6 +98,27 @@ const Explore = () => {
   const [location, setLocation] = useState(null);
 
   // ----------------------------------------
+
+  const { data, isLoading, isError } = useQuery(
+    "gymOwners",
+    async () => {
+      return getGymOwners();
+    },
+    {
+      refetchOnWindowFocus: false,
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+      onSuccess: (result) => {
+        setSelectedGym(result[0]);
+      },
+    }
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -140,59 +167,235 @@ const Explore = () => {
   });
 
   return (
-    <Flex
-      flexDirection="column"
-      backgroundImage={`url(${backgroundImage})`}
-      backgroundPosition="center"
-      backgroundRepeat="no-repeat"
-      backgroundSize="cover"
-      minHeight="100vh"
-    >
-      <Header />
-
+    <>
+      <UserSignUpModal
+        isModalOpen={isUserSignUpOpen}
+        closeModal={closeUserSignUp}
+        selectedGym={selectedGym}
+      />
       <Flex
-        paddingTop="8rem"
-        paddingBottom="8rem"
-        marginInline="auto"
-        width="full"
-        justifyContent="space-between"
-        paddingInline="5rem"
+        flexDirection="column"
+        backgroundImage={`url(${backgroundImage})`}
+        backgroundPosition="center"
+        backgroundRepeat="no-repeat"
+        backgroundSize="cover"
+        minHeight="100vh"
       >
-        <ExploreBox />
-        <Box
-          height="30rem"
-          width="35rem"
-          borderRadius="10px"
-          padding="10px"
-          bgColor="gray.100"
+        <Header />
+
+        <Flex
+          paddingTop="8rem"
+          paddingBottom="8rem"
+          marginInline="auto"
+          width="full"
+          justifyContent="space-between"
+          paddingInline="5rem"
         >
-          <MapContainer
-            center={location ? location : position}
-            zoom={13}
-            scrollWheelZoom={true}
-            animate={true}
-            easeLinearity={0.35}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {/* {markers.map((marker, index) => (
+          <ExploreBox
+            setSelectedGym={setSelectedGym}
+            setExploreState={setExploreState}
+            owners={data}
+          />
+
+          {exploreState === "explore" ? (
+            <Box
+              height="500px"
+              width="35rem"
+              borderRadius="10px"
+              padding="10px"
+              bgColor="gray.100"
+            >
+              <Button
+                color="neutral.100"
+                bgColor="brand.100"
+                onClick={() => openUserSignUp()}
+              >
+                Join Now
+              </Button>
+            </Box>
+          ) : exploreState === "map" ? (
+            <Box
+              height="30rem"
+              width="35rem"
+              borderRadius="10px"
+              padding="10px"
+              bgColor="gray.100"
+            >
+              <MapContainer
+                center={location ? location : position}
+                zoom={13}
+                scrollWheelZoom={true}
+                animate={true}
+                easeLinearity={0.35}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                {/* {markers.map((marker, index) => (
               <Marker key={index} position={marker.geocode} icon={customIcon}>
                 <Popup>{marker.popUp}</Popup>
               </Marker>
             ))} */}
-            {/* {location && <Marker position={location} />} */}
-            {location && <Marker position={location} />}
-            {/* {location && <MapLocate location={location} />} */}
+                {/* {location && <Marker position={location} />} */}
+                {location && <Marker position={location} />}
+                {/* {location && <MapLocate location={location} />} */}
 
-            <GetCoordinates setPosition={setPosition} />
-            {/* <LocationMarker /> */}
-          </MapContainer>
-        </Box>
+                <GetCoordinates setPosition={setPosition} />
+                {/* <LocationMarker /> */}
+              </MapContainer>
+            </Box>
+          ) : null}
+
+          {/* ------ */}
+        </Flex>
       </Flex>
-    </Flex>
+    </>
   );
 };
 
 export default Explore;
+
+const i = {
+  _id: "659e466635ad21cca5bb238d",
+  firstname: "Billy",
+  middlename: "Mac",
+  lastname: "Awad",
+  email: "ben@gmail.com",
+  password: "$2a$10$i.VS/T9rZ/aa8qv2PPNl6OUnsPyXEnTRvV.kvVqPwC5t2F9SnEhgK",
+  gym: {
+    gymname: "Ben's Gym",
+    contact: "09456268535",
+    description: "This is description for Ben's Gym",
+    address: "My address",
+    gymLocation: [7.12542165579628, 122.04025268554689],
+    schedule: {
+      startday: "Tuesday",
+      endday: "Saturday",
+      opentime: "02:00",
+      closetime: "22:00",
+      _id: "659e466635ad21cca5bb238f",
+    },
+    permitBase64: "permit101.jpg",
+    isApproved: "approved",
+    _id: "659e466635ad21cca5bb238e",
+    equipments: [
+      {
+        equipmentName: "Dumbbell",
+        description: "For biceps",
+        equipmentImage: "dumbbell.png",
+        _id: "65a3800abe26aff88e108a31",
+      },
+    ],
+    plans: [
+      {
+        planName: "Premium",
+        duration: 30,
+        amount: 10000,
+        _id: "65a4ceb308427d0ccb1b4adb",
+      },
+      {
+        planName: "Standard",
+        duration: 30,
+        amount: 5000,
+        _id: "65a748411725d21a52bbe93e",
+      },
+    ],
+    services: [
+      {
+        serviceName: "Cardio",
+        description: "This is a cardio service",
+        serviceImage: "cardio.jpg",
+        _id: "65a747bd1725d21a52bbe914",
+      },
+    ],
+    trainers: [
+      {
+        firstname: "Maria",
+        middlename: "Reyes",
+        lastname: "Clara",
+        email: "maria@gmail.com",
+        contact: "09562457863",
+        address: "This is address",
+        dateOfBirth: "2024-01-10T00:00:00.000Z",
+        gender: "female",
+        certifications: [],
+        specialties: [
+          {
+            specialtyName: "Cardio",
+            _id: "65a641ad4d7c3db662aa5021",
+          },
+        ],
+        yearsOfExperience: "10",
+        biography: "This is biography",
+        _id: "65a641ad4d7c3db662aa5020",
+      },
+      {
+        firstname: "Sheldon",
+        middlename: "James",
+        lastname: "Faraway",
+        email: "sheldon@gmail.com",
+        contact: "094564845",
+        address: "This is my address",
+        dateOfBirth: "2023-11-06T00:00:00.000Z",
+        gender: "male",
+        certifications: [
+          {
+            certificateName: "Biking",
+            _id: "65a8b6d52d96957a0f224418",
+          },
+          {
+            certificateName: "Conditioning",
+            _id: "65a8b6d52d96957a0f224419",
+          },
+          {
+            certificateName: "Massage",
+            _id: "65a8b6d52d96957a0f22441a",
+          },
+        ],
+        specialties: [
+          {
+            specialtyName: "Nutrition",
+            _id: "65a8b6d52d96957a0f22441b",
+          },
+          {
+            specialtyName: "Cardio",
+            _id: "65a8b6d52d96957a0f22441c",
+          },
+          {
+            specialtyName: "Strength",
+            _id: "65a8b6d52d96957a0f22441d",
+          },
+        ],
+        yearsOfExperience: "15",
+        biography: "This is my biography",
+        _id: "65a8b6d52d96957a0f224417",
+      },
+    ],
+    amenities: [
+      {
+        amenityName: "Swimming",
+        description: "This is a swimming",
+        amenityImage: "swimming.jpg",
+        _id: "65a356a4ab09d4f6f3352607",
+      },
+    ],
+    announcements: [
+      {
+        announcement: "Magkakaron ako new work next month.",
+        createdAt: "2024-01-18T04:48:29.848Z",
+        _id: "65a393bfe8d31c8e675f492b",
+      },
+      {
+        announcement: "This is my announcement",
+        createdAt: "2024-01-20T12:43:57.899Z",
+        _id: "65abdab485049913f437922a",
+      },
+    ],
+    classes: [],
+    members: [],
+  },
+  createdAt: "2024-01-10T07:25:26.315Z",
+  updatedAt: "2024-01-20T14:41:25.506Z",
+  __v: 58,
+};

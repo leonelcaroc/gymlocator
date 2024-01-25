@@ -13,7 +13,7 @@ import {
   Divider,
 } from "@chakra-ui/react";
 
-const ExploreBox = () => {
+const ExploreBox = ({ owners, setExploreState, setSelectedGym }) => {
   return (
     <Flex
       flexDirection="column"
@@ -90,9 +90,25 @@ const ExploreBox = () => {
       </Flex>
       <Divider />
       <Box maxHeight="300px" overflow="auto">
-        <ExploreGymCard />
-        <ExploreGymCard />
-        <ExploreGymCard />
+        {owners?.length === 0 ? (
+          <Box
+            textAlign="center"
+            marginBlock="2rem"
+            fontWeight="600"
+            fontSize="1.3rem"
+          >
+            "No Results Found"
+          </Box>
+        ) : (
+          owners?.map((item) => (
+            <ExploreGymCard
+              key={item._id}
+              owner={item}
+              setExploreState={setExploreState}
+              setSelectedGym={setSelectedGym}
+            />
+          ))
+        )}
       </Box>
     </Flex>
   );
