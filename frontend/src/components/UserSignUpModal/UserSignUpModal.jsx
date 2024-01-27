@@ -15,11 +15,16 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { postRegisterUser } from "../../api/userApi/userApi";
+import { useMutation } from "react-query";
+import { useEffect } from "react";
 
 const UserSignUpModal = ({ isModalOpen, closeModal, selectedGym }) => {
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [signUpUser, setSignUpUser] = useState({
     firstname: "",
@@ -29,12 +34,55 @@ const UserSignUpModal = ({ isModalOpen, closeModal, selectedGym }) => {
     contact: "",
     address: "",
     dateOfBirth: "",
+    gymId: null,
     plan: null,
     gender: "",
     password: "",
   });
 
-  // const [selectedPlan, setSelectedPlan] = useState(null);
+  useEffect(() => {
+    setSignUpUser((prevUser) => ({
+      ...prevUser,
+      gymId: selectedGym?._id,
+    }));
+  }, [selectedGym]);
+
+  const registerUserMutation = useMutation(
+    async (formData) => {
+      return postRegisterUser(
+        formData.firstname,
+        formData.middlename,
+        formData.lastname,
+        formData.email,
+        formData.contact,
+        formData.address,
+        formData.dateOfBirth,
+        formData.plan,
+        formData.gender,
+        formData.password,
+        formData.gymId
+      );
+    },
+    {
+      onSuccess: (data) => {
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+        navigate("/userlogin");
+      },
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
 
   const handlePlanChange = (event) => {
     const selectedPlanId = event.target.value;
@@ -208,8 +256,8 @@ const UserSignUpModal = ({ isModalOpen, closeModal, selectedGym }) => {
           <Button
             bgColor="brand.100"
             color="neutral.100"
-            // onClick={() => navigate("/userlogin")}
-            onClick={() => console.log(signUpUser)}
+            isLoading={registerUserMutation.isLoading}
+            onClick={() => registerUserMutation.mutate(signUpUser)}
           >
             Sign Up
           </Button>

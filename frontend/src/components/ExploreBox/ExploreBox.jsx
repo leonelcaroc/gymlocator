@@ -13,7 +13,12 @@ import {
   Divider,
 } from "@chakra-ui/react";
 
-const ExploreBox = ({ owners, setExploreState, setSelectedGym }) => {
+const ExploreBox = ({
+  owners,
+  setExploreState,
+  selectedGym,
+  setSelectedGym,
+}) => {
   return (
     <Flex
       flexDirection="column"
@@ -106,6 +111,7 @@ const ExploreBox = ({ owners, setExploreState, setSelectedGym }) => {
               owner={item}
               setExploreState={setExploreState}
               setSelectedGym={setSelectedGym}
+              selectedGym={selectedGym}
             />
           ))
         )}

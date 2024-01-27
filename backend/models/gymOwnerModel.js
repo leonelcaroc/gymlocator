@@ -1,60 +1,50 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 
-const memberPlanSchema = mongoose.Schema({
-  planName: {
-    type: String,
-    required: true,
+const memberPlanSchema = mongoose.Schema(
+  {
+    planName: {
+      type: String,
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+    duration: {
+      type: Number,
+      required: true,
+    },
+    startTime: {
+      type: Date,
+      required: true,
+    },
+    endTime: {
+      type: Date,
+      required: true,
+    },
+    planStatus: {
+      type: String,
+      enum: ["active", "expired", "pending", "cancelled"],
+      // default: "pending",
+    },
   },
-  amount: {
-    type: String,
-    required: true,
-  },
-  planStatus: {
-    type: String,
-    enum: ["active", "expired", "pending", "cancelled"],
-    default: "pending",
-  },
-});
+  { _id: false }
+);
 
-const memberSchema = mongoose.Schema({
-  firstname: {
-    type: String,
-    required: true,
+const memberSchema = mongoose.Schema(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+    },
+    plan: {
+      type: memberPlanSchema,
+      required: true,
+    },
   },
-  middlename: {
-    type: String,
-    required: true,
-  },
-  lastname: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-  },
-  contact: {
-    type: String,
-    required: true,
-  },
-  address: {
-    type: String,
-    required: true,
-  },
-  dateOfBirth: {
-    type: Date,
-    required: true,
-  },
-  gender: {
-    type: String,
-    required: true,
-  },
-  plan: {
-    type: memberPlanSchema,
-    required: true,
-  },
-});
+  { _id: false }
+);
 
 const specialtySchema = mongoose.Schema({
   specialtyName: {
@@ -310,6 +300,7 @@ const gymSchema = mongoose.Schema({
   },
   members: {
     type: [memberSchema],
+    // type: Array,
     default: [],
   },
   reviews: {

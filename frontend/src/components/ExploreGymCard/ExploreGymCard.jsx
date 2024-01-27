@@ -33,7 +33,12 @@ import { useNavigate } from "react-router-dom";
 import getAbbreviatedDay from "../../utils/getAbbreviatedDay";
 import { formattedTime } from "../../utils/convertToAmericanTime";
 
-const ExploreGymCard = ({ owner, setExploreState, setSelectedGym }) => {
+const ExploreGymCard = ({
+  owner,
+  setExploreState,
+  selectedGym,
+  setSelectedGym,
+}) => {
   const [review, setReview] = useState(0);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -43,6 +48,11 @@ const ExploreGymCard = ({ owner, setExploreState, setSelectedGym }) => {
   const endDay = getAbbreviatedDay(owner.gym.schedule.endday);
   const startTime = formattedTime(owner.gym.schedule.opentime);
   const endTime = formattedTime(owner.gym.schedule.closetime);
+
+  const sum = selectedGym?.gym.reviews.reduce(
+    (accumulator, currentValue) => accumulator + currentValue,
+    0
+  );
 
   return (
     <Card
@@ -67,9 +77,9 @@ const ExploreGymCard = ({ owner, setExploreState, setSelectedGym }) => {
               marginTop="0.3rem"
               marginBottom="0.5rem"
             >
-              <Text>(1.7)</Text>
+              <Text>({sum})</Text>
 
-              <StarRating rating="1.7" />
+              <StarRating rating={sum} />
             </HStack>
 
             <Text>

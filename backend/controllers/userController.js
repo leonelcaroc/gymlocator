@@ -2,6 +2,10 @@ import asyncHandler from "express-async-handler";
 import generateToken from "../utils/generateToken.js";
 import validator from "validator";
 import User from "../models/userModel.js";
+import GymOwner from "../models/gymOwnerModel.js";
+import calculateEndTime from "../utils/calculateEndTime.js";
+import { ObjectId } from "mongodb";
+const newUserId = new ObjectId();
 
 // desc     Auth user/set token
 // route    POST /api/users/auth
@@ -31,26 +35,92 @@ const registerUser = asyncHandler(async (req, res) => {
     firstname,
     middlename,
     lastname,
-    gender,
-    birthdate,
-    address,
-    phoneNumber,
-    membershipType,
-    membershipFee,
-    payment,
-    username,
-    password,
     email,
+    contact,
+    address,
+    dateOfBirth,
+    plan,
+    gender,
+    password,
+    gymId,
   } = req.body;
+
+  const userEmailExists = await User.findOne({ email });
+
+  if (userEmailExists) {
+    res.status(400);
+    throw new Error("Email already exists.");
+  }
+
+  const verifiedGymOwner = await GymOwner.findById(gymId);
+
+  if (!verifiedGymOwner) {
+    res.status(404);
+    throw new Error("Gym not found");
+  }
+
+  const isPlanIdValid = verifiedGymOwner?.gym.plans.some(
+    (gymPlan) => gymPlan._id.toString() === plan._id
+  );
+
+  if (!isPlanIdValid) {
+    res.status(400);
+    throw new Error("Gym plan doesn't exists to your chosen gym");
+  }
+
+  const trimmedFirstname = firstname.trim();
+  const trimmedMiddlename = middlename.trim();
+  const trimmedLastname = lastname.trim();
+  const trimmedAddress = address.trim();
+  const trimmedContact = contact.trim();
+
+  function isValidDate(dateString) {
+    return validator.isDate(dateString);
+  }
+
+  function isValidGender(gender) {
+    const validGenders = ["Male", "Female"];
+    return validGenders.includes(gender);
+  }
+
+  if (!validator.isLength(trimmedFirstname, { min: 1 })) {
+    return res.status(400).json({ error: "First name is required." });
+  }
+
+  if (!validator.isLength(trimmedMiddlename, { min: 1 })) {
+    return res.status(400).json({ error: "Middle name is required." });
+  }
+
+  if (!validator.isLength(trimmedLastname, { min: 1 })) {
+    return res.status(400).json({ error: "Last name is required." });
+  }
 
   if (!validator.isEmail(email)) {
     return res.status(400).json({ error: "Invalid email address" });
   }
 
+  if (!validator.isLength(trimmedContact, { min: 1 })) {
+    return res.status(400).json({ error: "Contact is required." });
+  }
+
+  if (!validator.isLength(trimmedAddress, { min: 1 })) {
+    return res.status(400).json({ error: "Address is required." });
+  }
+
+  if (!isValidDate(dateOfBirth)) {
+    return res.status(400).json({ error: "Invalid date of birth." });
+  }
+
+  if (!isValidGender(gender)) {
+    return res
+      .status(400)
+      .json({ error: "Invalid gender. Valid values are 'Male' or 'Female'." });
+  }
+
   if (!validator.isLength(password, { min: 8, max: 16 })) {
     return res
       .status(400)
-      .json({ error: "Password must be between 6 and 8 characters" });
+      .json({ error: "Password must be between 8 and 16 characters" });
   }
 
   if (!validator.matches(password, /^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]+$/)) {
@@ -59,36 +129,48 @@ const registerUser = asyncHandler(async (req, res) => {
     });
   }
 
-  const userEmailExists = await User.findOne({ email });
-  const userNameExists = await User.findOne({ username });
-
-  if (userEmailExists) {
-    res.status(400);
-    throw new Error("Email already exists.");
-  }
-
-  if (userNameExists) {
-    res.status(400);
-    throw new Error("Username already exists.");
-  }
+  const membershipPlan = [
+    {
+      gymId: gymId,
+      plan: {
+        planName: plan.planName,
+        amount: plan.amount,
+        duration: plan.duration,
+        startTime: Date.now(),
+        endTime: calculateEndTime(plan.duration),
+        planStatus: "active",
+      },
+    },
+  ];
 
   const user = await User.create({
-    firstname,
-    middlename,
-    lastname,
-    gender,
-    birthdate,
-    address,
-    phoneNumber,
-    membershipType,
-    membershipFee,
-    payment,
-    username,
-    password,
-    email,
+    _id: newUserId,
+    firstname: trimmedFirstname,
+    middlename: trimmedMiddlename,
+    lastname: trimmedLastname,
+    email: email,
+    contact: trimmedContact,
+    address: trimmedAddress,
+    dateOfBirth: dateOfBirth,
+    memberships: membershipPlan,
+    gender: gender,
+    password: password,
   });
 
   if (user) {
+    verifiedGymOwner.gym.members.push({
+      userId: newUserId,
+      plan: {
+        planName: plan.planName,
+        amount: plan.amount,
+        duration: plan.duration,
+        startTime: Date.now(),
+        endTime: calculateEndTime(plan.duration),
+        planStatus: "active",
+      },
+    });
+    await verifiedGymOwner.save();
+
     res.status(201).json({
       message: "Account Created",
     });
@@ -97,6 +179,8 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid user data.");
   }
 });
+
+// ---------------------------------------------------------
 
 // desc     Logout user
 // route    POST /api/users/logout

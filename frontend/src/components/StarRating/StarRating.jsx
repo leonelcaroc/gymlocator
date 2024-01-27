@@ -2,7 +2,7 @@ import React from "react";
 import { Flex, Icon } from "@chakra-ui/react";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 
-const StarRating = ({ rating }) => {
+const StarRating = ({ rating = 0 }) => {
   const maxStars = 5;
   const roundedRating = Math.min(Math.round(rating * 2) / 2, maxStars);
   const fullStars = Math.floor(roundedRating);
