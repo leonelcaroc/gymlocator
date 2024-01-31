@@ -45,7 +45,7 @@ const UserProfile = () => {
                 Firstname
               </Text>
               <Text color="brand.200" fontSize="1.3rem">
-                {data.firstname}
+                {data?.firstname}
               </Text>
             </Box>
 
