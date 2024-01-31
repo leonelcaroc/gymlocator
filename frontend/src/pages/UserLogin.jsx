@@ -12,28 +12,62 @@ import {
   InputGroup,
   InputRightElement,
   Icon,
+  useToast,
 } from "@chakra-ui/react";
 import gym from "../assets/images/background.webp";
 import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
 import GoHome from "../components/GoHome/GoHome";
+import { postLoginUser } from "../api/userApi/userApi";
+import { useMutation } from "react-query";
+import TokenService from "../services/token";
 
 const UserLogin = () => {
+  const navigate = useNavigate();
+  const toast = useToast();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [show, setShow] = useState(false);
   const handleShowPassword = () => setShow(!show);
 
-  const navigate = useNavigate();
+  const loginUserMutation = useMutation(
+    async (formData) => {
+      return postLoginUser(formData.email, formData.password);
+    },
+    {
+      onSuccess: (data) => {
+        TokenService.setUserLocal(JSON.stringify(data));
+
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+
+        navigate("/user");
+      },
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // navigate("/user");
 
-    console.log(email, password);
+    // console.log(email, password);
+    loginUserMutation.mutate({ email, password });
   };
 
   return (
@@ -95,7 +129,7 @@ const UserLogin = () => {
             width="full"
             _hover={{ color: "brand.100", bgColor: "gray.200" }}
             type="submit"
-            onClick={() => navigate("/user")}
+            isLoading={loginUserMutation.isLoading}
           >
             Login
           </Button>

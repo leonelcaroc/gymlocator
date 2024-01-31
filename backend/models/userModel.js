@@ -34,6 +34,7 @@ const membershipSchema = mongoose.Schema(
           enum: ["active", "expired", "pending", "cancelled"],
           // default: "pending",
         },
+        _id: false,
       },
       required: true,
     },

@@ -5,6 +5,23 @@ const userApi = axiosInstance.create({
   baseURL: `${axiosInstance.defaults.baseURL}/users`,
 });
 
+export const postLoginUser = async (email, password) => {
+  try {
+    const { data } = await userApi.post(
+      "/auth",
+      {
+        email,
+        password,
+      }
+      // { withCredentials: true }
+    );
+    return data;
+  } catch (error) {
+    console.error("Error logging in user:", error);
+    throw error;
+  }
+};
+
 export const postRegisterUser = async (
   firstname,
   middlename,

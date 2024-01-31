@@ -1,41 +1,39 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-const memberPlanSchema = mongoose.Schema(
-  {
-    planName: {
-      type: String,
-      required: true,
-    },
-    amount: {
-      type: Number,
-      required: true,
-    },
-    duration: {
-      type: Number,
-      required: true,
-    },
-    startTime: {
-      type: Date,
-      required: true,
-    },
-    endTime: {
-      type: Date,
-      required: true,
-    },
-    planStatus: {
-      type: String,
-      enum: ["active", "expired", "pending", "cancelled"],
-      // default: "pending",
-    },
+const memberPlanSchema = mongoose.Schema({
+  planName: {
+    type: String,
+    required: true,
   },
-  { _id: false }
-);
+  amount: {
+    type: Number,
+    required: true,
+  },
+  duration: {
+    type: Number,
+    required: true,
+  },
+  startTime: {
+    type: Date,
+    required: true,
+  },
+  endTime: {
+    type: Date,
+    required: true,
+  },
+  planStatus: {
+    type: String,
+    enum: ["active", "expired", "pending", "cancelled"],
+    // default: "pending",
+  },
+  _id: false,
+});
 
 const memberSchema = mongoose.Schema(
   {
     userId: {
-      type: Schema.Types.ObjectId,
+      type: String,
       required: true,
     },
     plan: {
@@ -43,7 +41,9 @@ const memberSchema = mongoose.Schema(
       required: true,
     },
   },
-  { _id: false }
+  {
+    timestamps: true,
+  }
 );
 
 const specialtySchema = mongoose.Schema({
@@ -300,7 +300,6 @@ const gymSchema = mongoose.Schema({
   },
   members: {
     type: [memberSchema],
-    // type: Array,
     default: [],
   },
   reviews: {

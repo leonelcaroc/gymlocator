@@ -25,9 +25,13 @@ import UserNav from "../components/UserNav/UserNav";
 import { Outlet, useNavigate } from "react-router-dom";
 import { MdOutlineArrowDropUp } from "react-icons/md";
 
+import TokenService from "../services/token";
+
 const User = () => {
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
   const navigate = useNavigate();
+
+  const userInfo = JSON.parse(TokenService.getUserLocal());
 
   return (
     <Flex minHeight="100vh">
@@ -67,7 +71,7 @@ const User = () => {
         >
           <Stack direction="row" h="80px" p={4}>
             <Flex alignItems="center" fontSize="1.2rem" cursor="pointer">
-              Mary
+              {userInfo?.firstname}
             </Flex>
             <Divider orientation="vertical" />
 
@@ -76,7 +80,10 @@ const User = () => {
               fontSize="1.2rem"
               cursor="pointer"
               _hover={{ color: "gray" }}
-              onClick={() => navigate("/")}
+              onClick={() => {
+                TokenService.removeUserLocal();
+                navigate("/");
+              }}
             >
               Logout
             </Flex>

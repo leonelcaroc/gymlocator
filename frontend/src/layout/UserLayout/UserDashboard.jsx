@@ -13,6 +13,9 @@ import {
   Th,
   Tbody,
 } from "@chakra-ui/react";
+import TokenService from "../../services/token";
+
+const userInfo = JSON.parse(TokenService.getUserLocal());
 
 const UserDashboard = () => {
   return (
@@ -20,7 +23,7 @@ const UserDashboard = () => {
       <Text color="brand.200" fontSize="2rem" marginBottom="1rem">
         Good day,{" "}
         <Text as="span" color="brand.100">
-          Erasga Mae
+          {userInfo.firstname} {userInfo.lastname}
         </Text>
       </Text>
       <Text fontSize="1.5rem" marginBottom="0.5rem">

@@ -5,25 +5,31 @@ import User from "../models/userModel.js";
 import GymOwner from "../models/gymOwnerModel.js";
 import calculateEndTime from "../utils/calculateEndTime.js";
 import { ObjectId } from "mongodb";
-const newUserId = new ObjectId();
+import createToken from "../utils/createToken.js";
 
 // desc     Auth user/set token
 // route    POST /api/users/auth
 // @access  Public
 const authUser = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  const user = await User.findOne({ username });
+  const user = await User.findOne({ email });
 
   if (user && (await user.matchPassword(password))) {
-    generateToken(res, user._id);
+    const token = createToken(user._id);
+
     res.status(200).json({
-      message: "Login Successfully",
+      _id: user._id,
+      email: user.email,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      message: "Login Successful!",
+      token,
     });
   } else {
-    res.status(401).json({ message: "Invalid username or password" });
+    res.status(401).json({ error: "Invalid email or password" });
 
-    throw new Error("Invalid username or password.");
+    throw new Error("Invalid email or password.");
   }
 });
 
@@ -31,6 +37,8 @@ const authUser = asyncHandler(async (req, res) => {
 // route    POST /api/users
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
+  const newUserId = new ObjectId();
+
   const {
     firstname,
     middlename,
@@ -121,12 +129,6 @@ const registerUser = asyncHandler(async (req, res) => {
     return res
       .status(400)
       .json({ error: "Password must be between 8 and 16 characters" });
-  }
-
-  if (!validator.matches(password, /^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]+$/)) {
-    return res.status(400).json({
-      error: "Password must contain at least one special character (!@#$%^&*)",
-    });
   }
 
   const membershipPlan = [
