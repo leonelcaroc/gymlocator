@@ -25,7 +25,7 @@ const UserProfile = () => {
     }
   );
 
-  console.log(data);
+  // console.log(data);
 
   const dateToFormat = new Date(data?.dateOfBirth ?? new Date());
   const formattedDate = format(dateToFormat, "MMMM d, yyyy");
@@ -62,7 +62,7 @@ const UserProfile = () => {
                 Birth Date
               </Text>
               <Text color="brand.200" fontSize="1.3rem">
-                {/* {formattedDate} */}
+                {formattedDate}
               </Text>
             </Box>
           </Flex>
