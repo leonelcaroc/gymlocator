@@ -27,7 +27,7 @@ import User from "./pages/User";
 import UserDashboard from "./layout/UserLayout/UserDashboard";
 import UserProfile from "./layout/UserLayout/UserProfile";
 import UserBookings from "./layout/UserLayout/UserBookings";
-import UserReminders from "./layout/UserLayout/UserSubscriptions";
+import UserClasses from "./layout/UserLayout/UserClasses";
 import UserAnnouncements from "./layout/UserLayout/UserAnnouncements";
 import UserLogin from "./pages/UserLogin";
 import "leaflet/dist/leaflet.css";
@@ -127,8 +127,13 @@ const App = () => {
           }
         >
           <Route path="/user" element={<User />}>
-            <Route index={true} element={<UserDashboard />} />
-            <Route path="profile" element={<UserProfile />} />
+            {/* <Route index={true} element={<UserDashboard />} /> */}
+            <Route
+              index={true}
+              // path="profile"
+              element={<UserProfile />}
+            />
+            <Route path="classes" element={<UserClasses />} />
             <Route path="bookings" element={<UserBookings />} />
             <Route path="subscriptions" element={<UserSubscriptions />} />
             <Route path="announcements" element={<UserAnnouncements />} />

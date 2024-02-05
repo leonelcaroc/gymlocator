@@ -13,37 +13,47 @@ import {
   TableContainer,
 } from "@chakra-ui/react";
 
-const UserSubscriptions = () => {
+const UserClasses = () => {
   return (
     <Box padding="2rem">
       <Text color="brand.200" fontSize="2rem" marginBottom="2rem">
-        Subscriptions
+        Classes
       </Text>
       <TableContainer>
         <Table variant="simple">
           <Thead>
             <Tr>
               <Th>Gym Name</Th>
-              <Th>End Date</Th>
-              <Th>Plan</Th>
-              <Th>Status</Th>
-              <Th>Action</Th>
+              <Th>Class Name</Th>
+              <Th>Trainer</Th>
+              <Th>Schedule</Th>
+              <Th>Status/Action</Th>
             </Tr>
           </Thead>
           <Tbody>
             <Tr>
               <Td whiteSpace="normal">Dolby Fitness</Td>
-              <Td>2023/10/19</Td>
-              <Td>Premium</Td>
-              <Td>On-Going</Td>
-              <Td>
+              <Td whiteSpace="normal">Yoga</Td>
+              <Td whiteSpace="normal">Dan Cabalida</Td>
+              <Td whiteSpace="normal">
+                <Text>Feb. 2, 2024</Text>
+                <Text>3:00 PM - 4:00 PM</Text>
+              </Td>
+              <Td display="flex">
                 <Button
+                  bgColor="brand.100"
+                  color="neutral.100"
+                  _hover={{ color: "brand.100", bgColor: "gray.200" }}
+                >
+                  Join Now
+                </Button>
+                {/* <Button
                   bgColor="red"
                   color="neutral.100"
                   _hover={{ color: "red", bgColor: "gray.200" }}
                 >
                   Cancel
-                </Button>
+                </Button> */}
               </Td>
             </Tr>
           </Tbody>
@@ -53,4 +63,4 @@ const UserSubscriptions = () => {
   );
 };
 
-export default UserSubscriptions;
+export default UserClasses;

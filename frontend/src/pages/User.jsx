@@ -53,9 +53,11 @@ const User = () => {
           </Text>
         </Flex>
         <Box>
-          <UserNav route="/user" name="Dashboard" />
-          <UserNav route="/user/profile" name="Profile" />
+          {/* <UserNav route="/user" name="Dashboard" /> */}
+          <UserNav route="/user" name="Profile" />
+          {/* <UserNav route="/user/profile" name="Profile" /> */}
           <UserNav route="/user/bookings" name="Bookings" />
+          <UserNav route="/user/classes" name="Classes" />
           <UserNav route="/user/subscriptions" name="Subscriptions" />
           <UserNav route="/user/announcements" name="Announcements" />
         </Box>

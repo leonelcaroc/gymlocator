@@ -292,7 +292,7 @@ const GymOwnerAnnouncement = () => {
       <Modal isOpen={isDeleteAnnouncementOpen} onClose={handleCloseDelete}>
         <ModalOverlay />
         <ModalContent paddingInline="2rem" maxWidth="35rem">
-          <ModalHeader>Delete Amenity</ModalHeader>
+          <ModalHeader>Delete Announcement</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Text>

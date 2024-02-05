@@ -210,10 +210,11 @@ const getUserProfile = asyncHandler(async (req, res) => {
   res.status(200).json({
     firstname: user.firstname,
     lastname: user.lastname,
+    middlename: user.middlename,
     email: user.email,
     address: user.address,
     contact: user.contact,
-    birthDate: user.dateOfBirth,
+    dateOfBirth: user.dateOfBirth,
   });
 });
 
@@ -247,10 +248,22 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Update user profile" });
 });
 
+const getUserSubscriptions = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json(user.memberships);
+});
+
 export {
   authUser,
   registerUser,
   logoutUser,
   getUserProfile,
   updateUserProfile,
+  getUserSubscriptions,
 };
