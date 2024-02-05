@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import {
   Text,
   Box,
@@ -14,9 +14,8 @@ import {
   Tr,
   Tbody,
   Modal,
+  Select,
   Stack,
-  Checkbox,
-  CheckboxGroup,
   ModalOverlay,
   ModalContent,
   ModalHeader,
@@ -24,14 +23,263 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import {
+  getGymTrainers,
+  getGymClasses,
+  addGymClass,
+  updateGymClass,
+  deleteGymClass,
+} from "../../api/ownerApi/privateOwnerApi";
+import convertTo12HourFormat from "../../utils/convertTo12HourFormat";
+import { format, parseISO } from "date-fns";
 
 const GymOwnerClasses = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
+  const queryClient = useQueryClient();
+
+  const [selectedClass, setSelectedClass] = useState(null);
+  const [selectedDeleteClass, setSelectedDeleteClass] = useState(null);
+  const [listOfTrainers, setListOfTrainers] = useState([]);
+  const [newClass, setNewClass] = useState({
+    classname: "",
+    instructor: "",
+    date: "",
+    starttime: "",
+    endtime: "",
+    capacity: "",
+    description: "",
+    equipment: "",
+  });
+
+  const parsedDate = parseISO(selectedClass?.date ?? "2001-01-01");
+  const defaultDate = format(parsedDate, "yyyy-MM-dd");
+
+  const {
+    isOpen: isAddClassOpen,
+    onOpen: openAddClass,
+    onClose: closeAddClass,
+  } = useDisclosure();
+  const {
+    isOpen: isEditClassOpen,
+    onOpen: openEditClass,
+    onClose: closeEditClass,
+  } = useDisclosure();
+  const {
+    isOpen: isDeleteClassOpen,
+    onOpen: openDeleteClass,
+    onClose: closeDeleteClass,
+  } = useDisclosure();
+
+  const { data: trainers, isLoading: isLoadingTrainers } = useQuery(
+    "trainerData",
+    async () => {
+      return getGymTrainers();
+    },
+    {
+      refetchOnWindowFocus: false,
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  const { data: classes, isLoading: isLoadingClasses } = useQuery(
+    "gymClassData",
+    async () => {
+      return getGymClasses();
+    },
+    {
+      refetchOnWindowFocus: false,
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  const addGymClassMutation = useMutation(
+    async (formData) => {
+      return addGymClass(
+        formData.classname,
+        formData.instructor,
+        formData.date,
+        formData.starttime,
+        formData.endtime,
+        formData.capacity,
+        formData.description,
+        formData.equipment
+      );
+    },
+    {
+      onSuccess: (data) => {
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+
+        // Invalidate and refetch any queries that depend on the user data
+        queryClient.invalidateQueries("gymClassData");
+      },
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  const updateGymClassMutation = useMutation(
+    async (formData) => {
+      return updateGymClass(
+        formData._id,
+        formData.classname,
+        formData.instructor,
+        formData.date,
+        formData.starttime,
+        formData.endtime,
+        formData.capacity,
+        formData.description,
+        formData.equipment
+      );
+    },
+    {
+      onSuccess: (data) => {
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+
+        // Invalidate and refetch any queries that depend on the user data
+        queryClient.invalidateQueries("gymClassData");
+      },
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  const deleteGymClassMutation = useMutation(
+    async (id) => {
+      return deleteGymClass(id);
+    },
+    {
+      onSuccess: (data) => {
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+
+        // Invalidate and refetch any queries that depend on the user data
+        queryClient.invalidateQueries("gymClassData");
+      },
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  useEffect(() => {
+    setListOfTrainers(trainers);
+  }, [trainers]);
+
+  const handleSubmitNewClass = () => {
+    addGymClassMutation.mutate(newClass);
+    setNewClass({
+      classname: "",
+      instructor: "",
+      date: "",
+      starttime: "",
+      endtime: "",
+      capacity: "",
+      description: "",
+      equipment: "",
+    });
+    closeAddClass();
+  };
+
+  const handleCloseAddClass = () => {
+    setNewClass({
+      classname: "",
+      instructor: "",
+      date: "",
+      starttime: "",
+      endtime: "",
+      capacity: "",
+      description: "",
+      equipment: "",
+    });
+    closeAddClass();
+  };
+
+  const handleOpenEdit = (selectedClass) => {
+    setSelectedClass(selectedClass);
+    openEditClass();
+  };
+
+  const handleSaveEdit = () => {
+    updateGymClassMutation.mutate(selectedClass);
+    setSelectedClass(null);
+    closeEditClass();
+  };
+
+  const handleCloseEdit = () => {
+    setSelectedClass(null);
+    closeEditClass();
+    // Reset the edited data to the original data or fetch from your backend
+  };
+
+  const handleOpenDelete = (item) => {
+    setSelectedDeleteClass(item);
+    openDeleteClass();
+  };
+
+  const handleDeleteClass = () => {
+    deleteGymClassMutation.mutate(selectedDeleteClass?._id);
+    setSelectedDeleteClass(null);
+    closeDeleteClass();
+  };
+
+  const handleCloseDelete = () => {
+    setSelectedDeleteClass(null);
+    closeDeleteClass();
+    // Reset the edited data to the original data or fetch from your backend
+  };
 
   return (
     <Box padding="2rem">
-      <Modal isOpen={isOpen} onClose={onClose}>
+      {/* Add Class */}
+      <Modal isOpen={isAddClassOpen} onClose={handleCloseAddClass}>
         <ModalOverlay />
         <ModalContent paddingInline="2rem" maxWidth="35rem">
           <ModalHeader>Add Class</ModalHeader>
@@ -40,57 +288,316 @@ const GymOwnerClasses = () => {
             <Stack spacing="1rem">
               <Box>
                 <Text fontWeight="bold">Class Name</Text>
-                <Input type="text" placeholder="Class Name" />
+                <Input
+                  value={newClass.classname}
+                  onChange={(e) =>
+                    setNewClass({
+                      ...newClass,
+                      classname: e.target.value,
+                    })
+                  }
+                  type="text"
+                  placeholder="Class Name"
+                />
               </Box>
-              <CheckboxGroup colorScheme="green">
+              <Box>
                 <Text fontWeight="bold">Instructor</Text>
-                <Stack spacing={[1, 5]} direction="row">
-                  <Checkbox value="naruto">Chu Tristan</Checkbox>
-                  <Checkbox value="kakashi">Alexandria Ramirez</Checkbox>
-                </Stack>
-              </CheckboxGroup>
-
+                <Select
+                  placeholder="Select trainer"
+                  value={newClass?.instructor}
+                  onChange={(e) =>
+                    setNewClass({
+                      ...newClass,
+                      instructor: e.target.value,
+                    })
+                  }
+                >
+                  {listOfTrainers?.map((item) => (
+                    <option
+                      key={item._id}
+                      value={item.firstname + " " + item.lastname}
+                    >
+                      {item.firstname} {item.lastname}
+                    </option>
+                  ))}
+                </Select>
+              </Box>
               <Box>
                 <Text fontWeight="bold">Date</Text>
-                <Input type="date" />
+                <Input
+                  value={newClass.date}
+                  onChange={(e) =>
+                    setNewClass({
+                      ...newClass,
+                      date: e.target.value,
+                    })
+                  }
+                  type="date"
+                />
               </Box>
               <Box>
                 <Text fontWeight="bold">Start Time</Text>
-                <Input type="time" />
+                <Input
+                  value={newClass.starttime}
+                  onChange={(e) =>
+                    setNewClass({
+                      ...newClass,
+                      starttime: e.target.value,
+                    })
+                  }
+                  type="time"
+                />
               </Box>
               <Box>
                 <Text fontWeight="bold">End Time</Text>
-                <Input type="time" />
+                <Input
+                  value={newClass.endtime}
+                  onChange={(e) =>
+                    setNewClass({
+                      ...newClass,
+                      endtime: e.target.value,
+                    })
+                  }
+                  type="time"
+                />
               </Box>
 
               <Box>
                 <Text fontWeight="bold">Capacity</Text>
-                <Input type="number" placeholder="Capacity" />
+                <Input
+                  value={newClass.capacity}
+                  onChange={(e) =>
+                    setNewClass({
+                      ...newClass,
+                      capacity: e.target.value,
+                    })
+                  }
+                  type="number"
+                  placeholder="Capacity"
+                />
               </Box>
               <Box>
                 <Text fontWeight="bold">Description</Text>
-                <Textarea placeholder="Type your description here..." />
+                <Textarea
+                  value={newClass.description}
+                  onChange={(e) =>
+                    setNewClass({
+                      ...newClass,
+                      description: e.target.value,
+                    })
+                  }
+                  placeholder="Type your description here..."
+                />
               </Box>
               <Box>
                 <Text fontWeight="bold">Equipment</Text>
-                <Input required type="text" placeholder="Equipment" />
+                <Input
+                  value={newClass.equipment}
+                  onChange={(e) =>
+                    setNewClass({
+                      ...newClass,
+                      equipment: e.target.value,
+                    })
+                  }
+                  required
+                  type="text"
+                  placeholder="Equipment"
+                />
               </Box>
             </Stack>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
+            <Button colorScheme="blue" mr={3} onClick={closeAddClass}>
               Close
             </Button>
-            <Button bgColor="brand.100" color="neutral.100">
+            <Button
+              bgColor="brand.100"
+              color="neutral.100"
+              onClick={handleSubmitNewClass}
+              isLoading={addGymClassMutation.isLoading}
+            >
               Add Class
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* Edit Class */}
+
+      <Modal isOpen={isEditClassOpen} onClose={handleCloseEdit}>
+        <ModalOverlay />
+        <ModalContent paddingInline="2rem" maxWidth="35rem">
+          <ModalHeader>Edit Class</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Stack spacing="1rem">
+              <Box>
+                <Text fontWeight="bold">Class Name</Text>
+                <Input
+                  value={selectedClass?.classname}
+                  onChange={(e) =>
+                    setSelectedClass({
+                      ...selectedClass,
+                      classname: e.target.value,
+                    })
+                  }
+                  type="text"
+                  placeholder="Class Name"
+                />
+              </Box>
+              <Box>
+                <Text fontWeight="bold">Instructor</Text>
+                <Select
+                  placeholder="Select trainer"
+                  value={selectedClass?.instructor}
+                  onChange={(e) =>
+                    setSelectedClass({
+                      ...selectedClass,
+                      instructor: e.target.value,
+                    })
+                  }
+                >
+                  {listOfTrainers?.map((item) => (
+                    <option
+                      key={item._id}
+                      value={item.firstname + " " + item.lastname}
+                    >
+                      {item.firstname} {item.lastname}
+                    </option>
+                  ))}
+                </Select>
+              </Box>
+              <Box>
+                <Text fontWeight="bold">Date</Text>
+                <Input
+                  defaultValue={defaultDate}
+                  onChange={(e) =>
+                    setSelectedClass({
+                      ...selectedClass,
+                      date: e.target.value,
+                    })
+                  }
+                  type="date"
+                />
+              </Box>
+              <Box>
+                <Text fontWeight="bold">Start Time</Text>
+                <Input
+                  value={selectedClass?.starttime}
+                  onChange={(e) =>
+                    setSelectedClass({
+                      ...selectedClass,
+                      starttime: e.target.value,
+                    })
+                  }
+                  type="time"
+                />
+              </Box>
+              <Box>
+                <Text fontWeight="bold">End Time</Text>
+                <Input
+                  value={selectedClass?.endtime}
+                  onChange={(e) =>
+                    setSelectedClass({
+                      ...selectedClass,
+                      endtime: e.target.value,
+                    })
+                  }
+                  type="time"
+                />
+              </Box>
+
+              <Box>
+                <Text fontWeight="bold">Capacity</Text>
+                <Input
+                  value={selectedClass?.capacity}
+                  onChange={(e) =>
+                    setSelectedClass({
+                      ...selectedClass,
+                      capacity: e.target.value,
+                    })
+                  }
+                  type="number"
+                  placeholder="Capacity"
+                />
+              </Box>
+              <Box>
+                <Text fontWeight="bold">Description</Text>
+                <Textarea
+                  value={selectedClass?.description}
+                  onChange={(e) =>
+                    setSelectedClass({
+                      ...selectedClass,
+                      description: e.target.value,
+                    })
+                  }
+                  placeholder="Type your description here..."
+                />
+              </Box>
+              <Box>
+                <Text fontWeight="bold">Equipment</Text>
+                <Input
+                  value={selectedClass?.equipment}
+                  onChange={(e) =>
+                    setSelectedClass({
+                      ...selectedClass,
+                      equipment: e.target.value,
+                    })
+                  }
+                  required
+                  type="text"
+                  placeholder="Equipment"
+                />
+              </Box>
+            </Stack>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={closeEditClass}>
+              Close
+            </Button>
+            <Button
+              bgColor="brand.100"
+              color="neutral.100"
+              onClick={handleSaveEdit}
+              // isLoading={updateGymClassMutation.isLoading}
+            >
+              Save
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Delete Class */}
+
+      <Modal isOpen={isDeleteClassOpen} onClose={handleCloseDelete}>
+        <ModalOverlay />
+        <ModalContent paddingInline="2rem" maxWidth="35rem">
+          <ModalHeader>Delete Plan</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>
+              Are you sure you want to delete {selectedDeleteClass?.classname}?
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="gray" mr={3} onClick={handleCloseDelete}>
+              No
+            </Button>
+            <Button
+              bgColor="red"
+              color="neutral.100"
+              onClick={handleDeleteClass}
+            >
+              Yes
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
       <Text color="brand.200" fontSize="2rem" marginBottom="1rem">
         Classes
       </Text>
-      <Button bgColor="brand.100" color="neutral.100" onClick={onOpen}>
+      <Button bgColor="brand.100" color="neutral.100" onClick={openAddClass}>
         Add Class
       </Button>
 
@@ -102,24 +609,50 @@ const GymOwnerClasses = () => {
               <Th>Date</Th>
               <Th>Time</Th>
               <Th>Instructor</Th>
+              <Th>Capacity</Th>
               <Th>Action</Th>
             </Tr>
           </Thead>
           <Tbody>
-            <Tr>
-              <Td whiteSpace="normal">Yoga Class</Td>
-              <Td whiteSpace="normal">2023/8/14</Td>
-              <Td whiteSpace="normal">8:00AM - 10:00AM</Td>
-              <Td whiteSpace="normal">Larry Wheels</Td>
-              <Td display="flex" gap="0.5rem">
-                <Button bgColor="blue" color="neutral.100" marginBottom="1rem">
-                  Edit
-                </Button>
-                <Button bgColor="red" color="white">
-                  Delete
-                </Button>
-              </Td>
-            </Tr>
+            {classes?.length === 0 ? (
+              <Tr>
+                <Td textAlign="center" colSpan="6">
+                  n/a
+                </Td>
+              </Tr>
+            ) : (
+              classes?.map((item) => (
+                <Tr key={item._id}>
+                  <Td whiteSpace="normal">{item.classname}</Td>
+                  <Td whiteSpace="normal">
+                    {format(item.date, "MMMM d, yyyy")}
+                  </Td>
+                  <Td whiteSpace="normal">
+                    {convertTo12HourFormat(item.starttime)} -{" "}
+                    {convertTo12HourFormat(item.endtime)}
+                  </Td>
+                  <Td whiteSpace="normal">{item.instructor}</Td>
+                  <Td>{`${item.joinedMember}/${item.capacity}`}</Td>
+                  <Td display="flex" gap="0.5rem">
+                    <Button
+                      bgColor="blue"
+                      color="neutral.100"
+                      marginBottom="1rem"
+                      onClick={() => handleOpenEdit(item)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      bgColor="red"
+                      color="white"
+                      onClick={() => handleOpenDelete(item)}
+                    >
+                      Delete
+                    </Button>
+                  </Td>
+                </Tr>
+              ))
+            )}
           </Tbody>
         </Table>
       </TableContainer>

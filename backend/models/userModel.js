@@ -3,11 +3,11 @@ import bcrypt from "bcryptjs";
 
 const membershipSchema = mongoose.Schema(
   {
-    gymId: {
-      type: String,
+    gym: {
+      type: Object,
       required: true,
     },
-    plan: {
+    myPlan: {
       type: {
         planName: {
           type: String,
@@ -33,6 +33,10 @@ const membershipSchema = mongoose.Schema(
           type: String,
           enum: ["active", "expired", "pending", "cancelled"],
           // default: "pending",
+        },
+        paymentStatus: {
+          type: String,
+          enum: ["paid", "cancelled", "pending"],
         },
         _id: false,
       },

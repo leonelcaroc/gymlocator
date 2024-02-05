@@ -27,13 +27,17 @@ const memberPlanSchema = mongoose.Schema({
     enum: ["active", "expired", "pending", "cancelled"],
     // default: "pending",
   },
+  paymentStatus: {
+    type: String,
+    enum: ["paid", "cancelled", "pending"],
+  },
   _id: false,
 });
 
 const memberSchema = mongoose.Schema(
   {
-    userId: {
-      type: String,
+    user: {
+      type: Object,
       required: true,
     },
     plan: {
@@ -116,14 +120,6 @@ const classSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  description: {
-    type: String,
-    required: true,
-  },
-  equipment: {
-    type: String,
-    required: true,
-  },
   instructor: {
     type: String,
     required: true,
@@ -142,6 +138,19 @@ const classSchema = mongoose.Schema({
   },
   capacity: {
     type: Number,
+    required: true,
+  },
+  joinedMember: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  equipment: {
+    type: String,
     required: true,
   },
 });

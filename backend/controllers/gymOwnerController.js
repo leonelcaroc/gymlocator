@@ -226,6 +226,7 @@ const getOwnerProfile = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     firstname: user.firstname,
+    middlename: user.middlename,
     lastname: user.lastname,
     email: user.email,
   });
@@ -240,9 +241,10 @@ const updateOwnerProfile = asyncHandler(async (req, res) => {
   }
 
   const trimmedFirstName = validator.trim(req.body.firstname);
+  const trimmedMiddleName = validator.trim(req.body.middlename);
   const trimmedLastName = validator.trim(req.body.lastname);
 
-  if (!trimmedFirstName || !trimmedLastName) {
+  if (!trimmedFirstName || !trimmedLastName || trimmedMiddleName) {
     return res.status(400).json({ error: "Invalid input data" });
   }
 
@@ -252,6 +254,7 @@ const updateOwnerProfile = asyncHandler(async (req, res) => {
 
   if (user) {
     user.firstname = trimmedFirstName || user.firstname;
+    user.middlename = trimmedMiddleName || user.middlename;
     user.lastname = trimmedLastName || user.lastname;
     user.email = req.body.email || user.email;
 
@@ -259,6 +262,7 @@ const updateOwnerProfile = asyncHandler(async (req, res) => {
 
     res.status(200).json({
       firstname: updatedUser.firstname,
+      middlename: updatedUser.middlename,
       lastname: updatedUser.lastname,
       email: updatedUser.email,
       message: "Successfuly updated owner profile!",
@@ -1271,8 +1275,11 @@ const addGymClasses = asyncHandler(async (req, res) => {
       return res.status(400).json({ error: "Class description is required." });
     }
 
-    if (!validator.isNumeric(capacity)) {
-      return res.status(400).json({ error: "Capacity is invalid." });
+    if (
+      !validator.isNumeric(capacity) ||
+      !validator.isInt(capacity, { min: 1 })
+    ) {
+      return res.status(400).json({ error: "Capacity is cannot be 0." });
     }
 
     const newClass = {
@@ -1300,6 +1307,116 @@ const addGymClasses = asyncHandler(async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
+});
+
+const updateGymClass = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  // Extract the new equipment data from the request body
+  const {
+    id,
+    classname,
+    instructor,
+    date,
+    starttime,
+    endtime,
+    capacity,
+    description,
+    equipment,
+  } = req.body;
+
+  const trimmedClassName = validator.trim(classname);
+  const trimmedDescription = validator.trim(description);
+  const trimmedEquipment = validator.trim(equipment);
+
+  if (!validator.isLength(date, { min: 1 })) {
+    return res.status(400).json({ error: "Date is required." });
+  }
+
+  if (!validator.isLength(starttime, { min: 1 })) {
+    return res.status(400).json({ error: "Start Time is required." });
+  }
+
+  if (!validator.isLength(endtime, { min: 1 })) {
+    return res.status(400).json({ error: "End Time is required." });
+  }
+
+  if (!validator.isLength(trimmedDescription, { min: 1 })) {
+    return res.status(400).json({ error: "Class description is required." });
+  }
+
+  if (
+    !validator.isNumeric(capacity.toString()) ||
+    !validator.isInt(capacity.toString(), { min: 1 })
+  ) {
+    return res.status(400).json({ error: "Capacity is cannot be 0." });
+  }
+
+  const index = user.gym.classes.findIndex((myClass) => myClass.id === id);
+
+  if (capacity < user.gym.classes[index].joinedMember) {
+    return res
+      .status(400)
+      .json({ error: "Capacity cannot be less than joined members" });
+  }
+
+  if (index !== -1) {
+    // Update the service at the found index
+    user.gym.classes[index] = {
+      id: id,
+      classname: trimmedClassName,
+      instructor: instructor,
+      date: date,
+      starttime: starttime,
+      endtime: endtime,
+      capacity: capacity,
+      description: trimmedDescription,
+      equipment: trimmedEquipment,
+      joinedMember: user.gym.classes[index].joinedMember,
+    };
+
+    await user.save();
+
+    // Respond with the updated user profile
+    res.status(200).json({
+      message: "Successfully edited class",
+    });
+  }
+});
+
+const deleteGymClass = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
+  const { id } = req.body;
+
+  if (!user) {
+    res.status(404).json({ error: "User not found." });
+  }
+
+  const remainingClasses = user.gym.classes.filter((item) => item.id !== id);
+
+  user.gym.classes = [...remainingClasses];
+
+  await user.save();
+
+  res.status(200).json({ message: "Successfully deleted class" });
+});
+
+// GYM Members
+
+const getGymMembers = asyncHandler(async (req, res) => {
+  const user = await GymOwner.findById(req.user._id);
+
+  if (!user) {
+    res.status(404).json({ error: "User not found" });
+    throw new Error("User not found");
+  }
+
+  res.status(200).json(user.gym.members);
 });
 
 // Payment Stripe
@@ -1361,4 +1478,7 @@ export {
   deleteGymAnnouncement,
   getGymClasses,
   addGymClasses,
+  getGymMembers,
+  updateGymClass,
+  deleteGymClass,
 };

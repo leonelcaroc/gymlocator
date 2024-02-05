@@ -131,6 +131,7 @@ const Explore = () => {
       },
       onSuccess: (result) => {
         setSelectedGym(result[0]);
+        // console.log(selectedGym);
       },
     }
   );
@@ -223,57 +224,73 @@ const Explore = () => {
               bgColor="gray.100"
               padding="2rem"
             >
-              <Box>
-                <Text fontWeight="900" fontSize="1.3rem">
-                  {selectedGym?.gym.gymname}
-                </Text>
-                <Flex alignItems="center" gap="0.5rem">
-                  ({sum}) <StarRating rating={sum} />
-                </Flex>
-                <Text>
-                  Open {startTime} {startDay}-{endDay}
-                </Text>
-                <Flex gap="1rem" marginBlock="0.5rem">
-                  <Button
-                    color="neutral.100"
-                    bgColor="brand.100"
-                    maxHeight="2rem"
-                    onClick={() => navigate("/userlogin")}
-                  >
-                    Login
-                  </Button>
-                  <Button
-                    color="neutral.100"
-                    bgColor="brand.100"
-                    maxHeight="2rem"
-                    onClick={() => openUserSignUp()}
-                  >
-                    Join Now
-                  </Button>
-                </Flex>
-              </Box>
-              <Divider marginBlock="1rem" borderColor="gray.500" />
-              <Box>
-                <Text fontWeight="800">Gym Details</Text>
-                <Text>- {selectedGym?.gym.description}</Text>
-                <Box marginBlock="1.5rem">
-                  <Text fontWeight="700">Contact</Text>
-                  <Box paddingLeft="1.2rem">
-                    <Flex gap="0.3rem">
-                      <Text>Phone:</Text>
-                      <Text>{selectedGym?.gym.contact}</Text>
+              {selectedGym !== (null || undefined) ? (
+                <>
+                  <Box>
+                    <Text fontWeight="900" fontSize="1.3rem">
+                      {selectedGym?.gym.gymname}
+                    </Text>
+                    <Flex alignItems="center" gap="0.5rem">
+                      ({sum}) <StarRating rating={sum} />
                     </Flex>
-                    <Flex gap="0.3rem">
-                      <Text>Email:</Text>
-                      <Text>{selectedGym?.email}</Text>
-                    </Flex>
-                    <Flex gap="0.3rem">
-                      <Text>Address:</Text>
-                      <Text>{selectedGym?.gym.address}</Text>
+                    <Text>
+                      Open {startTime} {startDay}-{endDay}
+                    </Text>
+                    <Flex gap="1rem" marginBlock="0.5rem">
+                      <Button
+                        color="neutral.100"
+                        bgColor="brand.100"
+                        maxHeight="2rem"
+                        onClick={() => navigate("/userlogin")}
+                      >
+                        Login
+                      </Button>
+                      <Button
+                        color="neutral.100"
+                        bgColor="brand.100"
+                        maxHeight="2rem"
+                        onClick={() => openUserSignUp()}
+                      >
+                        Join Now
+                      </Button>
                     </Flex>
                   </Box>
+                  <Divider marginBlock="1rem" borderColor="gray.500" />
+                  <Box>
+                    <Text fontWeight="800">Gym Details</Text>
+                    <Text>- {selectedGym?.gym.description}</Text>
+                    <Box marginBlock="1.5rem">
+                      <Text fontWeight="700">Contact</Text>
+                      <Box paddingLeft="1.2rem">
+                        <Flex gap="0.3rem">
+                          <Text>Phone:</Text>
+                          <Text>{selectedGym?.gym.contact}</Text>
+                        </Flex>
+                        <Flex gap="0.3rem">
+                          <Text>Email:</Text>
+                          <Text>{selectedGym?.email}</Text>
+                        </Flex>
+                        <Flex gap="0.3rem">
+                          <Text>Address:</Text>
+                          <Text>{selectedGym?.gym.address}</Text>
+                        </Flex>
+                      </Box>
+                    </Box>
+                  </Box>
+                </>
+              ) : (
+                <Box
+                  display="flex"
+                  height="100%"
+                  width="100%"
+                  alignItems="center"
+                  justifyContent="center"
+                  fontSize="1.5rem"
+                  fontWeight="500"
+                >
+                  "No Gym Results"
                 </Box>
-              </Box>
+              )}
             </Box>
           ) : exploreState === "map" ? (
             <Box

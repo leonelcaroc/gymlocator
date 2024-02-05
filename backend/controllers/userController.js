@@ -6,6 +6,7 @@ import GymOwner from "../models/gymOwnerModel.js";
 import calculateEndTime from "../utils/calculateEndTime.js";
 import { ObjectId } from "mongodb";
 import createToken from "../utils/createToken.js";
+import stringifySafe from "json-stringify-safe";
 
 // desc     Auth user/set token
 // route    POST /api/users/auth
@@ -133,14 +134,15 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const membershipPlan = [
     {
-      gymId: gymId,
-      plan: {
+      gym: verifiedGymOwner,
+      myPlan: {
         planName: plan.planName,
         amount: plan.amount,
         duration: plan.duration,
         startTime: Date.now(),
         endTime: calculateEndTime(plan.duration),
         planStatus: "active",
+        paymentStatus: "paid",
       },
     },
   ];
@@ -160,8 +162,22 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   if (user) {
-    verifiedGymOwner.gym.members.push({
-      userId: newUserId,
+    const serializedUser = JSON.parse(
+      stringifySafe({
+        _id: user._id,
+        firstname: user.firstname,
+        middlename: user.middlename,
+        lastname: user.lastname,
+        address: user.address,
+        email: user.email,
+        contact: user.contact,
+        gender: user.gender,
+        dateOfBirth: user.dateOfBirth,
+      })
+    );
+
+    await verifiedGymOwner.gym.members.push({
+      user: serializedUser,
       plan: {
         planName: plan.planName,
         amount: plan.amount,
@@ -169,6 +185,7 @@ const registerUser = asyncHandler(async (req, res) => {
         startTime: Date.now(),
         endTime: calculateEndTime(plan.duration),
         planStatus: "active",
+        paymentStatus: "paid",
       },
     });
     await verifiedGymOwner.save();

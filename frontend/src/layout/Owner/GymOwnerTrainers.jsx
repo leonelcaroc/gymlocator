@@ -182,6 +182,18 @@ const GymOwnerTrainers = () => {
     });
   };
 
+  const handleDeleteSpecialty = (index) => {
+    setNewTrainer((prevTrainer) => {
+      const updatedSpecialties = [...prevTrainer.specialties];
+      updatedSpecialties.splice(index, 1);
+
+      return {
+        ...prevTrainer,
+        specialties: updatedSpecialties,
+      };
+    });
+  };
+
   const handleSubmitNewTrainer = () => {
     addGymTrainerMutation.mutate(newTrainer);
     setNewTrainer({
@@ -460,11 +472,20 @@ const GymOwnerTrainers = () => {
                 </InputGroup>
 
                 <UnorderedList>
-                  {newTrainer.specialties?.map((item) => {
+                  {/* {newTrainer.specialties?.map((item) => {
                     return (
                       <ListItem key={item.key}>{item.specialtyName}</ListItem>
                     );
-                  })}
+                  })} */}
+
+                  {newTrainer.specialties?.map((item, index) => (
+                    <Flex key={item.key} justify="space-between" align="center">
+                      <ListItem>{item.specialtyName}</ListItem>
+                      <CloseButton
+                        onClick={() => handleDeleteSpecialty(index)}
+                      />
+                    </Flex>
+                  ))}
                 </UnorderedList>
               </Stack>
               <Box>

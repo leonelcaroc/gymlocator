@@ -35,10 +35,16 @@ export const getOwnerProfile = async () => {
   }
 };
 
-export const updateOwnerProfile = async (firstname, lastname, email) => {
+export const updateOwnerProfile = async (
+  firstname,
+  middlename,
+  lastname,
+  email
+) => {
   try {
     const { data } = await privateOwnerApi.put("/profile", {
       firstname: firstname,
+      middlename: middlename,
       lastname: lastname,
       email: email,
     });
@@ -441,6 +447,88 @@ export const getGymClasses = async () => {
     return data;
   } catch (error) {
     console.error("Error getting gym classes:", error);
+    throw error;
+  }
+};
+
+export const addGymClass = async (
+  classname,
+  instructor,
+  date,
+  starttime,
+  endtime,
+  capacity,
+  description,
+  equipment
+) => {
+  try {
+    const { data } = await privateOwnerApi.post("/classes", {
+      classname: classname,
+      instructor: instructor,
+      date: date,
+      starttime: starttime,
+      endtime: endtime,
+      capacity: capacity,
+      description: description,
+      equipment: equipment,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error adding gym class:", error);
+    throw error;
+  }
+};
+
+export const updateGymClass = async (
+  id,
+  classname,
+  instructor,
+  date,
+  starttime,
+  endtime,
+  capacity,
+  description,
+  equipment
+) => {
+  try {
+    const { data } = await privateOwnerApi.put("/classes", {
+      id: id,
+      classname: classname,
+      instructor: instructor,
+      date: date,
+      starttime: starttime,
+      endtime: endtime,
+      capacity: capacity,
+      description: description,
+      equipment: equipment,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error updating gym class:", error);
+    throw error;
+  }
+};
+
+export const deleteGymClass = async (id) => {
+  try {
+    const { data } = await privateOwnerApi.delete("/classes", {
+      data: { id },
+    });
+    return data;
+  } catch (error) {
+    console.error("Error deleting class:", error);
+    throw error;
+  }
+};
+
+// Members API
+
+export const getGymMembers = async () => {
+  try {
+    const { data } = await privateOwnerApi.get("/members");
+    return data;
+  } catch (error) {
+    console.error("Error getting gym members:", error);
     throw error;
   }
 };

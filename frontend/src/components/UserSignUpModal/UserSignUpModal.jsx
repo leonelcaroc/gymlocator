@@ -71,7 +71,7 @@ const UserSignUpModal = ({ isModalOpen, closeModal, selectedGym }) => {
           duration: 2000,
           position: "bottom-right",
         });
-        navigate("/profile");
+        navigate("/userlogin");
       },
       onError: (error) => {
         toast({

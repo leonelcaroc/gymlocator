@@ -341,35 +341,44 @@ const GymOwnerAnnouncement = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {data?.map((item) => (
-                  <Tr key={item._id}>
-                    <Td whiteSpace="normal">{item.announcement}</Td>
-                    <Td whiteSpace="normal">
-                      {format(item.createdAt, "MMMM d, yyyy - h:mma")}
-                    </Td>
-                    <Td display="flex" gap="0.5rem">
-                      <Button
-                        bgColor="blue"
-                        color="neutral.100"
-                        marginBottom="1rem"
-                        onClick={() => handleOpenEdit(item)}
-                        isLoading={
-                          updateAnnouncementMutation.isLoading &&
-                          updateAnnouncementMutation.variables?.id === item._id
-                        }
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        bgColor="red"
-                        color="white"
-                        onClick={() => handleOpenDelete(item)}
-                      >
-                        Delete
-                      </Button>
+                {data?.length === 0 ? (
+                  <Tr>
+                    <Td textAlign="center" colSpan="4">
+                      n/a
                     </Td>
                   </Tr>
-                ))}
+                ) : (
+                  data?.map((item) => (
+                    <Tr key={item._id}>
+                      <Td whiteSpace="normal">{item.announcement}</Td>
+                      <Td whiteSpace="normal">
+                        {format(item.createdAt, "MMMM d, yyyy - h:mma")}
+                      </Td>
+                      <Td display="flex" gap="0.5rem">
+                        <Button
+                          bgColor="blue"
+                          color="neutral.100"
+                          marginBottom="1rem"
+                          onClick={() => handleOpenEdit(item)}
+                          isLoading={
+                            updateAnnouncementMutation.isLoading &&
+                            updateAnnouncementMutation.variables?.id ===
+                              item._id
+                          }
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          bgColor="red"
+                          color="white"
+                          onClick={() => handleOpenDelete(item)}
+                        >
+                          Delete
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))
+                )}
               </Tbody>
             </Table>
           </TableContainer>

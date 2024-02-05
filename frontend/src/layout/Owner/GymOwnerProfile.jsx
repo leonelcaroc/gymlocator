@@ -53,6 +53,7 @@ const GymOwnerProfile = () => {
     async (formData) => {
       return updateOwnerProfile(
         formData.firstname,
+        formData.middlename,
         formData.lastname,
         formData.email
       );
@@ -109,15 +110,15 @@ const GymOwnerProfile = () => {
         <Spinner size="lg" />
       ) : (
         <>
-          <Flex marginBottom="1rem">
-            <Box marginRight="10rem">
+          <Flex marginBottom="1rem" gap="10rem">
+            <Box>
               <Text color="gray" fontSize="1.3rem">
                 Firstname
               </Text>
 
               {isEditing ? (
                 <Input
-                  maxWidth="15rem"
+                  maxWidth="13rem"
                   fontSize="1.3rem"
                   value={profileData?.firstname}
                   onChange={(e) =>
@@ -133,13 +134,37 @@ const GymOwnerProfile = () => {
                 </Text>
               )}
             </Box>
+
+            <Box>
+              <Text color="gray" fontSize="1.3rem">
+                Middlename
+              </Text>
+              {isEditing ? (
+                <Input
+                  maxWidth="13rem"
+                  fontSize="1.3rem"
+                  value={profileData?.middlename}
+                  onChange={(e) =>
+                    setProfileData((prevData) => ({
+                      ...prevData,
+                      middlename: e.target.value,
+                    }))
+                  }
+                />
+              ) : (
+                <Text color="brand.200" fontSize="1.3rem">
+                  {profileData?.middlename}
+                </Text>
+              )}
+            </Box>
+
             <Box>
               <Text color="gray" fontSize="1.3rem">
                 Lastname
               </Text>
               {isEditing ? (
                 <Input
-                  maxWidth="15rem"
+                  maxWidth="13rem"
                   fontSize="1.3rem"
                   value={profileData?.lastname}
                   onChange={(e) =>

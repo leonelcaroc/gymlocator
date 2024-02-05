@@ -495,42 +495,50 @@ const GymOwnerPlans = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {data?.map((item) => (
-                  <Tr key={item._id}>
-                    <Td whiteSpace="normal">{item.planName}</Td>
-                    <Td whiteSpace="normal">{item.duration}</Td>
-                    <Td whiteSpace="normal">
-                      {item.amount.toLocaleString("en-PH", {
-                        style: "currency",
-                        currency: "PHP",
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </Td>
-
-                    <Td display="flex" gap="0.5rem">
-                      <Button
-                        bgColor="blue"
-                        color="neutral.100"
-                        marginBottom="1rem"
-                        onClick={() => handleOpenEdit(item)}
-                        isLoading={
-                          updateGymPlanMutation.isLoading &&
-                          updateGymPlanMutation.variables?._id === item._id
-                        }
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        bgColor="red"
-                        color="white"
-                        onClick={() => handleOpenDelete(item)}
-                      >
-                        Delete
-                      </Button>
+                {data?.length === 0 ? (
+                  <Tr>
+                    <Td textAlign="center" colSpan="4">
+                      n/a
                     </Td>
                   </Tr>
-                ))}
+                ) : (
+                  data?.map((item) => (
+                    <Tr key={item._id}>
+                      <Td whiteSpace="normal">{item.planName}</Td>
+                      <Td whiteSpace="normal">{item.duration}</Td>
+                      <Td whiteSpace="normal">
+                        {item.amount.toLocaleString("en-PH", {
+                          style: "currency",
+                          currency: "PHP",
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </Td>
+
+                      <Td display="flex" gap="0.5rem">
+                        <Button
+                          bgColor="blue"
+                          color="neutral.100"
+                          marginBottom="1rem"
+                          onClick={() => handleOpenEdit(item)}
+                          isLoading={
+                            updateGymPlanMutation.isLoading &&
+                            updateGymPlanMutation.variables?._id === item._id
+                          }
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          bgColor="red"
+                          color="white"
+                          onClick={() => handleOpenDelete(item)}
+                        >
+                          Delete
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))
+                )}
               </Tbody>
             </Table>
           </TableContainer>
