@@ -575,49 +575,55 @@ const GymOwnerTrainers = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {data?.map((item) => (
-              <Tr key={item._id}>
-                <Td whiteSpace="normal">{item.firstname}</Td>
-                <Td whiteSpace="normal">{item.lastname}</Td>
-                <Td whiteSpace="normal">
-                  {item.certifications.length !== 0
-                    ? item.certifications.reduce(
-                        (acc, curr) =>
-                          acc + (acc ? ", " : "") + curr.certificateName,
-                        ""
-                      )
-                    : "n/a"}
-                </Td>
-                <Td whiteSpace="normal">
-                  {item.specialties.length !== 0
-                    ? item.specialties.reduce(
-                        (acc, curr) =>
-                          acc + (acc ? ", " : "") + curr.specialtyName,
-                        ""
-                      )
-                    : "n/a"}
-                </Td>
+            {data?.length === 0 ? (
+              <Td textAlign="center" colSpan="5">
+                n/a
+              </Td>
+            ) : (
+              data?.map((item) => (
+                <Tr key={item._id}>
+                  <Td whiteSpace="normal">{item.firstname}</Td>
+                  <Td whiteSpace="normal">{item.lastname}</Td>
+                  <Td whiteSpace="normal">
+                    {item.certifications.length !== 0
+                      ? item.certifications.reduce(
+                          (acc, curr) =>
+                            acc + (acc ? ", " : "") + curr.certificateName,
+                          ""
+                        )
+                      : "n/a"}
+                  </Td>
+                  <Td whiteSpace="normal">
+                    {item.specialties.length !== 0
+                      ? item.specialties.reduce(
+                          (acc, curr) =>
+                            acc + (acc ? ", " : "") + curr.specialtyName,
+                          ""
+                        )
+                      : "n/a"}
+                  </Td>
 
-                <Td>
-                  <Flex gap="1rem">
-                    {/* <Button
+                  <Td>
+                    <Flex gap="1rem">
+                      {/* <Button
                       bgColor="blue"
                       color="neutral.100"
                       onClick={() => handleOpenEdit(item)}
                     >
                       Edit
                     </Button> */}
-                    <Button
-                      bgColor="red"
-                      color="white"
-                      onClick={() => handleOpenDelete(item)}
-                    >
-                      Delete
-                    </Button>
-                  </Flex>
-                </Td>
-              </Tr>
-            ))}
+                      <Button
+                        bgColor="red"
+                        color="white"
+                        onClick={() => handleOpenDelete(item)}
+                      >
+                        Delete
+                      </Button>
+                    </Flex>
+                  </Td>
+                </Tr>
+              ))
+            )}
           </Tbody>
         </Table>
       </TableContainer>
