@@ -33,6 +33,7 @@ import {
   updateGymAnnouncements,
   deleteGymAnnouncement,
 } from "../../api/ownerApi/privateOwnerApi";
+import { format } from "date-fns";
 
 const GymOwnerAnnouncement = () => {
   const toast = useToast();
@@ -343,7 +344,9 @@ const GymOwnerAnnouncement = () => {
                 {data?.map((item) => (
                   <Tr key={item._id}>
                     <Td whiteSpace="normal">{item.announcement}</Td>
-                    <Td whiteSpace="normal">{item.createdAt}</Td>
+                    <Td whiteSpace="normal">
+                      {format(item.createdAt, "MMMM d, yyyy - h:mma")}
+                    </Td>
                     <Td display="flex" gap="0.5rem">
                       <Button
                         bgColor="blue"
