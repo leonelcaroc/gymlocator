@@ -54,18 +54,16 @@ const registerUser = asyncHandler(async (req, res) => {
     gymId,
   } = req.body;
 
-  const userEmailExists = await User.findOne({ email });
-
-  if (userEmailExists) {
-    res.status(400);
-    throw new Error("Email already exists.");
-  }
-
   const verifiedGymOwner = await GymOwner.findById(gymId);
 
   if (!verifiedGymOwner) {
     res.status(404);
     throw new Error("Gym not found");
+  }
+
+  if (verifiedGymOwner?.gym.isApproved !== "approved") {
+    res.status(404).json({ error: "Gym is not approved by Admin" });
+    throw new Error("Gym is not approved by Admin");
   }
 
   const isPlanIdValid = verifiedGymOwner?.gym.plans.some(
@@ -75,6 +73,13 @@ const registerUser = asyncHandler(async (req, res) => {
   if (!isPlanIdValid) {
     res.status(400);
     throw new Error("Gym plan doesn't exists to your chosen gym");
+  }
+
+  const userEmailExists = await User.findOne({ email });
+
+  if (userEmailExists) {
+    res.status(400);
+    throw new Error("Email already exists.");
   }
 
   const trimmedFirstname = firstname.trim();
