@@ -67,10 +67,18 @@ const User = () => {
           boxShadow="0px 0px 10px rgba(0, 0, 0, 0.1)"
           height="100px"
           width="100%"
-          justifyContent="end"
+          justifyContent="space-between"
           alignItems="center"
-          paddingRight="3rem"
+          paddingInline="3rem"
         >
+          <Box
+            fontSize="1.2rem"
+            cursor="pointer"
+            _hover={{ color: "gray" }}
+            onClick={() => navigate("/")}
+          >
+            Go to Home
+          </Box>
           <Stack direction="row" h="80px" p={4}>
             <Flex alignItems="center" fontSize="1.2rem" cursor="pointer">
               {userInfo?.firstname}

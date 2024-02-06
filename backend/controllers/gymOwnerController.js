@@ -21,6 +21,24 @@ const authOwner = asyncHandler(async (req, res) => {
 
   const user = await GymOwner.findOne({ email });
 
+  if (user?.gym.isApproved !== "approved") {
+    res.status(401).json({
+      error: `${user?.gym.gymname} is ${
+        user?.gym.isApproved === "rejected"
+          ? "rejected by admin."
+          : "still for admin approval."
+      }`,
+    });
+
+    throw new Error(
+      `${user?.gym.gymname} is ${
+        user?.gym.isApproved === "rejected"
+          ? "rejected by admin."
+          : "still for admin approval."
+      }`
+    );
+  }
+
   if (user && (await user.matchPassword(password))) {
     const token = createToken(user._id);
 

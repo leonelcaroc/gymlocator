@@ -2,6 +2,7 @@ import { Box, HStack } from "@chakra-ui/react";
 
 import NavButton from "../../components/NavButton/NavButton";
 import NavMenuButton from "../../components/NavButton/NavMenuButton";
+import TokenService from "../../services/token";
 
 const Nav = ({ isScrolled }) => {
   return (
@@ -13,16 +14,27 @@ const Nav = ({ isScrolled }) => {
           buttonName="Find a Gym"
           route="/explore"
         />
-        <NavButton
-          isScrolled={isScrolled}
-          buttonName="Own a Gym"
-          route="/gym/signup"
-        />
-        <NavMenuButton
-          isScrolled={isScrolled}
-          buttonName="Login"
-          route={null}
-        />
+
+        {!TokenService.getUserLocal() ? (
+          <>
+            <NavButton
+              isScrolled={isScrolled}
+              buttonName="Own a Gym"
+              route="/gym/signup"
+            />
+            <NavMenuButton
+              isScrolled={isScrolled}
+              buttonName="Login"
+              route={null}
+            />
+          </>
+        ) : (
+          <NavButton
+            isScrolled={isScrolled}
+            buttonName="Profile"
+            route="/user"
+          />
+        )}
 
         {/* <NavButton
           isScrolled={isScrolled}
