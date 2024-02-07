@@ -34,16 +34,28 @@ export const getUserProfile = async () => {
   }
 };
 
-// export const updateGymStatus = async (action, id) => {
-//   try {
-//     const { data } = await privateAdminApi.patch(`/owners/${action}`, {
-//       id: id,
-//     });
-//     return data;
-//   } catch (error) {
-//     console.error("Error updating status:", error);
-//     throw error;
-//   }
-// };
+export const updateUserProfile = async (
+  firstname,
+  middlename,
+  lastname,
+  dateOfBirth,
+  contact,
+  address
+) => {
+  try {
+    const { data } = await privateUserApi.patch("/profile", {
+      firstname: firstname,
+      middlename: middlename,
+      lastname: lastname,
+      dateOfBirth: dateOfBirth,
+      contact: contact,
+      address: address,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    throw error;
+  }
+};
 
 export default privateUserApi;

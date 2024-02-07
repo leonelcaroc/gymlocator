@@ -246,28 +246,52 @@ const getUserProfile = asyncHandler(async (req, res) => {
 const updateUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
-  if (user) {
-    user.name = req.body.name || user.name;
-    user.email = req.body.email || user.email;
-
-    if (req.body.password) {
-      user.password = req.body.password;
-    }
-
-    const updatedUser = await user.save();
-
-    res.status(200).json({
-      _id: updatedUser._id,
-      name: updatedUser.name,
-      email: updatedUser.email,
-    });
-  } else {
+  if (!user) {
     res.status(404);
-
     throw new Error("User not found");
   }
 
-  res.status(200).json({ message: "Update user profile" });
+  const { firstname, middlename, lastname, dateOfBirth, contact, address } =
+    req.body;
+
+  const trimmedFirstName = validator.trim(firstname);
+  const trimmedMiddleName = validator.trim(middlename);
+  const trimmedLastName = validator.trim(lastname);
+
+  if (!trimmedFirstName || !trimmedLastName || !trimmedMiddleName) {
+    return res.status(400).json({ error: "Invalid input data" });
+  }
+
+  if (!validator.isISO8601(dateOfBirth, { strict: true })) {
+    return res.status(400).json({ error: "Invalid date" });
+  }
+
+  if (!validator.isLength(contact, { min: 1 })) {
+    return res.status(400).json({ error: "Contact is required." });
+  }
+
+  if (!validator.isLength(address, { min: 1 })) {
+    return res.status(400).json({ error: "Address is required." });
+  }
+
+  if (user) {
+    user.firstname = trimmedFirstName || user.firstname;
+    user.middlename = trimmedMiddleName || user.middlename;
+    user.lastname = trimmedLastName || user.lastname;
+    user.dateOfBirth = dateOfBirth || user.dateOfBirth;
+    user.contact = contact || user.contact;
+    user.address = address || user.address;
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Successfuly updated profile!",
+    });
+  } else {
+    res.status(404).json({ error: "Failed to update profile." });
+
+    throw new Error("User not found");
+  }
 });
 
 const getUserSubscriptions = asyncHandler(async (req, res) => {

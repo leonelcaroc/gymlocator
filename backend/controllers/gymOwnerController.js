@@ -262,7 +262,7 @@ const updateOwnerProfile = asyncHandler(async (req, res) => {
   const trimmedMiddleName = validator.trim(req.body.middlename);
   const trimmedLastName = validator.trim(req.body.lastname);
 
-  if (!trimmedFirstName || !trimmedLastName || trimmedMiddleName) {
+  if (!trimmedFirstName || !trimmedLastName || !trimmedMiddleName) {
     return res.status(400).json({ error: "Invalid input data" });
   }
 

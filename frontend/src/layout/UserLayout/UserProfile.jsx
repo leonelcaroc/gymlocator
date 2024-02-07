@@ -17,12 +17,16 @@ import {
   useToast,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useQuery } from "react-query";
-import { getUserProfile } from "../../api/userApi/privateUserApi";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import {
+  getUserProfile,
+  updateUserProfile,
+} from "../../api/userApi/privateUserApi";
 import { format, parseISO } from "date-fns";
 
 const UserProfile = () => {
   const toast = useToast();
+  const queryClient = useQueryClient();
 
   const [userProfile, setUserProfile] = useState(null);
 
@@ -50,6 +54,40 @@ const UserProfile = () => {
     }
   );
 
+  const updateUserProfileMutation = useMutation(
+    async (formData) => {
+      return updateUserProfile(
+        formData.firstname,
+        formData.middlename,
+        formData.lastname,
+        formData.dateOfBirth,
+        formData.contact,
+        formData.address
+      );
+    },
+    {
+      onSuccess: (data) => {
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+
+        // Invalidate and refetch any queries that depend on the user data
+        queryClient.invalidateQueries("userProfile");
+      },
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
   // console.log(data);
 
   const dateToFormat = new Date(data?.dateOfBirth ?? new Date());
@@ -64,10 +102,10 @@ const UserProfile = () => {
   };
 
   const handleSaveEdit = () => {
-    // updateGymPlanMutation.mutate(selectedPlan);
-    // setSelectedPlan(null);
-    console.log(userProfile);
-    // closeEditProfile();
+    updateUserProfileMutation.mutate(userProfile);
+    setUserProfile(null);
+    // console.log(userProfile);
+    closeEditProfile();
   };
 
   const handleCloseEdit = () => {
@@ -256,6 +294,7 @@ const UserProfile = () => {
               bgColor="brand.100"
               marginTop="5rem"
               onClick={() => handleOpenEdit(data)}
+              isLoading={updateUserProfileMutation.isLoading}
             >
               Edit Profile
             </Button>

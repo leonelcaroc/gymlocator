@@ -16,7 +16,7 @@ router.post("/logout", logoutUser);
 router
   .route("/profile")
   .get(protectUser, getUserProfile)
-  .put(protectUser, updateUserProfile);
+  .patch(protectUser, updateUserProfile);
 router.route("/subscriptions").get(protectUser, getUserSubscriptions);
 // .put(protectUser, updateUserProfile);
 export default router;
