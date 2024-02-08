@@ -58,4 +58,37 @@ export const updateUserProfile = async (
   }
 };
 
+export const getUserSubscription = async () => {
+  try {
+    const { data } = await privateUserApi.get("/subscriptions");
+    return data;
+  } catch (error) {
+    console.error("Error fetching user subscriptions:", error);
+    throw error;
+  }
+};
+
+// export const updateUserSub = async (gymId, userId) => {
+//   try {
+//     const { data } = await privateUserApi.patch("/subscriptions", {
+//       gymId: gymId,
+//       userId: userId,
+//     });
+//     return data;
+//   } catch (error) {
+//     console.error("Error cancelling user subscription:", error);
+//     throw error;
+//   }
+// };
+
+export const getUserClasses = async () => {
+  try {
+    const { data } = await privateUserApi.get("/classes");
+    return data;
+  } catch (error) {
+    console.error("Error fetching user classes:", error);
+    throw error;
+  }
+};
+
 export default privateUserApi;

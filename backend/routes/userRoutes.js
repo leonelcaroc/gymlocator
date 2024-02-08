@@ -7,6 +7,8 @@ import {
   getUserProfile,
   updateUserProfile,
   getUserSubscriptions,
+  // cancelSubscription,
+  getUserClasses,
 } from "../controllers/userController.js";
 import { protectUser } from "../middleware/authMiddleware.js";
 
@@ -18,5 +20,7 @@ router
   .get(protectUser, getUserProfile)
   .patch(protectUser, updateUserProfile);
 router.route("/subscriptions").get(protectUser, getUserSubscriptions);
-// .put(protectUser, updateUserProfile);
+// .patch(protectUser, cancelSubscription);
+router.route("/classes").get(protectUser, getUserClasses);
+
 export default router;

@@ -491,7 +491,7 @@ export const updateGymClass = async (
   equipment
 ) => {
   try {
-    const { data } = await privateOwnerApi.put("/classes", {
+    const { data } = await privateOwnerApi.patch("/classes", {
       id: id,
       classname: classname,
       instructor: instructor,

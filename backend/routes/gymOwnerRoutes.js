@@ -29,7 +29,7 @@ import {
   getGymTrainers,
   addGymTrainers,
   deleteGymTrainer,
-  getStripePrices,
+  // getStripePrices,
   addGymAnnouncement,
   getGymAnnouncement,
   updateGymAnnouncement,
@@ -119,7 +119,7 @@ router
   .route("/classes")
   .get(protectOwner, getGymClasses)
   .post(protectOwner, addGymClasses)
-  .put(protectOwner, updateGymClass)
+  .patch(protectOwner, updateGymClass)
   .delete(protectOwner, deleteGymClass);
 router
   .route("/announcements")

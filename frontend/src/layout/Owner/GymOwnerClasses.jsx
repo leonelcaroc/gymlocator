@@ -248,6 +248,7 @@ const GymOwnerClasses = () => {
   };
 
   const handleSaveEdit = () => {
+    // console.log(selectedClass);
     updateGymClassMutation.mutate(selectedClass);
     setSelectedClass(null);
     closeEditClass();
@@ -266,6 +267,7 @@ const GymOwnerClasses = () => {
 
   const handleDeleteClass = () => {
     deleteGymClassMutation.mutate(selectedDeleteClass?._id);
+    // console.log(selectedDeleteClass);
     setSelectedDeleteClass(null);
     closeDeleteClass();
   };
@@ -632,7 +634,7 @@ const GymOwnerClasses = () => {
                     {convertTo12HourFormat(item.endtime)}
                   </Td>
                   <Td whiteSpace="normal">{item.instructor}</Td>
-                  <Td>{`${item.joinedMember}/${item.capacity}`}</Td>
+                  <Td>{`${item.joinedMember.length}/${item.capacity}`}</Td>
                   <Td display="flex" gap="0.5rem">
                     <Button
                       bgColor="blue"

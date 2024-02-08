@@ -139,7 +139,10 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const membershipPlan = [
     {
-      gym: verifiedGymOwner,
+      gym: {
+        gymname: verifiedGymOwner.gym.gymname,
+        ownerId: verifiedGymOwner._id,
+      },
       myPlan: {
         planName: plan.planName,
         amount: plan.amount,
@@ -167,8 +170,10 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   if (user) {
-    const serializedUser = JSON.parse(
-      stringifySafe({
+    const serializedUser =
+      // JSON.parse(
+      //   stringifySafe({
+      {
         _id: user._id,
         firstname: user.firstname,
         middlename: user.middlename,
@@ -178,8 +183,9 @@ const registerUser = asyncHandler(async (req, res) => {
         contact: user.contact,
         gender: user.gender,
         dateOfBirth: user.dateOfBirth,
-      })
-    );
+      };
+    //   })
+    // );
 
     await verifiedGymOwner.gym.members.push({
       user: serializedUser,
@@ -305,6 +311,61 @@ const getUserSubscriptions = asyncHandler(async (req, res) => {
   res.status(200).json(user.memberships);
 });
 
+// const cancelSubscription = asyncHandler(async (req, res) => {
+//   const user = await User.findById(req.user._id);
+//   const { userId, gymId } = req.body;
+
+//   if (!user) {
+//     res.status(404);
+//     throw new Error("User not found");
+//   }
+
+//   const userClient = await User.findById(userId);
+//   const gymClient = await GymOwner.findById(gymId);
+
+//   if (!userClient) {
+//     res.status(404).json({ error: "User id is invalid" });
+//     throw new Error("User not found");
+//   }
+
+//   if (!gymClient) {
+//     res.status(404).json({ error: "Gym id is invalid" });
+//     throw new Error("Gym not found");
+//   }
+
+//   // const userSub = userClient?.filter((item) => {
+//   //   return item.gym._id === userId;
+//   // });
+
+//   // const userPlan = gymClient?.filter((item) => {
+//   //   return item.gym._id === gymId;
+//   // });
+
+//   res.status(200).json(userClient.memberships);
+// });
+
+const getUserClasses = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  // res.status(200).json({ id: user.memberships[0].gym.ownerId });
+
+  const allOwnerIds = [];
+
+  user.memberships.forEach((item) => {
+    if (item.gym && item.gym.ownerId) {
+      allOwnerIds.push(item.gym.ownerId);
+    }
+  });
+
+  res.status(200).json({ ownerIds: allOwnerIds });
+  // res.status(200).json({ greeting: "Hello World!" });
+});
+
 export {
   authUser,
   registerUser,
@@ -312,4 +373,6 @@ export {
   getUserProfile,
   updateUserProfile,
   getUserSubscriptions,
+  getUserClasses,
+  // cancelSubscription,
 };

@@ -11,9 +11,34 @@ import {
   Td,
   Tbody,
   TableContainer,
+  useToast,
 } from "@chakra-ui/react";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import { getUserClasses } from "../../api/userApi/privateUserApi";
 
 const UserClasses = () => {
+  const toast = useToast();
+
+  const { data, isLoading, isError } = useQuery(
+    "userClasses",
+    async () => {
+      return getUserClasses();
+    },
+    {
+      refetchOnWindowFocus: false,
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  console.log(data);
+
   return (
     <Box padding="2rem">
       <Text color="brand.200" fontSize="2rem" marginBottom="2rem">

@@ -88,8 +88,6 @@ const UserProfile = () => {
     }
   );
 
-  // console.log(data);
-
   const dateToFormat = new Date(data?.dateOfBirth ?? new Date());
   const formattedDate = format(dateToFormat, "MMMM d, yyyy");
 

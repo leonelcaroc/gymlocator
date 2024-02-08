@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import generateToken from "../utils/generateToken.js";
 import validator from "validator";
 import GymOwner from "../models/gymOwnerModel.js";
+import Class from "../models/classModel.js";
 import formidable from "formidable";
 
 import createToken from "../utils/createToken.js";
@@ -1261,70 +1262,82 @@ const getGymClasses = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  res.status(200).json(user.gym.classes);
+  const myClasses = await Class.find({ gymOwnerId: req.user._id });
+
+  res.status(200).json(myClasses);
 });
 
 const addGymClasses = asyncHandler(async (req, res) => {
-  try {
-    const user = await GymOwner.findById(req.user._id);
+  // try {
+  const newClassId = new ObjectId();
+  const user = await GymOwner.findById(req.user._id);
 
-    if (!user) {
-      res.status(404);
-      throw new Error("User not found");
-    }
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
 
-    // Extract the new equipment data from the request body
-    const {
-      classname,
-      instructor,
-      date,
-      starttime,
-      endtime,
-      capacity,
-      description,
-      equipment,
-    } = req.body;
+  // Extract the new equipment data from the request body
+  const {
+    classname,
+    instructor,
+    date,
+    starttime,
+    endtime,
+    capacity,
+    description,
+    equipment,
+  } = req.body;
 
-    const trimmedClassName = validator.trim(classname);
-    const trimmedDescription = validator.trim(description);
-    const trimmedEquipment = validator.trim(equipment);
+  const trimmedClassName = validator.trim(classname);
+  const trimmedDescription = validator.trim(description);
+  const trimmedEquipment = validator.trim(equipment);
 
-    if (!validator.isLength(trimmedDescription, { min: 1 })) {
-      return res.status(400).json({ error: "Class description is required." });
-    }
+  if (!validator.isLength(trimmedDescription, { min: 1 })) {
+    return res.status(400).json({ error: "Class description is required." });
+  }
 
-    if (
-      !validator.isNumeric(capacity) ||
-      !validator.isInt(capacity, { min: 1 })
-    ) {
-      return res.status(400).json({ error: "Capacity is cannot be 0." });
-    }
+  if (
+    !validator.isNumeric(capacity) ||
+    !validator.isInt(capacity, { min: 1 })
+  ) {
+    return res.status(400).json({ error: "Capacity is cannot be 0." });
+  }
 
-    const newClass = {
-      classname: trimmedClassName,
-      description: trimmedDescription,
-      equipment: trimmedEquipment,
-      instructor: instructor,
-      date: date,
-      starttime: starttime,
-      endtime: endtime,
-      capacity: capacity,
-    };
+  const newClass = await Class.create({
+    _id: newClassId,
+    gymOwnerId: user._id,
+    classname: trimmedClassName,
+    description: trimmedDescription,
+    equipment: trimmedEquipment,
+    instructor: instructor,
+    date: date,
+    starttime: starttime,
+    endtime: endtime,
+    capacity: capacity,
+  });
 
-    // Add the new service to the existing service list
-    user.gym.classes.push(newClass);
+  // Add the new service to the existing service list
 
-    // Save the updated user with the new service
+  // Save the updated user with the new service
+  // await user.save();
+
+  // Respond with the updated user profile
+  if (newClass) {
+    user.gym.classes.push(newClassId);
+
     await user.save();
 
-    // Respond with the updated user profile
     res.status(200).json({
       message: "Successfully added new class",
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+  } else {
+    res.status(400).json({ error: "Failed to add class" });
   }
+  // } catch (error) {
+  //   console.error(error);
+  //   res.status(500).json({ error: "Internal Server Error" });
+  // }
 });
 
 const updateGymClass = asyncHandler(async (req, res) => {
@@ -1347,6 +1360,8 @@ const updateGymClass = asyncHandler(async (req, res) => {
     description,
     equipment,
   } = req.body;
+
+  const specificClass = await Class.findById(id);
 
   const trimmedClassName = validator.trim(classname);
   const trimmedDescription = validator.trim(description);
@@ -1375,35 +1390,30 @@ const updateGymClass = asyncHandler(async (req, res) => {
     return res.status(400).json({ error: "Capacity is cannot be 0." });
   }
 
-  const index = user.gym.classes.findIndex((myClass) => myClass.id === id);
-
-  if (capacity < user.gym.classes[index].joinedMember) {
+  if (capacity < specificClass.joinedMember.length) {
     return res
       .status(400)
       .json({ error: "Capacity cannot be less than joined members" });
   }
 
-  if (index !== -1) {
-    // Update the service at the found index
-    user.gym.classes[index] = {
-      id: id,
-      classname: trimmedClassName,
-      instructor: instructor,
-      date: date,
-      starttime: starttime,
-      endtime: endtime,
-      capacity: capacity,
-      description: trimmedDescription,
-      equipment: trimmedEquipment,
-      joinedMember: user.gym.classes[index].joinedMember,
-    };
+  specificClass.classname = trimmedClassName;
+  specificClass.instructor = instructor;
+  specificClass.date = date;
+  specificClass.starttime = starttime;
+  specificClass.endtime = endtime;
+  specificClass.capacity = capacity;
+  specificClass.description = trimmedDescription;
+  specificClass.equipment = trimmedEquipment;
 
-    await user.save();
+  const updatedClass = await specificClass.save();
 
-    // Respond with the updated user profile
+  if (updatedClass) {
     res.status(200).json({
       message: "Successfully edited class",
     });
+  } else {
+    res.status(400).json({ error: "Failed to edit class." });
+    throw new Error("Failed to edit class.");
   }
 });
 
@@ -1415,13 +1425,24 @@ const deleteGymClass = asyncHandler(async (req, res) => {
     res.status(404).json({ error: "User not found." });
   }
 
-  const remainingClasses = user.gym.classes.filter((item) => item.id !== id);
+  const deletedClass = await Class.deleteOne({ _id: id });
 
-  user.gym.classes = [...remainingClasses];
+  if (deletedClass) {
+    try {
+      const remainingClasses = user.gym.classes.filter(
+        (item) => item.toString() !== id
+      );
 
-  await user.save();
+      user.gym.classes = [...remainingClasses];
 
-  res.status(200).json({ message: "Successfully deleted class" });
+      await user.save();
+
+      res.status(200).json({ message: "Successfully deleted class" });
+    } catch (error) {
+      res.status(400).json({ error: "Failed to delete class" });
+      throw new Error("Failed to delete class");
+    }
+  }
 });
 
 // GYM Members

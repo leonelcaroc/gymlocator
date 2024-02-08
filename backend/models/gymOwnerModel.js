@@ -115,45 +115,50 @@ const trainerSchema = mongoose.Schema({
   },
 });
 
-const classSchema = mongoose.Schema({
-  classname: {
-    type: String,
-    required: true,
-  },
-  instructor: {
-    type: String,
-    required: true,
-  },
-  date: {
-    type: Date,
-    required: true,
-  },
-  starttime: {
-    type: String,
-    required: true,
-  },
-  endtime: {
-    type: String,
-    required: true,
-  },
-  capacity: {
-    type: Number,
-    required: true,
-  },
-  joinedMember: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  equipment: {
-    type: String,
-    required: true,
-  },
-});
+// const classSchema = mongoose.Schema(
+//   {
+//     classname: {
+//       type: String,
+//       required: true,
+//     },
+//     instructor: {
+//       type: String,
+//       required: true,
+//     },
+//     date: {
+//       type: Date,
+//       required: true,
+//     },
+//     starttime: {
+//       type: String,
+//       required: true,
+//     },
+//     endtime: {
+//       type: String,
+//       required: true,
+//     },
+//     capacity: {
+//       type: Number,
+//       required: true,
+//     },
+//     joinedMember: {
+//       type: Number,
+//       required: true,
+//       default: 0,
+//     },
+//     description: {
+//       type: String,
+//       required: true,
+//     },
+//     equipment: {
+//       type: String,
+//       required: true,
+//     },
+//   },
+//   {
+//     timestamps: true,
+//   }
+// );
 
 const announcementSchema = mongoose.Schema({
   announcement: {
@@ -299,7 +304,7 @@ const gymSchema = mongoose.Schema({
     default: [],
   },
   classes: {
-    type: [classSchema],
+    type: Array,
     default: [],
   },
   isApproved: {
