@@ -1405,15 +1405,14 @@ const updateGymClass = asyncHandler(async (req, res) => {
   specificClass.description = trimmedDescription;
   specificClass.equipment = trimmedEquipment;
 
-  const updatedClass = await specificClass.save();
+  try {
+    await specificClass.save();
 
-  if (updatedClass) {
     res.status(200).json({
       message: "Successfully edited class",
     });
-  } else {
-    res.status(400).json({ error: "Failed to edit class." });
-    throw new Error("Failed to edit class.");
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
