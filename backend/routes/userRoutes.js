@@ -9,6 +9,8 @@ import {
   getUserSubscriptions,
   // cancelSubscription,
   getUserClasses,
+  getGyms,
+  userJoinGym,
 } from "../controllers/userController.js";
 import { protectUser } from "../middleware/authMiddleware.js";
 
@@ -22,5 +24,7 @@ router
 router.route("/subscriptions").get(protectUser, getUserSubscriptions);
 // .patch(protectUser, cancelSubscription);
 router.route("/classes").get(protectUser, getUserClasses);
+router.route("/join").post(protectUser, userJoinGym);
+router.route("/gyms").get(protectUser, getGyms);
 
 export default router;

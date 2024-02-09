@@ -9,10 +9,12 @@ import {
   Divider,
   Button,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import { getGymOwners } from "../api/publicApi/publicApi";
+import { getUserGyms } from "../api/userApi/privateUserApi";
 import { formattedTime } from "../utils/convertToAmericanTime";
 import getAbbreviatedDay from "../utils/getAbbreviatedDay";
 import Header from "../layout/Header/Header";
@@ -34,6 +36,8 @@ import { useState, useEffect } from "react";
 import L from "leaflet";
 import GetCoordinates from "../components/GetCoordinates/GetCoordinates";
 import StarRating from "../components/StarRating/StarRating";
+import TokenService from "../services/token";
+import UserJoinOtherGymModal from "../components/UserJoinOtherGymModal/UserJoinOtherGymModal";
 
 const TOKEN =
   "pk.eyJ1IjoidGVhbXNlY3JldDI1IiwiYSI6ImNscGgybG5vNDA1N3kycXAwemdnN3ViZHgifQ.-_tUlVTRPjswzrl2b6nuag";
@@ -85,8 +89,11 @@ function MapLocate({ location }) {
 
 const Explore = () => {
   const navigate = useNavigate();
+  const toast = useToast();
   const [exploreState, setExploreState] = useState("explore");
   const [selectedGym, setSelectedGym] = useState(null);
+
+  const queryClient = useQueryClient();
 
   const startDay = getAbbreviatedDay(selectedGym?.gym.schedule.startday);
   const endDay = getAbbreviatedDay(selectedGym?.gym.schedule.endday);
@@ -105,6 +112,11 @@ const Explore = () => {
     onOpen: openUserSignUp,
     onClose: closeUserSignUp,
   } = useDisclosure();
+  const {
+    isOpen: isUserJoinGymOpen,
+    onOpen: openUserJoinGym,
+    onClose: closeUserJoinGym,
+  } = useDisclosure();
 
   // const [location, setLocation] = useState([]);
   const [position, setPosition] = useState([
@@ -114,10 +126,43 @@ const Explore = () => {
 
   // ----------------------------------------
 
-  const { data, isLoading, isError } = useQuery(
+  // useQuery for getting all gyms that the user did not subscribed and isApproved by admin
+
+  // const { data: userGyms, isLoading: isUserGymsLoading } = useQuery(
+  //   "gymOwners",
+  //   async () => {
+  //     return getUserGyms();
+  //   },
+  //   {
+  //     refetchOnWindowFocus: false,
+  //     onError: (error) => {
+  //       toast({
+  //         title: error.response.data.error || "Something went wrong",
+  //         status: "error",
+  //         duration: 2000,
+  //         position: "bottom-right",
+  //       });
+  //     },
+  //     onSuccess: (result) => {
+  //       let approvedGym = result?.filter((item) => {
+  //         return item.gym.isApproved === "approved";
+  //       });
+
+  //       if (approvedGym.length !== 0) {
+  //         setSelectedGym(result[0]);
+  //       }
+  //     },
+  //   }
+  // );
+
+  // useQuery for getting all gyms that isApproved
+
+  const { data, isLoading } = useQuery(
     "gymOwners",
     async () => {
-      return getGymOwners();
+      return TokenService.getUserLocal() ? getUserGyms() : getGymOwners();
+      // return getGymOwners();
+      // return getUserGyms();
     },
     {
       refetchOnWindowFocus: false,
@@ -140,6 +185,8 @@ const Explore = () => {
       },
     }
   );
+
+  // const dataToFilter = TokenService.getUserLocal() ? userGyms : allGyms;
 
   const approvedGyms = data?.filter((item) => {
     return item.gym.isApproved === "approved";
@@ -168,6 +215,7 @@ const Explore = () => {
 
     return () => {
       isMounted = false; // Cleanup to avoid memory leaks
+      queryClient.cancelQueries("gymOwners");
     };
   }, []); // Empty dependency array means this effect runs once after the initial render
 
@@ -193,11 +241,21 @@ const Explore = () => {
 
   // console.log(selectedGym);
 
+  // console.log(data);
+  // console.log(TokenService.getUserLocal()?.token);
+  // console.log(allGyms);
+
   return (
     <>
       <UserSignUpModal
         isModalOpen={isUserSignUpOpen}
         closeModal={closeUserSignUp}
+        selectedGym={selectedGym}
+      />
+
+      <UserJoinOtherGymModal
+        isModalOpen={isUserJoinGymOpen}
+        closeModal={closeUserJoinGym}
         selectedGym={selectedGym}
       />
 
@@ -247,19 +305,26 @@ const Explore = () => {
                       Open {startTime} {startDay}-{endDay}
                     </Text>
                     <Flex gap="1rem" marginBlock="0.5rem">
+                      {!TokenService.getUserLocal() ? (
+                        <Button
+                          color="neutral.100"
+                          bgColor="brand.100"
+                          maxHeight="2rem"
+                          onClick={() => navigate("/userlogin")}
+                        >
+                          Login
+                        </Button>
+                      ) : null}
+
                       <Button
                         color="neutral.100"
                         bgColor="brand.100"
                         maxHeight="2rem"
-                        onClick={() => navigate("/userlogin")}
-                      >
-                        Login
-                      </Button>
-                      <Button
-                        color="neutral.100"
-                        bgColor="brand.100"
-                        maxHeight="2rem"
-                        onClick={() => openUserSignUp()}
+                        onClick={
+                          TokenService.getUserLocal()
+                            ? () => openUserJoinGym()
+                            : () => openUserSignUp()
+                        }
                       >
                         Join Now
                       </Button>

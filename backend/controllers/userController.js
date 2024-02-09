@@ -137,6 +137,8 @@ const registerUser = asyncHandler(async (req, res) => {
       .json({ error: "Password must be between 8 and 16 characters" });
   }
 
+  // const alreadySubscribed = verifiedGymOwner?.filter(item);
+
   const membershipPlan = [
     {
       gym: {
@@ -203,6 +205,98 @@ const registerUser = asyncHandler(async (req, res) => {
 
     res.status(201).json({
       message: "Account Created",
+    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid user data.");
+  }
+});
+
+const userJoinGym = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  const { plan, gymId } = req.body;
+
+  const verifiedGymOwner = await GymOwner.findById(gymId);
+
+  if (!verifiedGymOwner) {
+    res.status(404);
+    throw new Error("Gym not found");
+  }
+
+  if (verifiedGymOwner?.gym.isApproved !== "approved") {
+    res.status(404).json({ error: "Gym is not approved by Admin" });
+    throw new Error("Gym is not approved by Admin");
+  }
+
+  const isPlanIdValid = verifiedGymOwner?.gym.plans.some(
+    (gymPlan) => gymPlan._id.toString() === plan._id
+  );
+
+  if (!isPlanIdValid) {
+    res.status(400);
+    throw new Error("Gym plan doesn't exists to your chosen gym");
+  }
+
+  const membershipPlan = {
+    gym: {
+      gymname: verifiedGymOwner.gym.gymname,
+      ownerId: verifiedGymOwner._id,
+    },
+    myPlan: {
+      planName: plan.planName,
+      amount: plan.amount,
+      duration: plan.duration,
+      startTime: Date.now(),
+      endTime: calculateEndTime(plan.duration),
+      planStatus: "active",
+      paymentStatus: "paid",
+    },
+  };
+
+  user.memberships.push(membershipPlan);
+
+  await user.save();
+
+  if (user) {
+    const serializedUser =
+      // JSON.parse(
+      //   stringifySafe({
+      {
+        _id: user._id,
+        firstname: user.firstname,
+        middlename: user.middlename,
+        lastname: user.lastname,
+        address: user.address,
+        email: user.email,
+        contact: user.contact,
+        gender: user.gender,
+        dateOfBirth: user.dateOfBirth,
+      };
+    //   })
+    // );
+
+    await verifiedGymOwner.gym.members.push({
+      user: serializedUser,
+      plan: {
+        planName: plan.planName,
+        amount: plan.amount,
+        duration: plan.duration,
+        startTime: Date.now(),
+        endTime: calculateEndTime(plan.duration),
+        planStatus: "active",
+        paymentStatus: "paid",
+      },
+    });
+    await verifiedGymOwner.save();
+
+    res.status(201).json({
+      message: `Successfully joined at ${verifiedGymOwner.gym.gymname}`,
     });
   } else {
     res.status(400);
@@ -352,18 +446,46 @@ const getUserClasses = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
+  res.status(200).json(user.memberships);
+
+  // let userClasses = [];
+
+  // for (let i = 0; i < user.memberships.length; index++) {}
+
   // res.status(200).json({ id: user.memberships[0].gym.ownerId });
 
-  const allOwnerIds = [];
+  // const allOwnerIds = [];
 
-  user.memberships.forEach((item) => {
-    if (item.gym && item.gym.ownerId) {
-      allOwnerIds.push(item.gym.ownerId);
-    }
-  });
+  // user.memberships.forEach((item) => {
+  //   if (item.gym && item.gym.ownerId) {
+  //     allOwnerIds.push(item.gym.ownerId);
+  //   }
+  // });
 
   res.status(200).json({ ownerIds: allOwnerIds });
-  // res.status(200).json({ greeting: "Hello World!" });
+});
+
+const getGyms = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  const ownerIdList = user.memberships.map(
+    (membership) => membership.gym.ownerId
+  );
+
+  // const gymOwners = await GymOwner.find({ _id: { $in: ownerIdList } }).exec();
+
+  const gymOwners = await GymOwner.find({ _id: { $nin: ownerIdList } })
+    // .select(
+    //   "_id gym.gymname gym.contact gym.description gym.address gym.gymLocation schedule permitBase64 isApproved reviews equipments plans"
+    // )
+    .exec();
+
+  res.status(200).json(gymOwners);
 });
 
 export {
@@ -375,4 +497,27 @@ export {
   getUserSubscriptions,
   getUserClasses,
   // cancelSubscription,
+  getGyms,
+  userJoinGym,
 };
+
+// const a = [
+//   {
+//     firstname: "Maria",
+//     middlename: "Santos",
+//     lastname: "Clara",
+//     memberships: [{ gym: { gymname: "Ben's Gym", ownerId: "123" } }],
+//   },
+//   {
+//     firstname: "Honey",
+//     middlename: "Jean",
+//     lastname: "Dort",
+//     memberships: [{ gym: { gymname: "Mark's Gym", ownerId: "456" } }],
+//   },
+// ];
+
+// const b = ;[
+//   { gymname: "Ben's Gym", _id: "123" },
+//   { gymname: "Mark's Gym", _id: "456" },
+//   { gymname: "Leo's Gym", _id: "789" },
+// ]

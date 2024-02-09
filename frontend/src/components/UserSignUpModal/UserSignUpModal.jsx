@@ -45,6 +45,22 @@ const UserSignUpModal = ({ isModalOpen, closeModal, selectedGym }) => {
       ...prevUser,
       gymId: selectedGym?._id,
     }));
+
+    return () => {
+      setSignUpUser({
+        firstname: "",
+        middlename: "",
+        lastname: "",
+        email: "",
+        contact: "",
+        address: "",
+        dateOfBirth: "",
+        gymId: null,
+        plan: null,
+        gender: "",
+        password: "",
+      });
+    };
   }, [selectedGym]);
 
   const registerUserMutation = useMutation(

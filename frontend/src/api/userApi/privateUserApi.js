@@ -9,7 +9,7 @@ privateUserApi.interceptors.request.use(
   (config) => {
     // Retrieve the JWT token from your storage (e.g., cookies, localStorage, etc.)
     // const jwtToken = TokenService.getLocal("adminInfo");
-    const jwtToken = JSON.parse(TokenService.getUserLocal()).token;
+    const jwtToken = JSON.parse(TokenService.getUserLocal())?.token;
 
     // If the token is available, add it to the Authorization header
     if (jwtToken) {
@@ -87,6 +87,29 @@ export const getUserClasses = async () => {
     return data;
   } catch (error) {
     console.error("Error fetching user classes:", error);
+    throw error;
+  }
+};
+
+export const getUserGyms = async () => {
+  try {
+    const { data } = await privateUserApi.get("/gyms");
+    return data;
+  } catch (error) {
+    console.error("Error fetching gyms:", error);
+    throw error;
+  }
+};
+
+export const postUserJoinGym = async (plan, gymId) => {
+  try {
+    const { data } = await privateUserApi.post("/join", {
+      plan,
+      gymId,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error user join gym:", error);
     throw error;
   }
 };
