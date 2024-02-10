@@ -597,9 +597,11 @@ const GymOwnerTrainers = () => {
           </Thead>
           <Tbody>
             {data?.length === 0 ? (
-              <Td textAlign="center" colSpan="5">
-                n/a
-              </Td>
+              <Tr>
+                <Td textAlign="center" colSpan="5">
+                  n/a
+                </Td>
+              </Tr>
             ) : (
               data?.map((item) => (
                 <Tr key={item._id}>

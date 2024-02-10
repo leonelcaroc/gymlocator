@@ -50,116 +50,6 @@ const memberSchema = mongoose.Schema(
   }
 );
 
-const specialtySchema = mongoose.Schema({
-  specialtyName: {
-    type: String,
-    required: true,
-  },
-});
-
-const certificationSchema = mongoose.Schema({
-  certificateName: {
-    type: String,
-    required: true,
-  },
-});
-
-const trainerSchema = mongoose.Schema({
-  firstname: {
-    type: String,
-    required: true,
-  },
-  middlename: {
-    type: String,
-    required: true,
-  },
-  lastname: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-  },
-  contact: {
-    type: String,
-    required: true,
-  },
-  address: {
-    type: String,
-    required: true,
-  },
-  dateOfBirth: {
-    type: Date,
-    required: true,
-  },
-  gender: {
-    type: String,
-    required: true,
-  },
-  certifications: {
-    type: [certificationSchema],
-    default: [],
-  },
-  specialties: {
-    type: [specialtySchema],
-    default: [],
-  },
-  yearsOfExperience: {
-    type: String,
-    required: true,
-  },
-  biography: {
-    type: String,
-    required: true,
-  },
-});
-
-// const classSchema = mongoose.Schema(
-//   {
-//     classname: {
-//       type: String,
-//       required: true,
-//     },
-//     instructor: {
-//       type: String,
-//       required: true,
-//     },
-//     date: {
-//       type: Date,
-//       required: true,
-//     },
-//     starttime: {
-//       type: String,
-//       required: true,
-//     },
-//     endtime: {
-//       type: String,
-//       required: true,
-//     },
-//     capacity: {
-//       type: Number,
-//       required: true,
-//     },
-//     joinedMember: {
-//       type: Number,
-//       required: true,
-//       default: 0,
-//     },
-//     description: {
-//       type: String,
-//       required: true,
-//     },
-//     equipment: {
-//       type: String,
-//       required: true,
-//     },
-//   },
-//   {
-//     timestamps: true,
-//   }
-// );
-
 const announcementSchema = mongoose.Schema({
   announcement: {
     type: String,
@@ -292,7 +182,7 @@ const gymSchema = mongoose.Schema({
     default: [],
   },
   trainers: {
-    type: [trainerSchema],
+    type: Array,
     default: [],
   },
   amenities: {

@@ -14,6 +14,10 @@ const classSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    instructorId: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+    },
     instructor: {
       type: String,
       required: true,

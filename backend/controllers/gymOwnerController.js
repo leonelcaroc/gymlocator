@@ -4,6 +4,7 @@ import validator from "validator";
 import GymOwner from "../models/gymOwnerModel.js";
 import Class from "../models/classModel.js";
 import User from "../models/userModel.js";
+import Trainer from "../models/trainerModel.js";
 import calculateEndTime from "../utils/calculateEndTime.js";
 import formidable from "formidable";
 
@@ -1025,6 +1026,7 @@ const getGymTrainers = asyncHandler(async (req, res) => {
 });
 
 const addGymTrainers = asyncHandler(async (req, res) => {
+  const newTrainerId = new ObjectId();
   const user = await GymOwner.findById(req.user._id);
 
   if (!user) {
@@ -1092,6 +1094,8 @@ const addGymTrainers = asyncHandler(async (req, res) => {
   }
 
   const newTrainer = {
+    _id: newTrainerId,
+    gymOwnerId: user._id,
     firstname: trimmedFirstname,
     middlename: trimmedMiddlename,
     lastname: trimmedLastname,
@@ -1110,15 +1114,20 @@ const addGymTrainers = asyncHandler(async (req, res) => {
     biography: trimmedBiography,
   };
 
-  user.gym.trainers.push(newTrainer);
+  const newUser = await Trainer.create(newTrainer);
 
-  // Save the updated user with the new service
-  await user.save();
+  if (newUser) {
+    user.gym.trainers.push(newUser);
 
-  // Respond with the updated user profile
-  res.status(200).json({
-    message: "Successfully added new trainer",
-  });
+    await user.save();
+
+    return res.status(200).json({
+      message: "Successfully added new trainer",
+    });
+  } else {
+    res.status(400).json({ message: "Failed to add new trainer" });
+    throw new Error("Failed to add new trainer");
+  }
 });
 
 const deleteGymTrainer = asyncHandler(async (req, res) => {
@@ -1130,20 +1139,42 @@ const deleteGymTrainer = asyncHandler(async (req, res) => {
   }
 
   const trainerToRemove = user.gym.trainers.find(
-    (trainer) => trainer.id === id
+    (trainer) => trainer._id.toString() === id
   );
 
   if (!trainerToRemove) {
     res.status(404).json({ error: "Trainer not found." });
   }
 
-  const remainingTrainers = user.gym.trainers.filter((item) => item.id !== id);
+  const isTrainerAssigned = await Class.find({
+    instructorId: id,
+  });
+
+  if (isTrainerAssigned > 0) {
+    res.status(400).json({
+      error: "Failed to delete trainer. Please remove assignment from a class.",
+    });
+    throw new Error(
+      "Failed to delete trainer. Please remove assignment from a class."
+    );
+  }
+
+  const deleteTrainer = await Trainer.findByIdAndDelete(id);
+
+  const remainingTrainers = user.gym.trainers.filter(
+    (item) => item._id.toString() !== id
+  );
 
   user.gym.trainers = [...remainingTrainers];
 
-  await user.save();
+  if (deleteTrainer) {
+    await user.save();
 
-  res.status(200).json({ message: "Successfully deleted trainer" });
+    return res.status(200).json({ message: "Successfully deleted trainer" });
+  } else {
+    res.status(400).json({ error: "Failed to delete trainer" });
+    throw new Error("Failed to delete trainer");
+  }
 });
 
 // GYM ANNOUNCEMENTS
@@ -1274,7 +1305,6 @@ const getGymClasses = asyncHandler(async (req, res) => {
 });
 
 const addGymClasses = asyncHandler(async (req, res) => {
-  // try {
   const newClassId = new ObjectId();
   const user = await GymOwner.findById(req.user._id);
 
@@ -1341,10 +1371,6 @@ const addGymClasses = asyncHandler(async (req, res) => {
   } else {
     res.status(400).json({ error: "Failed to add class" });
   }
-  // } catch (error) {
-  //   console.error(error);
-  //   res.status(500).json({ error: "Internal Server Error" });
-  // }
 });
 
 const updateGymClass = asyncHandler(async (req, res) => {
