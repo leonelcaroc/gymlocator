@@ -329,12 +329,6 @@ const GymOwnerClasses = () => {
                         : null,
                     });
                   }}
-                  // onChange={(e) =>
-                  //   setNewClass({
-                  //     ...newClass,
-                  //     instructor: e.target.value,
-                  //   })
-                  // }
                 >
                   {listOfTrainers?.map((trainer) => (
                     <option
@@ -474,12 +468,21 @@ const GymOwnerClasses = () => {
                 <Select
                   placeholder="Select trainer"
                   value={selectedClass?.instructor}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const selectedTrainer = listOfTrainers.find(
+                      (trainer) =>
+                        trainer.firstname + " " + trainer.lastname ===
+                        e.target.value
+                    );
+
                     setSelectedClass({
                       ...selectedClass,
                       instructor: e.target.value,
-                    })
-                  }
+                      instructorId: selectedTrainer
+                        ? selectedTrainer._id
+                        : null,
+                    });
+                  }}
                 >
                   {listOfTrainers?.map((item) => (
                     <option

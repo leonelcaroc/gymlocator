@@ -1154,6 +1154,10 @@ const deleteGymTrainer = asyncHandler(async (req, res) => {
     res.status(404).json({ error: "User not found." });
   }
 
+  // const isTrainerAssigneds = await Class.find({
+  //   instructorId: id,
+  // });
+
   const trainerToRemove = user.gym.trainers.find(
     (trainer) => trainer._id.toString() === id
   );
@@ -1166,7 +1170,7 @@ const deleteGymTrainer = asyncHandler(async (req, res) => {
     instructorId: id,
   });
 
-  if (isTrainerAssigned > 0) {
+  if (isTrainerAssigned.length > 0) {
     res.status(400).json({
       error: "Failed to delete trainer. Please remove assignment from a class.",
     });
@@ -1415,6 +1419,8 @@ const updateGymClass = asyncHandler(async (req, res) => {
     description,
     equipment,
   } = req.body;
+
+  // return console.log(req.body) && console.log("Hello");
 
   const specificClass = await Class.findById(id);
 
