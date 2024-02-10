@@ -12,6 +12,7 @@ import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import gymOwnerRoutes from "./routes/gymOwnerRoutes.js";
 import publicRoutes from "./routes/publicRoutes.js";
+import trainerRoutes from "./routes/trainerRoutes.js";
 // import searchRoutes from "./routes/searchRoutes.js";
 
 connectDB();
@@ -39,6 +40,7 @@ app.use("/api", publicRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/gymowner", gymOwnerRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/trainer", trainerRoutes);
 
 if (process.env.NODE_ENV === "production") {
   const __dirname = path.resolve();

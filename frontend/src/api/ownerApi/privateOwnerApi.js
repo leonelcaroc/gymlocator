@@ -403,7 +403,8 @@ export const addGymTrainers = async (
   certifications,
   specialties,
   yearsOfExperience,
-  biography
+  biography,
+  password
 ) => {
   try {
     const { data } = await privateOwnerApi.post("/trainers", {
@@ -419,6 +420,7 @@ export const addGymTrainers = async (
       specialties: specialties,
       yearsOfExperience: yearsOfExperience,
       biography: biography,
+      password: password,
     });
     return data;
   } catch (error) {

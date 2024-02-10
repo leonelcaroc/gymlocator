@@ -67,6 +67,7 @@ const GymOwnerTrainers = () => {
     specialties: [],
     yearsOfExperience: "",
     biography: "",
+    password: "",
   });
 
   const {
@@ -117,7 +118,8 @@ const GymOwnerTrainers = () => {
         formData.certifications,
         formData.specialties,
         formData.yearsOfExperience,
-        formData.biography
+        formData.biography,
+        formData.password
       );
     },
     {
@@ -209,6 +211,7 @@ const GymOwnerTrainers = () => {
       specialties: [],
       yearsOfExperience: "",
       biography: "",
+      password: "",
     });
     closeAddNewTrainer();
   };
@@ -227,6 +230,7 @@ const GymOwnerTrainers = () => {
       specialties: [],
       yearsOfExperience: "",
       biography: "",
+      password: "",
     });
     closeAddNewTrainer();
   };
@@ -524,6 +528,19 @@ const GymOwnerTrainers = () => {
                   }
                   type="text"
                   placeholder="Type your biography"
+                />
+              </Box>
+              <Box>
+                <Text fontWeight="bold">Password</Text>
+                <Input
+                  onChange={(e) =>
+                    setNewTrainer({
+                      ...newTrainer,
+                      password: e.target.value,
+                    })
+                  }
+                  type="password"
+                  placeholder="Type your password"
                 />
               </Box>
             </Stack>

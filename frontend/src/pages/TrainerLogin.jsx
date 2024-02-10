@@ -12,28 +12,60 @@ import {
   InputGroup,
   InputRightElement,
   Icon,
+  useToast,
 } from "@chakra-ui/react";
 import gym from "../assets/images/background.webp";
 import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
 import { Link as ReachLink, useNavigate } from "react-router-dom";
 import GoHome from "../components/GoHome/GoHome";
+import { useMutation } from "react-query";
+import TokenService from "../services/token";
+import { postLoginTrainer } from "../api/trainerApi/trainerApi";
 
 const TrainerLogin = () => {
+  const toast = useToast();
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [show, setShow] = useState(false);
   const handleShowPassword = () => setShow(!show);
 
-  const navigate = useNavigate();
+  const loginTrainerMutation = useMutation(
+    async (formData) => {
+      return postLoginTrainer(formData.email, formData.password);
+    },
+    {
+      onSuccess: (data) => {
+        TokenService.setTrainerLocal(JSON.stringify(data));
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+        navigate("/trainer");
+      },
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // navigate("/user");
+    // console.log(email, password);
 
-    console.log(email, password);
+    loginTrainerMutation.mutate({ email, password });
   };
 
   return (
@@ -95,7 +127,8 @@ const TrainerLogin = () => {
             width="full"
             _hover={{ color: "brand.100", bgColor: "gray.200" }}
             type="submit"
-            onClick={() => navigate("/trainer")}
+            // onClick={() => navigate("/trainer")}
+            isLoading={loginTrainerMutation.isLoading}
           >
             Login
           </Button>

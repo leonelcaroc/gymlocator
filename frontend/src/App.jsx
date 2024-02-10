@@ -41,34 +41,44 @@ import TrainerBookings from "./layout/TrainerLayout/TrainerBookings";
 
 import GuardRoute from "./privateRoute/GuardRoute";
 import PrivateRoute from "./privateRoute/PrivateRoute";
+import TrainerClasses from "./layout/TrainerLayout/TrainerClasses";
 
 const App = () => {
   return (
     <Routes>
       <Route
         path=""
-        element={<PrivateRoute clientInfo="adminInfo" navigateRoute="/admin" />}
+        element={
+          <PrivateRoute clientInfo="trainerInfo" navigateRoute="/trainer" />
+        }
       >
         <Route
           path=""
           element={
-            <PrivateRoute clientInfo="ownerInfo" navigateRoute="/gymowner" />
+            <PrivateRoute clientInfo="adminInfo" navigateRoute="/admin" />
           }
         >
-          <Route path="/" element={<Home />} />
-          <Route path="/explore" element={<Explore />} />
-
           <Route
             path=""
             element={
-              <PrivateRoute clientInfo="userInfo" navigateRoute="/user" />
+              <PrivateRoute clientInfo="ownerInfo" navigateRoute="/gymowner" />
             }
           >
-            <Route path="/adminlogin" element={<AdminLogin />} />
-            <Route path="/gym/signup" element={<GymOwnerSignUp />} />
-            <Route path="/gym/login" element={<GymOwnerLogin />} />
-            <Route path="/userlogin" element={<UserLogin />} />
-            <Route path="/trainerlogin" element={<TrainerLogin />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/explore" element={<Explore />} />
+
+            <Route
+              path=""
+              element={
+                <PrivateRoute clientInfo="userInfo" navigateRoute="/user" />
+              }
+            >
+              <Route path="/adminlogin" element={<AdminLogin />} />
+              <Route path="/gym/signup" element={<GymOwnerSignUp />} />
+              <Route path="/gym/login" element={<GymOwnerLogin />} />
+              <Route path="/userlogin" element={<UserLogin />} />
+              <Route path="/trainerlogin" element={<TrainerLogin />} />
+            </Route>
           </Route>
         </Route>
       </Route>
@@ -77,24 +87,34 @@ const App = () => {
       <Route
         path=""
         element={
-          <GuardRoute clientInfo="adminInfo" navigateLoginRoute="/adminlogin" />
+          <PrivateRoute clientInfo="trainerInfo" navigateRoute="/trainer" />
         }
       >
         <Route
           path=""
           element={
-            <PrivateRoute clientInfo="ownerInfo" navigateRoute="/gymowner" />
+            <GuardRoute
+              clientInfo="adminInfo"
+              navigateLoginRoute="/adminlogin"
+            />
           }
         >
           <Route
             path=""
             element={
-              <PrivateRoute clientInfo="userInfo" navigateRoute="/user" />
+              <PrivateRoute clientInfo="ownerInfo" navigateRoute="/gymowner" />
             }
           >
-            <Route path="/admin" element={<Admin />}>
-              <Route index={true} element={<AdminDashboard />} />
-              <Route path="manage" element={<AdminGymManage />} />
+            <Route
+              path=""
+              element={
+                <PrivateRoute clientInfo="userInfo" navigateRoute="/user" />
+              }
+            >
+              <Route path="/admin" element={<Admin />}>
+                <Route index={true} element={<AdminDashboard />} />
+                <Route path="manage" element={<AdminGymManage />} />
+              </Route>
             </Route>
           </Route>
         </Route>
@@ -103,33 +123,44 @@ const App = () => {
       {/* Gym Owner Routes */}
       <Route
         path=""
-        element={<PrivateRoute clientInfo="adminInfo" navigateRoute="/admin" />}
+        element={
+          <PrivateRoute clientInfo="trainerInfo" navigateRoute="/trainer" />
+        }
       >
         <Route
           path=""
-          element={<PrivateRoute clientInfo="userInfo" navigateRoute="/user" />}
+          element={
+            <PrivateRoute clientInfo="adminInfo" navigateRoute="/admin" />
+          }
         >
           <Route
             path=""
             element={
-              <GuardRoute
-                clientInfo="ownerInfo"
-                navigateLoginRoute="/gym/login"
-              />
+              <PrivateRoute clientInfo="userInfo" navigateRoute="/user" />
             }
           >
-            <Route path="/gymowner" element={<GymOwner />}>
-              <Route index={true} element={<GymOwnerDashboard />} />
-              <Route path="profile" element={<GymOwnerProfile />} />
-              <Route path="member" element={<GymOwnerMemberManagement />} />
-              <Route path="announcement" element={<GymOwnerAnnouncement />} />
-              <Route path="classes" element={<GymOwnerClasses />} />
-              <Route path="amenities" element={<GymOwnerAmenities />} />
-              <Route path="details" element={<GymOwnerDetails />} />
-              <Route path="equipments" element={<GymOwnerEquipments />} />
-              <Route path="plans" element={<GymOwnerPlans />} />
-              <Route path="services" element={<GymOwnerServices />} />
-              <Route path="trainers" element={<GymOwnerTrainers />} />
+            <Route
+              path=""
+              element={
+                <GuardRoute
+                  clientInfo="ownerInfo"
+                  navigateLoginRoute="/gym/login"
+                />
+              }
+            >
+              <Route path="/gymowner" element={<GymOwner />}>
+                <Route index={true} element={<GymOwnerDashboard />} />
+                <Route path="profile" element={<GymOwnerProfile />} />
+                <Route path="member" element={<GymOwnerMemberManagement />} />
+                <Route path="announcement" element={<GymOwnerAnnouncement />} />
+                <Route path="classes" element={<GymOwnerClasses />} />
+                <Route path="amenities" element={<GymOwnerAmenities />} />
+                <Route path="details" element={<GymOwnerDetails />} />
+                <Route path="equipments" element={<GymOwnerEquipments />} />
+                <Route path="plans" element={<GymOwnerPlans />} />
+                <Route path="services" element={<GymOwnerServices />} />
+                <Route path="trainers" element={<GymOwnerTrainers />} />
+              </Route>
             </Route>
           </Route>
         </Route>
@@ -138,34 +169,43 @@ const App = () => {
       {/* User Routes */}
       <Route
         path=""
-        element={<PrivateRoute clientInfo="adminInfo" navigateRoute="/admin" />}
+        element={
+          <PrivateRoute clientInfo="trainerInfo" navigateRoute="/trainer" />
+        }
       >
         <Route
           path=""
           element={
-            <PrivateRoute clientInfo="ownerInfo" navigateRoute="/gymowner" />
+            <PrivateRoute clientInfo="adminInfo" navigateRoute="/admin" />
           }
         >
           <Route
             path=""
             element={
-              <GuardRoute
-                clientInfo="userInfo"
-                navigateLoginRoute="/userlogin"
-              />
+              <PrivateRoute clientInfo="ownerInfo" navigateRoute="/gymowner" />
             }
           >
-            <Route path="/user" element={<User />}>
-              {/* <Route index={true} element={<UserDashboard />} /> */}
-              <Route
-                index={true}
-                // path="profile"
-                element={<UserProfile />}
-              />
-              <Route path="classes" element={<UserClasses />} />
-              <Route path="bookings" element={<UserBookings />} />
-              <Route path="subscriptions" element={<UserSubscriptions />} />
-              <Route path="announcements" element={<UserAnnouncements />} />
+            <Route
+              path=""
+              element={
+                <GuardRoute
+                  clientInfo="userInfo"
+                  navigateLoginRoute="/userlogin"
+                />
+              }
+            >
+              <Route path="/user" element={<User />}>
+                {/* <Route index={true} element={<UserDashboard />} /> */}
+                <Route
+                  index={true}
+                  // path="profile"
+                  element={<UserProfile />}
+                />
+                <Route path="classes" element={<UserClasses />} />
+                <Route path="bookings" element={<UserBookings />} />
+                <Route path="subscriptions" element={<UserSubscriptions />} />
+                <Route path="announcements" element={<UserAnnouncements />} />
+              </Route>
             </Route>
           </Route>
         </Route>
@@ -178,14 +218,30 @@ const App = () => {
       >
         <Route
           path=""
-          element={
-            <PrivateRoute clientInfo="ownerInfo" navigateRoute="/gymowner" />
-          }
+          element={<PrivateRoute clientInfo="userInfo" navigateRoute="/user" />}
         >
-          <Route path="/trainer" element={<Trainer />}>
-            <Route index={true} element={<TrainerDashboard />} />
-            <Route path="profile" element={<TrainerProfile />} />
-            <Route path="bookings" element={<TrainerBookings />} />
+          <Route
+            path=""
+            element={
+              <PrivateRoute clientInfo="ownerInfo" navigateRoute="/gymowner" />
+            }
+          >
+            <Route
+              path=""
+              element={
+                <GuardRoute
+                  clientInfo="trainerInfo"
+                  navigateLoginRoute="/trainerlogin"
+                />
+              }
+            >
+              <Route path="/trainer" element={<Trainer />}>
+                <Route index={true} element={<TrainerClasses />} />
+                {/* <Route index={true} element={<TrainerDashboard />} /> */}
+                {/* <Route path="profile" element={<TrainerProfile />} />
+            <Route path="bookings" element={<TrainerBookings />} /> */}
+              </Route>
+            </Route>
           </Route>
         </Route>
       </Route>

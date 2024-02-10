@@ -50,8 +50,9 @@ const Trainer = () => {
         </Flex>
         <Box>
           <UserNav route="/trainer" name="Dashboard" />
+          {/* <UserNav route="/trainer" name="Dashboard" />
           <UserNav route="/trainer/profile" name="Profile" />
-          <UserNav route="/trainer/bookings" name="Bookings" />
+          <UserNav route="/trainer/bookings" name="Bookings" /> */}
         </Box>
       </Box>
       <Box width="full" bgColor="neutral.100">

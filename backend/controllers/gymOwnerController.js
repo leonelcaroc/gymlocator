@@ -1047,6 +1047,7 @@ const addGymTrainers = asyncHandler(async (req, res) => {
     specialties,
     yearsOfExperience,
     biography,
+    password,
   } = req.body;
 
   const trimmedFirstname = validator.trim(firstname);
@@ -1056,9 +1057,17 @@ const addGymTrainers = asyncHandler(async (req, res) => {
   const trimmedContact = validator.trim(contact);
   const trimmedExperience = validator.trim(yearsOfExperience);
   const trimmedBiography = validator.trim(biography);
+  const trimmedPassword = validator.trim(password);
 
   if (!validator.isEmail(email)) {
     return res.status(400).json({ error: "Invalid email address" });
+  }
+
+  const userEmailExists = await Trainer.findOne({ email });
+
+  if (userEmailExists) {
+    res.status(400);
+    throw new Error("Email already exists.");
   }
 
   if (!validator.isLength(trimmedFirstname, { min: 1 })) {
@@ -1093,6 +1102,12 @@ const addGymTrainers = asyncHandler(async (req, res) => {
     return res.status(400).json({ error: "Biography is required." });
   }
 
+  if (!validator.isLength(trimmedPassword, { min: 8, max: 16 })) {
+    return res
+      .status(400)
+      .json({ error: "Password must be between 8 and 16 characters" });
+  }
+
   const newTrainer = {
     _id: newTrainerId,
     gymOwnerId: user._id,
@@ -1112,6 +1127,7 @@ const addGymTrainers = asyncHandler(async (req, res) => {
     })),
     yearsOfExperience: yearsOfExperience,
     biography: trimmedBiography,
+    password: trimmedPassword,
   };
 
   const newUser = await Trainer.create(newTrainer);
