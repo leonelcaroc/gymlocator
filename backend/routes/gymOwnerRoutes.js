@@ -139,9 +139,6 @@ router
   .delete(protectOwner, deleteGymPlan);
 router.route("/members").get(protectOwner, getGymMembers);
 router.route("/members").post(protectOwner, addNewMember);
-// .post(protectOwner, addGymPlans)
-// .put(protectOwner, updateGymPlans)
-// .delete(protectOwner, deleteGymPlan);
 router.route("/ownergym").get(protectOwner, getMyGym);
 
 export default router;

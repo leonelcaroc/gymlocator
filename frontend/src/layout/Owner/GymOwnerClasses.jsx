@@ -46,6 +46,7 @@ const GymOwnerClasses = () => {
   const [newClass, setNewClass] = useState({
     classname: "",
     instructor: "",
+    instructorId: "",
     date: "",
     starttime: "",
     endtime: "",
@@ -114,6 +115,7 @@ const GymOwnerClasses = () => {
       return addGymClass(
         formData.classname,
         formData.instructor,
+        formData.instructorId,
         formData.date,
         formData.starttime,
         formData.endtime,
@@ -151,6 +153,7 @@ const GymOwnerClasses = () => {
         formData._id,
         formData.classname,
         formData.instructor,
+        formData.instructorId,
         formData.date,
         formData.starttime,
         formData.endtime,
@@ -183,8 +186,8 @@ const GymOwnerClasses = () => {
   );
 
   const deleteGymClassMutation = useMutation(
-    async (id) => {
-      return deleteGymClass(id);
+    async (formData) => {
+      return deleteGymClass(formData.classId, formData.instructorId);
     },
     {
       onSuccess: (data) => {
@@ -218,6 +221,7 @@ const GymOwnerClasses = () => {
     setNewClass({
       classname: "",
       instructor: "",
+      instructorId: "",
       date: "",
       starttime: "",
       endtime: "",
@@ -232,6 +236,7 @@ const GymOwnerClasses = () => {
     setNewClass({
       classname: "",
       instructor: "",
+      instructorId: "",
       date: "",
       starttime: "",
       endtime: "",
@@ -248,7 +253,6 @@ const GymOwnerClasses = () => {
   };
 
   const handleSaveEdit = () => {
-    // console.log(selectedClass);
     updateGymClassMutation.mutate(selectedClass);
     setSelectedClass(null);
     closeEditClass();
@@ -266,7 +270,10 @@ const GymOwnerClasses = () => {
   };
 
   const handleDeleteClass = () => {
-    deleteGymClassMutation.mutate(selectedDeleteClass?._id);
+    deleteGymClassMutation.mutate({
+      classId: selectedDeleteClass?._id,
+      instructorId: selectedDeleteClass?.instructorId,
+    });
     // console.log(selectedDeleteClass);
     setSelectedDeleteClass(null);
     closeDeleteClass();
@@ -307,19 +314,34 @@ const GymOwnerClasses = () => {
                 <Select
                   placeholder="Select trainer"
                   value={newClass?.instructor}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const selectedTrainer = listOfTrainers.find(
+                      (trainer) =>
+                        trainer.firstname + " " + trainer.lastname ===
+                        e.target.value
+                    );
+
                     setNewClass({
                       ...newClass,
                       instructor: e.target.value,
-                    })
-                  }
+                      instructorId: selectedTrainer
+                        ? selectedTrainer._id
+                        : null,
+                    });
+                  }}
+                  // onChange={(e) =>
+                  //   setNewClass({
+                  //     ...newClass,
+                  //     instructor: e.target.value,
+                  //   })
+                  // }
                 >
-                  {listOfTrainers?.map((item) => (
+                  {listOfTrainers?.map((trainer) => (
                     <option
-                      key={item._id}
-                      value={item.firstname + " " + item.lastname}
+                      key={trainer._id}
+                      value={trainer.firstname + " " + trainer.lastname}
                     >
-                      {item.firstname} {item.lastname}
+                      {trainer.firstname} {trainer.lastname}
                     </option>
                   ))}
                 </Select>

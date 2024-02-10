@@ -56,6 +56,11 @@ const trainerSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  classes: {
+    type: Array,
+    required: true,
+    default: [],
+  },
   certifications: {
     type: [certificationSchema],
     default: [],

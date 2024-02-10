@@ -1333,6 +1333,7 @@ const addGymClasses = asyncHandler(async (req, res) => {
   const {
     classname,
     instructor,
+    instructorId,
     date,
     starttime,
     endtime,
@@ -1344,9 +1345,14 @@ const addGymClasses = asyncHandler(async (req, res) => {
   const trimmedClassName = validator.trim(classname);
   const trimmedDescription = validator.trim(description);
   const trimmedEquipment = validator.trim(equipment);
+  const trimmedInstructorId = validator.trim(instructorId);
 
   if (!validator.isLength(trimmedDescription, { min: 1 })) {
     return res.status(400).json({ error: "Class description is required." });
+  }
+
+  if (!validator.isLength(trimmedInstructorId, { min: 1 })) {
+    return res.status(400).json({ error: "Instructor is required." });
   }
 
   if (
@@ -1356,6 +1362,8 @@ const addGymClasses = asyncHandler(async (req, res) => {
     return res.status(400).json({ error: "Capacity is cannot be 0." });
   }
 
+  const trainer = await Trainer.findById(trimmedInstructorId);
+
   const newClass = await Class.create({
     _id: newClassId,
     gymname: user.gym.gymname,
@@ -1363,6 +1371,7 @@ const addGymClasses = asyncHandler(async (req, res) => {
     classname: trimmedClassName,
     description: trimmedDescription,
     equipment: trimmedEquipment,
+    instructorId: trimmedInstructorId,
     instructor: instructor,
     date: date,
     starttime: starttime,
@@ -1370,16 +1379,12 @@ const addGymClasses = asyncHandler(async (req, res) => {
     capacity: capacity,
   });
 
-  // Add the new service to the existing service list
-
-  // Save the updated user with the new service
-  // await user.save();
-
-  // Respond with the updated user profile
   if (newClass) {
     user.gym.classes.push(newClassId);
+    trainer.classes.push(newClassId);
 
     await user.save();
+    await trainer.save();
 
     res.status(200).json({
       message: "Successfully added new class",
@@ -1402,6 +1407,7 @@ const updateGymClass = asyncHandler(async (req, res) => {
     id,
     classname,
     instructor,
+    instructorId,
     date,
     starttime,
     endtime,
@@ -1447,6 +1453,7 @@ const updateGymClass = asyncHandler(async (req, res) => {
 
   specificClass.classname = trimmedClassName;
   specificClass.instructor = instructor;
+  specificClass.instructorId = instructorId;
   specificClass.date = date;
   specificClass.starttime = starttime;
   specificClass.endtime = endtime;
@@ -1467,18 +1474,27 @@ const updateGymClass = asyncHandler(async (req, res) => {
 
 const deleteGymClass = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
-  const { id } = req.body;
+  const { classId, instructorId } = req.body;
 
   if (!user) {
     res.status(404).json({ error: "User not found." });
   }
 
-  const deletedClass = await Class.deleteOne({ _id: id });
+  const deletedClass = await Class.deleteOne({ _id: classId });
 
-  if (deletedClass) {
+  const removeClassOnTrainer = await Trainer.updateOne(
+    { _id: new ObjectId(instructorId) },
+    {
+      $pull: {
+        classes: new ObjectId(classId),
+      },
+    }
+  );
+
+  if (deletedClass && removeClassOnTrainer) {
     try {
       const remainingClasses = user.gym.classes.filter(
-        (item) => item.toString() !== id
+        (item) => item.toString() !== classId
       );
 
       user.gym.classes = [...remainingClasses];

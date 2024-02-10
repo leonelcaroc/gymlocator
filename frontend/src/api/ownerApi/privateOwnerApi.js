@@ -456,6 +456,7 @@ export const getGymClasses = async () => {
 export const addGymClass = async (
   classname,
   instructor,
+  instructorId,
   date,
   starttime,
   endtime,
@@ -467,6 +468,7 @@ export const addGymClass = async (
     const { data } = await privateOwnerApi.post("/classes", {
       classname: classname,
       instructor: instructor,
+      instructorId: instructorId,
       date: date,
       starttime: starttime,
       endtime: endtime,
@@ -485,6 +487,7 @@ export const updateGymClass = async (
   id,
   classname,
   instructor,
+  instructorId,
   date,
   starttime,
   endtime,
@@ -497,6 +500,7 @@ export const updateGymClass = async (
       id: id,
       classname: classname,
       instructor: instructor,
+      instructorId: instructorId,
       date: date,
       starttime: starttime,
       endtime: endtime,
@@ -511,10 +515,10 @@ export const updateGymClass = async (
   }
 };
 
-export const deleteGymClass = async (id) => {
+export const deleteGymClass = async (classId, instructorId) => {
   try {
     const { data } = await privateOwnerApi.delete("/classes", {
-      data: { id },
+      data: { classId, instructorId },
     });
     return data;
   } catch (error) {
