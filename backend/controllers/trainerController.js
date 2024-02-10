@@ -37,4 +37,15 @@ const authTrainer = asyncHandler(async (req, res) => {
   }
 });
 
-export { authTrainer };
+const getMyClasses = asyncHandler(async (req, res) => {
+  const user = await Trainer.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json(user);
+});
+
+export { authTrainer, getMyClasses };

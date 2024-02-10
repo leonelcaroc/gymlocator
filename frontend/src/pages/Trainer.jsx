@@ -24,6 +24,7 @@ import UserNav from "../components/UserNav/UserNav";
 
 import { Outlet, useNavigate } from "react-router-dom";
 import { MdOutlineArrowDropUp } from "react-icons/md";
+import TokenService from "../services/token";
 
 const Trainer = () => {
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
@@ -75,7 +76,10 @@ const Trainer = () => {
               fontSize="1.2rem"
               cursor="pointer"
               _hover={{ color: "gray" }}
-              onClick={() => navigate("/")}
+              onClick={() => {
+                TokenService.removeTrainerLocal();
+                navigate("/");
+              }}
             >
               Logout
             </Flex>
