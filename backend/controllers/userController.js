@@ -3,6 +3,7 @@ import generateToken from "../utils/generateToken.js";
 import validator from "validator";
 import User from "../models/userModel.js";
 import GymOwner from "../models/gymOwnerModel.js";
+import Class from "../models/classModel.js";
 import calculateEndTime from "../utils/calculateEndTime.js";
 import { ObjectId } from "mongodb";
 import createToken from "../utils/createToken.js";
@@ -15,6 +16,10 @@ const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
+
+  if (!user) {
+    return res.status(404).json({ error: "Email is not yet registered." });
+  }
 
   if (user && (await user.matchPassword(password))) {
     const token = createToken(user._id);
@@ -446,23 +451,15 @@ const getUserClasses = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  res.status(200).json(user.memberships);
+  const ownerIdList = user.memberships.map(
+    (membership) => membership.gym.ownerId
+  );
 
-  // let userClasses = [];
+  const availableClasses = await Class.find({
+    gymOwnerId: { $in: ownerIdList },
+  }).exec();
 
-  // for (let i = 0; i < user.memberships.length; index++) {}
-
-  // res.status(200).json({ id: user.memberships[0].gym.ownerId });
-
-  // const allOwnerIds = [];
-
-  // user.memberships.forEach((item) => {
-  //   if (item.gym && item.gym.ownerId) {
-  //     allOwnerIds.push(item.gym.ownerId);
-  //   }
-  // });
-
-  res.status(200).json({ ownerIds: allOwnerIds });
+  res.status(200).json(availableClasses);
 });
 
 const getGyms = asyncHandler(async (req, res) => {
@@ -488,6 +485,84 @@ const getGyms = asyncHandler(async (req, res) => {
   res.status(200).json(gymOwners);
 });
 
+const userJoinClass = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404).json({ error: "User not found" });
+    throw new Error("User not found");
+  }
+
+  const { classId } = req.body;
+
+  if (!validator.isLength(classId, { min: 1 })) {
+    return res.status(400).json({ error: "Class selection is required." });
+  }
+
+  const specificClass = await Class.findById(classId);
+
+  if (specificClass.joinedMember.length === specificClass.capacity) {
+    return res.status(400).json({ error: "Class has no available slot" });
+  }
+
+  user.classes.push(specificClass._id);
+  specificClass.joinedMember.push(user._id);
+
+  const saveUser = await user.save();
+  const saveClass = await specificClass.save();
+
+  if (saveUser && saveClass) {
+    return res.status(200).json({ message: "Successfully joined the class" });
+  } else {
+    res.status(400).json({ message: "Failed to join class" });
+    throw new Error("Failed to join class");
+  }
+});
+
+const userWithdrawClass = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404).json({ error: "User not found" });
+    throw new Error("User not found");
+  }
+
+  const { classId } = req.body;
+
+  if (!validator.isLength(classId, { min: 1 })) {
+    return res.status(400).json({ error: "Class selection is required." });
+  }
+
+  const specificClass = await Class.findById(classId);
+
+  const updateUserQuery = {
+    $pull: { classes: new ObjectId(classId) },
+  };
+
+  const userResult = await User.updateOne(
+    { _id: new ObjectId(user._id) },
+    updateUserQuery
+  );
+
+  const updateClassQuery = {
+    $pull: { joinedMember: new ObjectId(user._id) },
+  };
+
+  const classResult = await Class.updateOne(
+    { _id: new ObjectId(classId) },
+    updateClassQuery
+  );
+
+  if (userResult && classResult) {
+    return res
+      .status(200)
+      .json({ message: "Successfully withdrawn from the class" });
+  } else {
+    res.status(400).json({ message: "Failed to join class" });
+    throw new Error("Failed to join class");
+  }
+});
+
 export {
   authUser,
   registerUser,
@@ -499,6 +574,8 @@ export {
   // cancelSubscription,
   getGyms,
   userJoinGym,
+  userJoinClass,
+  userWithdrawClass,
 };
 
 // const a = [

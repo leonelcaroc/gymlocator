@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 
 import { useQuery, useMutation, useQueryClient } from "react-query";
+import { postRegisterUser } from "../api/userApi/userApi";
 import { getGymOwners } from "../api/publicApi/publicApi";
 import { getUserGyms } from "../api/userApi/privateUserApi";
 import { formattedTime } from "../utils/convertToAmericanTime";
@@ -189,8 +190,45 @@ const Explore = () => {
   // const dataToFilter = TokenService.getUserLocal() ? userGyms : allGyms;
 
   const approvedGyms = data?.filter((item) => {
-    return item.gym.isApproved === "approved";
+    return item.gym.isApproved === "approved" && item.gym.plans.length > 0;
   });
+
+  const registerUserMutation = useMutation(
+    async (formData) => {
+      return postRegisterUser(
+        formData.firstname,
+        formData.middlename,
+        formData.lastname,
+        formData.email,
+        formData.contact,
+        formData.address,
+        formData.dateOfBirth,
+        formData.plan,
+        formData.gender,
+        formData.password,
+        formData.gymId
+      );
+    },
+    {
+      onSuccess: (data) => {
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+        navigate("/userlogin");
+      },
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -248,9 +286,11 @@ const Explore = () => {
   return (
     <>
       <UserSignUpModal
+        modalName="User Sign Up"
         isModalOpen={isUserSignUpOpen}
         closeModal={closeUserSignUp}
         selectedGym={selectedGym}
+        mutationFunc={registerUserMutation}
       />
 
       <UserJoinOtherGymModal
@@ -292,7 +332,7 @@ const Explore = () => {
               bgColor="gray.100"
               padding="2rem"
             >
-              {selectedGym !== null || approvedGyms?.length !== 0 ? (
+              {approvedGyms?.length !== 0 ? (
                 <>
                   <Box>
                     <Text fontWeight="900" fontSize="1.3rem">

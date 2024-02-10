@@ -6,6 +6,10 @@ const classSchema = mongoose.Schema(
       type: mongoose.Types.ObjectId,
       required: true,
     },
+    gymname: {
+      type: String,
+      required: true,
+    },
     classname: {
       type: String,
       required: true,
@@ -31,7 +35,7 @@ const classSchema = mongoose.Schema(
       required: true,
     },
     joinedMember: {
-      type: Array,
+      type: [String],
       required: true,
       default: [],
     },

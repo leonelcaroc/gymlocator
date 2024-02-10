@@ -83,6 +83,10 @@ const userSchema = mongoose.Schema(
       type: [membershipSchema],
       default: [],
     },
+    classes: {
+      type: Array,
+      required: true,
+    },
     gender: {
       type: String,
       required: true,

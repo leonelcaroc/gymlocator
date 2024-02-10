@@ -14,10 +14,18 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import { getUserClasses } from "../../api/userApi/privateUserApi";
+import {
+  getUserClasses,
+  postUserJoinClass,
+  postUserWithdrawClass,
+} from "../../api/userApi/privateUserApi";
+import formatDateToCustomFormat from "../../utils/formatDateToCustomFormat";
+import convertTo12HourFormat from "../../utils/convertTo12HourFormat";
+import TokenService from "../../services/token";
 
 const UserClasses = () => {
   const toast = useToast();
+  const queryClient = useQueryClient();
 
   const { data, isLoading, isError } = useQuery(
     "userClasses",
@@ -37,7 +45,69 @@ const UserClasses = () => {
     }
   );
 
-  console.log(data);
+  const userWithdrawClassMutation = useMutation(
+    async (formData) => {
+      return postUserWithdrawClass(formData);
+    },
+    {
+      onSuccess: (data) => {
+        toast({
+          title: data?.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+
+        // Invalidate and refetch any queries that depend on the user data
+        queryClient.invalidateQueries("userClasses");
+      },
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  const userJoinClassMutation = useMutation(
+    async (formData) => {
+      return postUserJoinClass(formData);
+    },
+    {
+      onSuccess: (data) => {
+        toast({
+          title: data?.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+
+        // Invalidate and refetch any queries that depend on the user data
+        queryClient.invalidateQueries("userClasses");
+      },
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  const handleJoinNow = (classItem) => {
+    userJoinClassMutation.mutate(classItem._id);
+  };
+
+  const handleWithdrawClass = (classItem) => {
+    userWithdrawClassMutation.mutate(classItem._id);
+  };
+
+  // console.log(data);
 
   return (
     <Box padding="2rem">
@@ -52,35 +122,62 @@ const UserClasses = () => {
               <Th>Class Name</Th>
               <Th>Trainer</Th>
               <Th>Schedule</Th>
+              <Th>Slots</Th>
               <Th>Status/Action</Th>
             </Tr>
           </Thead>
           <Tbody>
-            <Tr>
-              <Td whiteSpace="normal">Dolby Fitness</Td>
-              <Td whiteSpace="normal">Yoga</Td>
-              <Td whiteSpace="normal">Dan Cabalida</Td>
-              <Td whiteSpace="normal">
-                <Text>Feb. 2, 2024</Text>
-                <Text>3:00 PM - 4:00 PM</Text>
-              </Td>
-              <Td display="flex">
-                <Button
-                  bgColor="brand.100"
-                  color="neutral.100"
-                  _hover={{ color: "brand.100", bgColor: "gray.200" }}
+            {data?.map((item) => (
+              <Tr key={item._id}>
+                <Td whiteSpace="normal">{item.gymname}</Td>
+                <Td whiteSpace="normal">{item.classname}</Td>
+                <Td whiteSpace="normal">{item.instructor}</Td>
+                <Td
+                  whiteSpace="normal"
+                  display="flex"
+                  flexDir="column"
+                  gap="5px"
                 >
-                  Join Now
-                </Button>
-                {/* <Button
-                  bgColor="red"
-                  color="neutral.100"
-                  _hover={{ color: "red", bgColor: "gray.200" }}
+                  <Text>{formatDateToCustomFormat(item.date)}</Text>
+                  <Text>
+                    {convertTo12HourFormat(item.starttime)} -{" "}
+                    {convertTo12HourFormat(item.endtime)}
+                  </Text>
+                </Td>
+                <Td>{`${item.joinedMember.length}/${item.capacity}`}</Td>
+                <Td display="flex">
+                  {item.joinedMember.includes(
+                    JSON.parse(TokenService.getUserLocal())._id
+                  ) ? (
+                    <Button
+                      bgColor="red"
+                      color="neutral.100"
+                      _hover={{ color: "red", bgColor: "gray.200" }}
+                      onClick={() => handleWithdrawClass(item)}
+                      isLoading={userWithdrawClassMutation.isLoading}
+                    >
+                      Withdraw
+                    </Button>
+                  ) : (
+                    <Button
+                      bgColor="brand.100"
+                      color="neutral.100"
+                      _hover={{ color: "brand.100", bgColor: "gray.200" }}
+                      onClick={() => handleJoinNow(item)}
+                      isLoading={userJoinClassMutation.isLoading}
+                    >
+                      Join Now
+                    </Button>
+                  )}
+
+                  {/* <Button
+                  
                 >
                   Cancel
                 </Button> */}
-              </Td>
-            </Tr>
+                </Td>
+              </Tr>
+            ))}
           </Tbody>
         </Table>
       </TableContainer>

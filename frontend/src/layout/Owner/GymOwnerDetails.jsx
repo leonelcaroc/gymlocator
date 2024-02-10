@@ -117,7 +117,7 @@ const GymOwnerDetails = () => {
       ) : (
         <Box maxWidth="800px">
           <Grid templateColumns="repeat(2, 1fr)" columnGap="1rem" margin="auto">
-            <Box p="10px 0">
+            {/* <Box p="10px 0">
               <Text color="gray" fontSize="1rem">
                 Gym Name
               </Text>
@@ -140,7 +140,7 @@ const GymOwnerDetails = () => {
                   {gymData?.gymname}
                 </Text>
               )}
-            </Box>
+            </Box> */}
 
             <Box p="10px 0">
               <Text color="gray" fontSize="1rem">

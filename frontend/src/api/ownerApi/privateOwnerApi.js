@@ -76,7 +76,7 @@ export const getGymDetails = async () => {
 };
 
 export const updateGymDetails = async (
-  gymname,
+  // gymname,
   address,
   contact,
   description,
@@ -87,7 +87,7 @@ export const updateGymDetails = async (
 ) => {
   try {
     const { data } = await privateOwnerApi.put("/gymdetails", {
-      gymname: gymname,
+      // gymname: gymname,
       address: address,
       contact: contact,
       description: description,
@@ -529,6 +529,50 @@ export const getGymMembers = async () => {
     return data;
   } catch (error) {
     console.error("Error getting gym members:", error);
+    throw error;
+  }
+};
+
+export const postAddNewMember = async (
+  firstname,
+  middlename,
+  lastname,
+  email,
+  contact,
+  address,
+  dateOfBirth,
+  plan,
+  gender,
+  password
+) => {
+  try {
+    const { data } = await privateOwnerApi.post("/members", {
+      firstname,
+      middlename,
+      lastname,
+      email,
+      contact,
+      address,
+      dateOfBirth,
+      plan,
+      gender,
+      password,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error register user:", error);
+    throw error;
+  }
+};
+
+// Get Own Gym Infos
+
+export const getMyGym = async () => {
+  try {
+    const { data } = await privateOwnerApi.get("/ownergym");
+    return data;
+  } catch (error) {
+    console.error("Error getting owner's gym", error);
     throw error;
   }
 };

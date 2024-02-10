@@ -114,4 +114,28 @@ export const postUserJoinGym = async (plan, gymId) => {
   }
 };
 
+export const postUserJoinClass = async (classId) => {
+  try {
+    const { data } = await privateUserApi.post("/joinclass", {
+      classId,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error user join class:", error);
+    throw error;
+  }
+};
+
+export const postUserWithdrawClass = async (classId) => {
+  try {
+    const { data } = await privateUserApi.patch("/joinclass", {
+      classId,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error user withdraw class:", error);
+    throw error;
+  }
+};
+
 export default privateUserApi;

@@ -22,7 +22,13 @@ import { postRegisterUser } from "../../api/userApi/userApi";
 import { useMutation } from "react-query";
 import { useEffect } from "react";
 
-const UserSignUpModal = ({ isModalOpen, closeModal, selectedGym }) => {
+const UserSignUpModal = ({
+  isModalOpen,
+  closeModal,
+  selectedGym,
+  modalName,
+  mutationFunc,
+}) => {
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -63,43 +69,6 @@ const UserSignUpModal = ({ isModalOpen, closeModal, selectedGym }) => {
     };
   }, [selectedGym]);
 
-  const registerUserMutation = useMutation(
-    async (formData) => {
-      return postRegisterUser(
-        formData.firstname,
-        formData.middlename,
-        formData.lastname,
-        formData.email,
-        formData.contact,
-        formData.address,
-        formData.dateOfBirth,
-        formData.plan,
-        formData.gender,
-        formData.password,
-        formData.gymId
-      );
-    },
-    {
-      onSuccess: (data) => {
-        toast({
-          title: data.message,
-          status: "success",
-          duration: 2000,
-          position: "bottom-right",
-        });
-        navigate("/userlogin");
-      },
-      onError: (error) => {
-        toast({
-          title: error.response.data.error || "Something went wrong",
-          status: "error",
-          duration: 2000,
-          position: "bottom-right",
-        });
-      },
-    }
-  );
-
   const handlePlanChange = (event) => {
     const selectedPlanId = event.target.value;
 
@@ -117,7 +86,7 @@ const UserSignUpModal = ({ isModalOpen, closeModal, selectedGym }) => {
     <Modal isOpen={isModalOpen} onClose={closeModal}>
       <ModalOverlay />
       <ModalContent paddingInline="2rem" maxWidth="35rem">
-        <ModalHeader>User Sign Up</ModalHeader>
+        <ModalHeader>{modalName}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Stack spacing="1rem">
@@ -272,8 +241,8 @@ const UserSignUpModal = ({ isModalOpen, closeModal, selectedGym }) => {
           <Button
             bgColor="brand.100"
             color="neutral.100"
-            isLoading={registerUserMutation.isLoading}
-            onClick={() => registerUserMutation.mutate(signUpUser)}
+            isLoading={mutationFunc.isLoading}
+            onClick={() => mutationFunc.mutate(signUpUser)}
           >
             Sign Up
           </Button>

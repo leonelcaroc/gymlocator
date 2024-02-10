@@ -11,6 +11,8 @@ import {
   getUserClasses,
   getGyms,
   userJoinGym,
+  userJoinClass,
+  userWithdrawClass,
 } from "../controllers/userController.js";
 import { protectUser } from "../middleware/authMiddleware.js";
 
@@ -26,5 +28,9 @@ router.route("/subscriptions").get(protectUser, getUserSubscriptions);
 router.route("/classes").get(protectUser, getUserClasses);
 router.route("/join").post(protectUser, userJoinGym);
 router.route("/gyms").get(protectUser, getGyms);
+router
+  .route("/joinclass")
+  .post(protectUser, userJoinClass)
+  .patch(protectUser, userWithdrawClass);
 
 export default router;

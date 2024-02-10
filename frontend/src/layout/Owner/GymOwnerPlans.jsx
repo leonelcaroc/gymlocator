@@ -519,7 +519,6 @@ const GymOwnerPlans = () => {
                         <Button
                           bgColor="blue"
                           color="neutral.100"
-                          marginBottom="1rem"
                           onClick={() => handleOpenEdit(item)}
                           isLoading={
                             updateGymPlanMutation.isLoading &&
