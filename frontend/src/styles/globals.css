@@ -12,8 +12,7 @@ body {
 } */
 
 #upload-permit-id,
-#upload-equipment-image,
-#upload-amenity-image {
+#upload-equipment-image {
   display: inline-block;
   background-color: rgb(213, 213, 213);
   color: rgb(16, 16, 16);

@@ -6,6 +6,8 @@ import Class from "../models/classModel.js";
 import User from "../models/userModel.js";
 import Trainer from "../models/trainerModel.js";
 import calculateEndTime from "../utils/calculateEndTime.js";
+import createPreset from "../utils/createPreset.js";
+import cloudinary from "../utils/cloudinary.js";
 import formidable from "formidable";
 
 import createToken from "../utils/createToken.js";
@@ -625,12 +627,6 @@ const addGymAmenities = asyncHandler(async (req, res) => {
   // Extract the new equipment data from the request body
   const { amenityName, description, amenityImage } = req.body;
 
-  // res.status(200).json({
-  //   amenityName: amenityName,
-  //   description: description,
-  //   amenityImage: amenityImage,
-  // });
-
   const trimmedAmenity = validator.trim(amenityName);
   const trimmedDescription = validator.trim(description);
 
@@ -642,22 +638,36 @@ const addGymAmenities = asyncHandler(async (req, res) => {
     return res.status(400).json({ error: "Amenity description is required." });
   }
 
-  const newAmenity = {
-    amenityName: trimmedAmenity,
-    description: trimmedDescription,
-    amenityImage: amenityImage,
-  };
+  if (!validator.isLength(amenityImage, { min: 1 })) {
+    return res.status(400).json({ error: "Amenity image is required." });
+  }
 
-  // Add the new service to the existing service list
-  user.gym.amenities.push(newAmenity);
+  if (amenityImage) {
+    const uploadRes = await cloudinary.uploader.upload(amenityImage, {
+      upload_preset: "amenity",
+    });
 
-  // Save the updated user with the new service
-  await user.save();
+    if (uploadRes) {
+      const newAmenity = {
+        amenityName: trimmedAmenity,
+        description: trimmedDescription,
+        amenityImage: uploadRes,
+      };
 
-  // Respond with the updated user profile
-  res.status(200).json({
-    message: "Successfully added new amenity",
-  });
+      user.gym.amenities.push(newAmenity);
+
+      await user.save();
+
+      return res.status(200).json({
+        message: "Successfully added new amenity",
+      });
+    } else {
+      res.status(400).json({
+        message: "Failed to add new amenity",
+      });
+      throw new Error("Failed to add new amenity");
+    }
+  }
 });
 
 const updateGymAmenities = asyncHandler(async (req, res) => {
@@ -668,43 +678,67 @@ const updateGymAmenities = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  const { id, amenityName, description, amenityImage } = req.body;
+  const { id, amenityName, description, amenityImage, publicId } = req.body;
+
+  // return console.log(id, amenityName, description, amenityImage, publicId);
 
   const trimmedAmenityName = validator.trim(amenityName);
   const trimmedAmenityDescription = validator.trim(description);
 
   if (!validator.isLength(trimmedAmenityName, { min: 1 })) {
-    return res.status(400).json({ error: "Amenity name is invalid." });
+    return res.status(400).json({ error: "Amenity name is required." });
   }
 
   if (!validator.isLength(trimmedAmenityDescription, { min: 1 })) {
-    return res.status(400).json({ error: "Amenity description is invalid." });
+    return res.status(400).json({ error: "Amenity description is required." });
   }
 
   const index = user.gym.amenities.findIndex((amenity) => amenity.id === id);
 
   if (index !== -1) {
     // Update the service at the found index
-    user.gym.amenities[index] = {
-      id: id,
-      amenityName: trimmedAmenityName,
-      description: trimmedAmenityDescription,
-      amenityImage: amenityImage,
-    };
+    if (amenityImage.length > 0 && typeof amenityImage === "string") {
+      const uploadRes = await cloudinary.uploader.upload(amenityImage, {
+        upload_preset: "amenity",
+      });
 
-    // Save the updated user
-    // const updatedService = await user.save();
-    await user.save();
+      user.gym.amenities[index] = {
+        ...user.gym.amenities[index],
+        amenityName: trimmedAmenityName,
+        description: trimmedAmenityDescription,
+        amenityImage: uploadRes,
+      };
 
-    res.status(200).json({ message: "Successfully updated amenity!" });
+      // Save the updated user
+      await user.save();
+
+      await cloudinary.uploader.destroy(publicId);
+
+      return res.status(200).json({ message: "Successfully updated amenity!" });
+    } else {
+      user.gym.amenities[index] = {
+        ...user.gym.amenities[index],
+        amenityName: trimmedAmenityName,
+        description: trimmedAmenityDescription,
+        amenityImage: user.gym.amenities[index].amenityImage,
+      };
+
+      // Save the updated user
+      await user.save();
+
+      await cloudinary.uploader.destroy(publicId);
+
+      return res.status(200).json({ message: "Successfully updated amenity!" });
+    }
   } else {
-    res.status(404).json({ error: "Amenity not found" });
+    res.status(404).json({ error: "Failed to update amenity" });
+    throw new Error("Failed to update amenity");
   }
 });
 
 const deleteGymAmenities = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
-  const { id } = req.body;
+  const { id, publicId } = req.body;
 
   if (!user) {
     res.status(404).json({ error: "User not found." });
@@ -724,9 +758,15 @@ const deleteGymAmenities = asyncHandler(async (req, res) => {
 
   user.gym.amenities = [...remainingAmenities];
 
-  await user.save();
+  const deleteImage = await cloudinary.uploader.destroy(publicId);
 
-  res.status(200).json({ message: "Successfully deleted amenity" });
+  if (deleteImage) {
+    await user.save();
+    return res.status(200).json({ message: "Successfully deleted amenity" });
+  } else {
+    res.status(400).json({ message: "Failed to delete amenity" });
+    throw new Error("Failed to delete amenity");
+  }
 });
 
 // EQUIPMENTS //
@@ -830,7 +870,7 @@ const updateGymEquipments = asyncHandler(async (req, res) => {
 
 const deleteGymEquipment = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
-  const { id } = req.body;
+  const { id, publicId } = req.body;
 
   if (!user) {
     res.status(404).json({ error: "User not found." });

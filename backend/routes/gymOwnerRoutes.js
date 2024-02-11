@@ -102,7 +102,7 @@ router
   .route("/amenity")
   .get(protectOwner, getGymAmenities)
   .post(protectOwner, addGymAmenities)
-  .put(protectOwner, updateGymAmenities)
+  .patch(protectOwner, updateGymAmenities)
   .delete(protectOwner, deleteGymAmenities);
 router
   .route("/equipments")

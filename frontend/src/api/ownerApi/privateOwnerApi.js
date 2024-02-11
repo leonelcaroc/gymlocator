@@ -173,12 +173,16 @@ export const getGymAmenities = async () => {
   }
 };
 
-export const addGymAmenities = async (formData) => {
+export const addGymAmenities = async (
+  amenityName,
+  description,
+  amenityImage
+) => {
   try {
-    const { data } = await privateOwnerApi.post("/amenity", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+    const { data } = await privateOwnerApi.post("/amenity", {
+      amenityName: amenityName,
+      description: description,
+      amenityImage: amenityImage,
     });
     return data;
   } catch (error) {
@@ -191,14 +195,16 @@ export const updateGymAmenities = async (
   id,
   amenityName,
   description,
-  amenityImage
+  amenityImage,
+  publicId
 ) => {
   try {
-    const { data } = await privateOwnerApi.put("/amenity", {
+    const { data } = await privateOwnerApi.patch("/amenity", {
       id: id,
       amenityName: amenityName,
       description: description,
       amenityImage: amenityImage,
+      publicId: publicId,
     });
     return data;
   } catch (error) {
@@ -207,10 +213,10 @@ export const updateGymAmenities = async (
   }
 };
 
-export const deleteGymAmenity = async (id) => {
+export const deleteGymAmenity = async (id, publicId) => {
   try {
     const { data } = await privateOwnerApi.delete("/amenity", {
-      data: { id },
+      data: { id, publicId },
     });
     return data;
   } catch (error) {

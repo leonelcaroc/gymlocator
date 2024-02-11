@@ -6,6 +6,7 @@ import {
   Flex,
   Heading,
   Input,
+  Image,
   Stack,
   Spinner,
   Textarea,
@@ -30,6 +31,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import {
   getGymAmenities,
+  addGymAmenities,
   updateGymAmenities,
   deleteGymAmenity,
 } from "../../api/ownerApi/privateOwnerApi";
@@ -41,10 +43,13 @@ const GymOwnerAmenities = () => {
   const [newAmenity, setNewAmenity] = useState({
     amenityName: "",
     description: "",
-    amenityImage: null,
+    amenityImage: "",
+    imageName: "",
+    imageType: "",
   });
   const [selectedAmenity, setSelectedAmenity] = useState(null);
   const [selectedDeleteAmenity, setSelectedDeleteAmenity] = useState(null);
+  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
 
   const {
     isOpen: isAddAmenityOpen,
@@ -60,6 +65,11 @@ const GymOwnerAmenities = () => {
     isOpen: isDeleteAmenityOpen,
     onOpen: openDeleteAmenity,
     onClose: closeDeleteAmenity,
+  } = useDisclosure();
+  const {
+    isOpen: isImageOpen,
+    onOpen: openImage,
+    onClose: closeImage,
   } = useDisclosure();
 
   const { data, isLoading, isError } = useQuery(
@@ -80,10 +90,9 @@ const GymOwnerAmenities = () => {
     }
   );
 
-  const updateAmenityMutation = useMutation(
+  const addAmenityMutation = useMutation(
     async (formData) => {
-      return updateGymAmenities(
-        formData._id,
+      return addGymAmenities(
         formData.amenityName,
         formData.description,
         formData.amenityImage
@@ -91,7 +100,8 @@ const GymOwnerAmenities = () => {
     },
     {
       onSuccess: (data) => {
-        setSelectedAmenity(null);
+        handleCloseNewAmenity();
+
         toast({
           title: data.message,
           status: "success",
@@ -103,7 +113,42 @@ const GymOwnerAmenities = () => {
         queryClient.invalidateQueries("amenityData");
       },
       onError: (error) => {
-        setSelectedAmenity(null);
+        handleCloseNewAmenity();
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  const updateAmenityMutation = useMutation(
+    async (formData) => {
+      return updateGymAmenities(
+        formData._id,
+        formData.amenityName,
+        formData.description,
+        formData.newAmenityImage,
+        formData.amenityImage.public_id
+      );
+    },
+    {
+      onSuccess: (data) => {
+        handleCloseEdit();
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+
+        // Invalidate and refetch any queries that depend on the user data
+        queryClient.invalidateQueries("amenityData");
+      },
+      onError: (error) => {
+        handleCloseEdit();
         toast({
           title: error.response.data.error || "Something went wrong",
           status: "error",
@@ -116,7 +161,7 @@ const GymOwnerAmenities = () => {
 
   const deleteAmenityMutation = useMutation(
     async (formData) => {
-      return deleteGymAmenity(formData._id);
+      return deleteGymAmenity(formData._id, formData.amenityImage.public_id);
     },
     {
       onSuccess: (data) => {
@@ -143,25 +188,31 @@ const GymOwnerAmenities = () => {
     }
   );
 
+  const handleAddNewAmenity = () => {
+    addAmenityMutation.mutate(newAmenity);
+  };
+
   const handleCloseNewAmenity = () => {
     setNewAmenity({
       amenityName: "",
       description: "",
-      amenityImage: null,
+      amenityImage: "",
+      imageName: "",
+      imageType: "",
     });
 
     closeAddAmenity();
   };
 
   const handleOpenEdit = (amenity) => {
-    setSelectedAmenity(amenity);
+    setSelectedAmenity({ ...amenity, newAmenityImage: "" });
+
     openEditAmenity();
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     updateAmenityMutation.mutate(selectedAmenity);
-    setSelectedAmenity(null);
-    closeEditAmenity();
+    // console.log(selectedAmenity);
   };
 
   const handleCloseEdit = () => {
@@ -188,16 +239,89 @@ const GymOwnerAmenities = () => {
   };
 
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
+    const files = event.target.files;
 
-    if (file && isValidFileType(file)) {
-      setSelectedFile(file);
-      // Additional actions with the valid file
-    } else {
-      // Clear selected file if not valid
-      setSelectedFile(null);
-      alert("Please select a valid PNG or JPG file.");
+    if (files.length === 0) {
+      // User canceled file selection
+      return;
     }
+
+    const file = files[0];
+    const allowedFileTypes = ["image/png", "image/jpeg", "image/jpg"];
+
+    if (!allowedFileTypes.includes(file?.type)) {
+      return toast({
+        title: "Please select a valid jpg, jpeg, or png file.",
+        status: "error",
+        duration: 2000,
+        position: "bottom-right",
+      });
+    }
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setNewAmenity((prevAmenity) => {
+        return {
+          ...prevAmenity,
+          amenityImage: reader.result,
+          imageName:
+            file.name.length > 15
+              ? file.name.split(".")[0].concat("...")
+              : file.name.split(".")[0],
+          imageType: file.type.split("/")[1],
+        };
+      });
+    };
+  };
+
+  const handleEditFileChange = (event) => {
+    const files = event.target.files;
+
+    if (files.length === 0) {
+      // User canceled file selection
+      return;
+    }
+
+    const file = files[0];
+    const allowedFileTypes = ["image/png", "image/jpeg", "image/jpg"];
+
+    if (!allowedFileTypes.includes(file?.type)) {
+      return toast({
+        title: "Please select a valid jpg, jpeg, or png file.",
+        status: "error",
+        duration: 2000,
+        position: "bottom-right",
+      });
+    }
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setSelectedAmenity((prevAmenity) => {
+        return {
+          ...prevAmenity,
+          newAmenityImage: reader.result,
+          imageName:
+            file.name.length > 15
+              ? file.name.split(".")[0].concat("...")
+              : file.name.split(".")[0],
+          imageType: file.type.split("/")[1],
+        };
+      });
+    };
+  };
+
+  const handleOpenImage = (url) => {
+    setSelectedImageUrl(url);
+    openImage();
+  };
+
+  const handleCloseImage = () => {
+    setSelectedImageUrl(null);
+    closeImage();
   };
 
   return (
@@ -243,33 +367,31 @@ const GymOwnerAmenities = () => {
                     id="upload-amenity"
                     type="file"
                     display="none"
-                    // onChange={handleFileChange}
+                    onChange={handleFileChange}
                   />
-                  <Text
-                    id="upload-amenity-image"
-                    as="label"
-                    htmlFor="upload-amenity"
-                    marginInline="0.8rem 1.2rem"
-                    width="fit-content"
-                  >
-                    Choose file
+                  <Text>
+                    Image Name:{" "}
+                    {newAmenity.imageName.length !== 0
+                      ? newAmenity.imageName.concat(`.${newAmenity.imageType}`)
+                      : "No image uploaded"}
                   </Text>
+
+                  <Button as="label" htmlFor="upload-amenity" cursor="pointer">
+                    Choose file
+                  </Button>
                 </Flex>
               </Box>
             </Stack>
           </ModalBody>
           <ModalFooter>
-            <Button
-              colorScheme="blue"
-              mr={3}
-              // onClick={handleCloseNewService}
-            >
+            <Button colorScheme="blue" mr={3} onClick={handleCloseNewAmenity}>
               Close
             </Button>
             <Button
               bgColor="brand.100"
               color="neutral.100"
-              // onClick={handleSubmitNewService}
+              onClick={handleAddNewAmenity}
+              isLoading={addAmenityMutation.isLoading}
             >
               Add Amenity
             </Button>
@@ -322,17 +444,25 @@ const GymOwnerAmenities = () => {
                     id="upload-edit-amenity"
                     type="file"
                     display="none"
-                    // onChange={handleFileChange}
+                    onChange={handleEditFileChange}
                   />
-                  <Text
-                    id="upload-edit-amenity-image"
+
+                  <Text>
+                    Image Name:{" "}
+                    {selectedAmenity?.imageName?.length !== 0
+                      ? selectedAmenity?.imageName?.concat(
+                          `.${selectedAmenity?.imageType}`
+                        )
+                      : "No image uploaded"}
+                  </Text>
+
+                  <Button
                     as="label"
                     htmlFor="upload-edit-amenity"
-                    marginInline="0.8rem 1.2rem"
-                    width="fit-content"
+                    cursor="pointer"
                   >
                     Choose file
-                  </Text>
+                  </Button>
                 </Flex>
               </Box>
             </Stack>
@@ -345,6 +475,7 @@ const GymOwnerAmenities = () => {
               bgColor="brand.100"
               color="neutral.100"
               onClick={handleSaveEdit}
+              isLoading={updateAmenityMutation.isLoading}
             >
               Save
             </Button>
@@ -380,6 +511,24 @@ const GymOwnerAmenities = () => {
         </ModalContent>
       </Modal>
 
+      {/* Open Image Modal */}
+
+      <Modal isOpen={isImageOpen} onClose={handleCloseImage}>
+        <ModalOverlay />
+        <ModalContent>
+          <Image
+            src={selectedImageUrl}
+            alt=""
+            boxSize="100%"
+            position="absolute"
+            width="600px"
+            height="400px"
+            top="0"
+            left="0"
+          />
+        </ModalContent>
+      </Modal>
+
       <Text color="brand.200" fontSize="2rem" marginBottom="1rem">
         Amenities
       </Text>
@@ -405,41 +554,51 @@ const GymOwnerAmenities = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {data?.map((item) => (
-                  <Tr key={item._id}>
-                    <Td>{item.amenityName}</Td>
-                    <Td>{item.description}</Td>
-                    <Td color="brand.100">
-                      <Text
-                        _hover={{ textDecoration: "underline" }}
-                        cursor="pointer"
-                      >
-                        {item.amenityImage}
-                      </Text>
-                    </Td>
-                    <Td display="flex" gap="0.5rem">
-                      <Button
-                        bgColor="blue"
-                        color="neutral.100"
-                        marginBottom="1rem"
-                        onClick={() => handleOpenEdit(item)}
-                        isLoading={
-                          updateAmenityMutation.isLoading &&
-                          updateAmenityMutation.variables?._id === item._id
-                        }
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        bgColor="red"
-                        color="white"
-                        onClick={() => handleOpenDelete(item)}
-                      >
-                        Delete
-                      </Button>
+                {data?.length !== 0 ? (
+                  data?.map((item) => (
+                    <Tr key={item._id}>
+                      <Td>{item.amenityName}</Td>
+                      <Td>{item.description}</Td>
+                      <Td color="brand.100">
+                        <Text
+                          _hover={{ textDecoration: "underline" }}
+                          cursor="pointer"
+                          onClick={() => handleOpenImage(item.amenityImage.url)}
+                        >
+                          View
+                        </Text>
+                      </Td>
+                      <Td display="flex" gap="0.5rem">
+                        <Button
+                          bgColor="blue"
+                          color="neutral.100"
+                          marginBottom="1rem"
+                          onClick={() => handleOpenEdit(item)}
+                          isLoading={
+                            updateAmenityMutation.isLoading &&
+                            updateAmenityMutation.variables?._id === item._id
+                          }
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          bgColor="red"
+                          color="white"
+                          onClick={() => handleOpenDelete(item)}
+                          isLoading={deleteAmenityMutation.isLoading}
+                        >
+                          Delete
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))
+                ) : (
+                  <Tr>
+                    <Td textAlign="center" colSpan="4">
+                      n/a
                     </Td>
                   </Tr>
-                ))}
+                )}
               </Tbody>
             </Table>
           </TableContainer>

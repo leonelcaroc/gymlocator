@@ -124,6 +124,22 @@ const GymOwnerTrainers = () => {
     },
     {
       onSuccess: (data) => {
+        setNewTrainer({
+          firstname: "",
+          middlename: "",
+          lastname: "",
+          email: "",
+          contact: "",
+          address: "",
+          dateOfBirth: null,
+          gender: "",
+          certifications: [],
+          specialties: [],
+          yearsOfExperience: "",
+          biography: "",
+          password: "",
+        });
+        closeAddNewTrainer();
         toast({
           title: data.message,
           status: "success",
@@ -198,22 +214,6 @@ const GymOwnerTrainers = () => {
 
   const handleSubmitNewTrainer = () => {
     addGymTrainerMutation.mutate(newTrainer);
-    setNewTrainer({
-      firstname: "",
-      middlename: "",
-      lastname: "",
-      email: "",
-      contact: "",
-      address: "",
-      dateOfBirth: null,
-      gender: "",
-      certifications: [],
-      specialties: [],
-      yearsOfExperience: "",
-      biography: "",
-      password: "",
-    });
-    closeAddNewTrainer();
   };
 
   const handleCloseNewTrainer = () => {

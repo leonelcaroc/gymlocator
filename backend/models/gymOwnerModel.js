@@ -71,7 +71,7 @@ const amenitySchema = mongoose.Schema({
     required: true,
   },
   amenityImage: {
-    type: String,
+    type: Object,
     required: true,
   },
 });
