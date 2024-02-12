@@ -247,11 +247,11 @@ const GymOwnerAmenities = () => {
     }
 
     const file = files[0];
-    const allowedFileTypes = ["image/png", "image/jpeg", "image/jpg"];
+    const allowedFileTypes = ["image/jpeg", "image/jpg"];
 
     if (!allowedFileTypes.includes(file?.type)) {
       return toast({
-        title: "Please select a valid jpg, jpeg, or png file.",
+        title: "Please select a valid jpg, or jpeg file.",
         status: "error",
         duration: 2000,
         position: "bottom-right",
@@ -285,11 +285,11 @@ const GymOwnerAmenities = () => {
     }
 
     const file = files[0];
-    const allowedFileTypes = ["image/png", "image/jpeg", "image/jpg"];
+    const allowedFileTypes = ["image/jpeg", "image/jpg"];
 
     if (!allowedFileTypes.includes(file?.type)) {
       return toast({
-        title: "Please select a valid jpg, jpeg, or png file.",
+        title: "Please select a valid jpg, or jpeg file.",
         status: "error",
         duration: 2000,
         position: "bottom-right",
