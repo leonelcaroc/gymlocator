@@ -6,6 +6,7 @@ import {
   Flex,
   Heading,
   Input,
+  Image,
   Stack,
   Spinner,
   Textarea,
@@ -42,10 +43,14 @@ const GymOwnerEquipments = () => {
   const [newEquipment, setNewEquipment] = useState({
     equipmentName: "",
     description: "",
-    equipmentImage: null,
+    equipmentImage: "",
+    imageName: "",
+    imageType: "",
   });
+
   const [selectedEquipment, setSelectedEquipment] = useState(null);
   const [selectedDeleteEquipment, setSelectedDeleteEquipment] = useState(null);
+  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
 
   const {
     isOpen: isAddEquipmentOpen,
@@ -61,6 +66,11 @@ const GymOwnerEquipments = () => {
     isOpen: isDeleteEquipmentOpen,
     onOpen: openDeleteEquipment,
     onClose: closeDeleteEquipment,
+  } = useDisclosure();
+  const {
+    isOpen: isImageOpen,
+    onOpen: openImage,
+    onClose: closeImage,
   } = useDisclosure();
 
   const { data, isLoading, isError } = useQuery(
@@ -81,10 +91,9 @@ const GymOwnerEquipments = () => {
     }
   );
 
-  const updateEquipmentMutation = useMutation(
+  const addEquipmentMutation = useMutation(
     async (formData) => {
-      return updateGymEquipments(
-        formData._id,
+      return addGymEquipments(
         formData.equipmentName,
         formData.description,
         formData.equipmentImage
@@ -92,7 +101,8 @@ const GymOwnerEquipments = () => {
     },
     {
       onSuccess: (data) => {
-        setSelectedEquipment(null);
+        handleCloseNewEquipment();
+
         toast({
           title: data.message,
           status: "success",
@@ -104,7 +114,42 @@ const GymOwnerEquipments = () => {
         queryClient.invalidateQueries("equipmentData");
       },
       onError: (error) => {
-        setSelectedEquipment(null);
+        handleCloseNewEquipment();
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  const updateEquipmentMutation = useMutation(
+    async (formData) => {
+      return updateGymEquipments(
+        formData._id,
+        formData.equipmentName,
+        formData.description,
+        formData.newEquipmentImage,
+        formData.equipmentImage.public_id
+      );
+    },
+    {
+      onSuccess: (data) => {
+        handleCloseEdit();
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+
+        // Invalidate and refetch any queries that depend on the user data
+        queryClient.invalidateQueries("equipmentData");
+      },
+      onError: (error) => {
+        handleCloseEdit();
         toast({
           title: error.response.data.error || "Something went wrong",
           status: "error",
@@ -117,7 +162,10 @@ const GymOwnerEquipments = () => {
 
   const deleteEquipmentMutation = useMutation(
     async (formData) => {
-      return deleteGymEquipment(formData._id);
+      return deleteGymEquipment(
+        formData._id,
+        formData.equipmentImage.public_id
+      );
     },
     {
       onSuccess: (data) => {
@@ -144,31 +192,35 @@ const GymOwnerEquipments = () => {
     }
   );
 
+  const handleAddNewEquipment = () => {
+    addEquipmentMutation.mutate(newEquipment);
+  };
+
   const handleCloseNewEquipment = () => {
     setNewEquipment({
       equipmentName: "",
       description: "",
-      equipmentImage: null,
+      equipmentImage: "",
+      imageName: "",
+      imageType: "",
     });
 
     closeAddEquipment();
   };
 
   const handleOpenEdit = (equipment) => {
-    setSelectedEquipment(equipment);
+    setSelectedEquipment({ ...equipment, newEquipmentImage: "" });
+
     openEditEquipment();
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     updateEquipmentMutation.mutate(selectedEquipment);
-    setSelectedEquipment(null);
-    closeEditEquipment();
   };
 
   const handleCloseEdit = () => {
     setSelectedEquipment(null);
     closeEditEquipment();
-    // Reset the edited data to the original data or fetch from your backend
   };
 
   const handleOpenDelete = (equipment) => {
@@ -189,16 +241,89 @@ const GymOwnerEquipments = () => {
   };
 
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
+    const files = event.target.files;
 
-    if (file && isValidFileType(file)) {
-      setSelectedFile(file);
-      // Additional actions with the valid file
-    } else {
-      // Clear selected file if not valid
-      setSelectedFile(null);
-      alert("Please select a valid PNG or JPG file.");
+    if (files.length === 0) {
+      // User canceled file selection
+      return;
     }
+
+    const file = files[0];
+    const allowedFileTypes = ["image/jpeg", "image/jpg"];
+
+    if (!allowedFileTypes.includes(file?.type)) {
+      return toast({
+        title: "Please select a valid jpg, or jpeg file.",
+        status: "error",
+        duration: 2000,
+        position: "bottom-right",
+      });
+    }
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setNewEquipment((prevEquipment) => {
+        return {
+          ...prevEquipment,
+          equipmentImage: reader.result,
+          imageName:
+            file.name.length > 15
+              ? file.name.split(".")[0].concat("...")
+              : file.name.split(".")[0],
+          imageType: file.type.split("/")[1],
+        };
+      });
+    };
+  };
+
+  const handleEditFileChange = (event) => {
+    const files = event.target.files;
+
+    if (files.length === 0) {
+      // User canceled file selection
+      return;
+    }
+
+    const file = files[0];
+    const allowedFileTypes = ["image/jpeg", "image/jpg"];
+
+    if (!allowedFileTypes.includes(file?.type)) {
+      return toast({
+        title: "Please select a valid jpg, or jpeg file.",
+        status: "error",
+        duration: 2000,
+        position: "bottom-right",
+      });
+    }
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setSelectedEquipment((prevEquipment) => {
+        return {
+          ...prevEquipment,
+          newEquipmentImage: reader.result,
+          imageName:
+            file.name.length > 15
+              ? file.name.split(".")[0].concat("...")
+              : file.name.split(".")[0],
+          imageType: file.type.split("/")[1],
+        };
+      });
+    };
+  };
+
+  const handleOpenImage = (url) => {
+    setSelectedImageUrl(url);
+    openImage();
+  };
+
+  const handleCloseImage = () => {
+    setSelectedImageUrl(null);
+    closeImage();
   };
 
   return (
@@ -244,35 +369,39 @@ const GymOwnerEquipments = () => {
                     id="upload-equipment"
                     type="file"
                     display="none"
-                    // onChange={handleFileChange}
+                    onChange={handleFileChange}
                   />
-                  <Text
-                    id="upload-equipment-image"
+                  <Text>
+                    Image Name:{" "}
+                    {newEquipment.imageName.length !== 0
+                      ? newEquipment.imageName.concat(
+                          `.${newEquipment.imageType}`
+                        )
+                      : "No image uploaded"}
+                  </Text>
+
+                  <Button
                     as="label"
                     htmlFor="upload-equipment"
-                    marginInline="0.8rem 1.2rem"
-                    width="fit-content"
+                    cursor="pointer"
                   >
                     Choose file
-                  </Text>
+                  </Button>
                 </Flex>
               </Box>
             </Stack>
           </ModalBody>
           <ModalFooter>
-            <Button
-              colorScheme="blue"
-              mr={3}
-              // onClick={handleCloseNewService}
-            >
+            <Button colorScheme="blue" mr={3} onClick={handleCloseNewEquipment}>
               Close
             </Button>
             <Button
               bgColor="brand.100"
               color="neutral.100"
-              // onClick={handleSubmitNewService}
+              onClick={handleAddNewEquipment}
+              isLoading={addEquipmentMutation.isLoading}
             >
-              Add Service
+              Add Equipment
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -323,17 +452,25 @@ const GymOwnerEquipments = () => {
                     id="upload-edit-equipment"
                     type="file"
                     display="none"
-                    // onChange={handleFileChange}
+                    onChange={handleEditFileChange}
                   />
-                  <Text
-                    id="upload-edit-equipment-image"
+
+                  <Text>
+                    Image Name:{" "}
+                    {selectedEquipment?.imageName?.length !== 0
+                      ? selectedEquipment?.imageName?.concat(
+                          `.${selectedEquipment?.imageType}`
+                        )
+                      : "No image uploaded"}
+                  </Text>
+
+                  <Button
                     as="label"
                     htmlFor="upload-edit-equipment"
-                    marginInline="0.8rem 1.2rem"
-                    width="fit-content"
+                    cursor="pointer"
                   >
                     Choose file
-                  </Text>
+                  </Button>
                 </Flex>
               </Box>
             </Stack>
@@ -346,6 +483,7 @@ const GymOwnerEquipments = () => {
               bgColor="brand.100"
               color="neutral.100"
               onClick={handleSaveEdit}
+              isLoading={updateEquipmentMutation.isLoading}
             >
               Save
             </Button>
@@ -353,7 +491,7 @@ const GymOwnerEquipments = () => {
         </ModalContent>
       </Modal>
 
-      {/* Delete Amenity*/}
+      {/* Delete Equipment*/}
 
       <Modal isOpen={isDeleteEquipmentOpen} onClose={handleCloseDelete}>
         <ModalOverlay />
@@ -381,6 +519,24 @@ const GymOwnerEquipments = () => {
         </ModalContent>
       </Modal>
 
+      {/* Open Image Modal */}
+
+      <Modal isOpen={isImageOpen} onClose={handleCloseImage}>
+        <ModalOverlay />
+        <ModalContent>
+          <Image
+            src={selectedImageUrl}
+            alt=""
+            boxSize="100%"
+            position="absolute"
+            width="600px"
+            height="400px"
+            top="0"
+            left="0"
+          />
+        </ModalContent>
+      </Modal>
+
       <Text color="brand.200" fontSize="2rem" marginBottom="1rem">
         Equipments
       </Text>
@@ -391,14 +547,12 @@ const GymOwnerEquipments = () => {
       >
         Add Equipment
       </Button>
+
       <Box>
         {isLoading ? (
           <Spinner size="lg" mt="4rem" />
         ) : (
           <TableContainer marginTop="1.5rem">
-            <Heading as="h3" size="lg" marginBottom="1rem">
-              List of Equipments
-            </Heading>
             <Table variant="simple">
               <Thead>
                 <Tr>
@@ -409,41 +563,53 @@ const GymOwnerEquipments = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {data?.map((item) => (
-                  <Tr key={item._id}>
-                    <Td>{item.equipmentName}</Td>
-                    <Td>{item.description}</Td>
-                    <Td color="brand.100">
-                      <Text
-                        _hover={{ textDecoration: "underline" }}
-                        cursor="pointer"
-                      >
-                        {item.equipmentImage}
-                      </Text>
-                    </Td>
-                    <Td display="flex" gap="0.5rem">
-                      <Button
-                        bgColor="blue"
-                        color="neutral.100"
-                        marginBottom="1rem"
-                        onClick={() => handleOpenEdit(item)}
-                        isLoading={
-                          updateEquipmentMutation.isLoading &&
-                          updateEquipmentMutation.variables?._id === item._id
-                        }
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        bgColor="red"
-                        color="white"
-                        onClick={() => handleOpenDelete(item)}
-                      >
-                        Delete
-                      </Button>
+                {data?.length !== 0 ? (
+                  data?.map((item) => (
+                    <Tr key={item._id}>
+                      <Td>{item.equipmentName}</Td>
+                      <Td>{item.description}</Td>
+                      <Td color="brand.100">
+                        <Text
+                          _hover={{ textDecoration: "underline" }}
+                          cursor="pointer"
+                          onClick={() =>
+                            handleOpenImage(item.equipmentImage.url)
+                          }
+                        >
+                          View
+                        </Text>
+                      </Td>
+                      <Td display="flex" gap="0.5rem">
+                        <Button
+                          bgColor="blue"
+                          color="neutral.100"
+                          marginBottom="1rem"
+                          onClick={() => handleOpenEdit(item)}
+                          isLoading={
+                            updateEquipmentMutation.isLoading &&
+                            updateEquipmentMutation.variables?._id === item._id
+                          }
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          bgColor="red"
+                          color="white"
+                          onClick={() => handleOpenDelete(item)}
+                          isLoading={deleteEquipmentMutation.isLoading}
+                        >
+                          Delete
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))
+                ) : (
+                  <Tr>
+                    <Td textAlign="center" colSpan="4">
+                      n/a
                     </Td>
                   </Tr>
-                ))}
+                )}
               </Tbody>
             </Table>
           </TableContainer>

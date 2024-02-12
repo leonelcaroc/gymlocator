@@ -243,12 +243,16 @@ export const getGymEquipments = async () => {
   }
 };
 
-export const addGymEquipments = async (formData) => {
+export const addGymEquipments = async (
+  equipmentName,
+  description,
+  equipmentImage
+) => {
   try {
-    const { data } = await privateOwnerApi.post("/equipments", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+    const { data } = await privateOwnerApi.post("/equipments", {
+      equipmentName: equipmentName,
+      description: description,
+      equipmentImage: equipmentImage,
     });
     return data;
   } catch (error) {
@@ -261,14 +265,16 @@ export const updateGymEquipments = async (
   id,
   equipmentName,
   description,
-  equipmentImage
+  equipmentImage,
+  publicId
 ) => {
   try {
-    const { data } = await privateOwnerApi.put("/equipments", {
+    const { data } = await privateOwnerApi.patch("/equipments", {
       id: id,
       equipmentName: equipmentName,
       description: description,
       equipmentImage: equipmentImage,
+      publicId: publicId,
     });
     return data;
   } catch (error) {
@@ -277,10 +283,10 @@ export const updateGymEquipments = async (
   }
 };
 
-export const deleteGymEquipment = async (id) => {
+export const deleteGymEquipment = async (id, publicId) => {
   try {
     const { data } = await privateOwnerApi.delete("/equipments", {
-      data: { id },
+      data: { id, publicId },
     });
     return data;
   } catch (error) {

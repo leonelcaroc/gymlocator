@@ -541,9 +541,6 @@ const GymOwnerAmenities = () => {
           <Spinner size="lg" mt="4rem" />
         ) : (
           <TableContainer marginTop="1.5rem">
-            <Heading as="h3" size="lg" marginBottom="1rem">
-              List of Amenities
-            </Heading>
             <Table variant="simple">
               <Thead>
                 <Tr>
