@@ -91,12 +91,8 @@ router
 router
   .route("/services")
   .get(protectOwner, getGymServices)
-  .post(
-    protectOwner,
-    // multerUpload("services").single("serviceImage"),
-    addGymServices
-  )
-  .put(protectOwner, updateGymServices)
+  .post(protectOwner, addGymServices)
+  .patch(protectOwner, updateGymServices)
   .delete(protectOwner, deleteGymServices);
 router
   .route("/amenity")
@@ -108,7 +104,7 @@ router
   .route("/equipments")
   .get(protectOwner, getGymEquipments)
   .post(protectOwner, addGymEquipments)
-  .put(protectOwner, updateGymEquipments)
+  .patch(protectOwner, updateGymEquipments)
   .delete(protectOwner, deleteGymEquipment);
 
 router

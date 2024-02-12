@@ -416,122 +416,54 @@ const getGymServices = asyncHandler(async (req, res) => {
 const addGymServices = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
 
-  // const form = formidable({ multiples: true });
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
 
-  // form.uploadDir = path.join(
-  //   __dirname,
-  //   `backend/uploads/${req.user._id}/services`
-  // );
+  const { serviceName, description, serviceImage } = req.body;
 
-  // form.parse(req, (err, fields, files) => {
-  //   if (err) {
-  //     console.error("Error parsing form data:", err);
-  //     res.status(500).send("Internal Server Error");
-  //     return;
-  //   }
+  const trimmedServiceName = validator.trim(serviceName);
+  const trimmedDescription = validator.trim(description);
 
-  //   // Extract values from req.body
-  //   const { serviceName, description } = fields;
-  //   const serviceImage = files.serviceImage;
+  if (!validator.isLength(trimmedServiceName, { min: 1 })) {
+    return res.status(400).json({ error: "Service name is required." });
+  }
 
-  //   // if (serviceName[0] === "King") {
-  //   //   uploadFile();
-  //   // }
-  //   // -----------------------
-  //   const newFilePath = path.join(__dirname, "uploads", serviceImage.name);
-  //   fs.rename(serviceImage.path, newFilePath, (err) => {
-  //     if (err) {
-  //       console.error("Error moving file:", err);
-  //       res.status(500).send("Internal Server Error");
-  //       return;
-  //     }
+  if (!validator.isLength(trimmedDescription, { min: 1 })) {
+    return res.status(400).json({ error: "Service description is required." });
+  }
 
-  //     console.log("File uploaded successfully:", newFilePath);
+  if (!validator.isLength(serviceImage, { min: 1 })) {
+    return res.status(400).json({ error: "Service image is required." });
+  }
 
-  //     // Continue with your processing logic
-  //     // ...
+  if (serviceImage) {
+    const uploadRes = await cloudinary.uploader.upload(serviceImage, {
+      upload_preset: "service",
+    });
 
-  //     res.status(200).send("File uploaded successfully");
-  //   });
+    if (uploadRes) {
+      const newService = {
+        serviceName: trimmedServiceName,
+        description: trimmedDescription,
+        serviceImage: uploadRes,
+      };
 
-  //   res.status(200).send("Received form data successfully");
-  // });
+      user.gym.services.push(newService);
 
-  // -------------------------------------------------------
+      await user.save();
 
-  // Upload Service Image
-
-  // multerUpload("services").single("serviceImage")(req, res, async (err) => {
-  //   if (err) {
-  //     // Handle multer errors
-  //     console.error("Multer error:", err);
-  //     return res.status(400).json({ error: "File upload failed" });
-  //   }
-  // });
-
-  // -----------------------
-
-  // throw new Error("You failed");
-
-  // Extract the new service data from the request body
-  // const { serviceName, description } = req.body;
-  // const serviceImage = req.file;
-
-  // if (!user) {
-  //   res.status(404).json({ error: "User not found" });
-  //   throw new Error("User not found");
-  // }
-
-  // console.log(serviceName);
-  // console.log(serviceImage);
-
-  // if (!serviceImage) {
-  //   res.status(400).json({ error: "No file uploaded" });
-  //   throw new Error("No file uploaded");
-  // } else {
-  //   res.status(200).json({ message: "File is uploaded" });
-  // }
-
-  // console.log({
-  //   serviceName: serviceName,
-  //   description: description,
-  //   serviceImage: serviceImage,
-  //   serviceType: "services",
-  // });
-
-  // throw new Error("You failed");
-
-  // console.log(req.file);
-
-  // ----------------
-
-  // const trimmedServiceName = validator.trim(serviceName);
-  // const trimmedDescription = validator.trim(description);
-
-  // if (!validator.isLength(trimmedServiceName, { min: 1 })) {
-  //   return res.status(400).json({ error: "Service name is invalid." });
-  // }
-
-  // if (!validator.isLength(trimmedDescription, { min: 1 })) {
-  //   return res.status(400).json({ error: "Service description is invalid." });
-  // }
-
-  // const newService = {
-  //   serviceName: trimmedServiceName,
-  //   description: trimmedDescription,
-  //   serviceImage: serviceImage,
-  // };
-
-  // // Add the new service to the existing service list
-  // user.gym.services.push(newService);
-
-  // // Save the updated user with the new service
-  // await user.save();
-
-  // // Respond with the updated user profile
-  // res.status(200).json({
-  //   message: "Successfully added new service",
-  // });
+      return res.status(200).json({
+        message: "Successfully added new service",
+      });
+    } else {
+      res.status(400).json({
+        message: "Failed to add new service",
+      });
+      throw new Error("Failed to add new service");
+    }
+  }
 });
 
 const updateGymServices = asyncHandler(async (req, res) => {
@@ -542,43 +474,65 @@ const updateGymServices = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  const { id, serviceName, description, serviceImage } = req.body;
+  const { id, serviceName, description, serviceImage, publicId } = req.body;
 
   const trimmedServiceName = validator.trim(serviceName);
   const trimmedServiceDescription = validator.trim(description);
 
   if (!validator.isLength(trimmedServiceName, { min: 1 })) {
-    return res.status(400).json({ error: "Service name is invalid." });
+    return res.status(400).json({ error: "Service name is required." });
   }
 
   if (!validator.isLength(trimmedServiceDescription, { min: 1 })) {
-    return res.status(400).json({ error: "Service description is invalid." });
+    return res.status(400).json({ error: "Service description is required." });
   }
 
   const index = user.gym.services.findIndex((service) => service.id === id);
 
   if (index !== -1) {
     // Update the service at the found index
-    user.gym.services[index] = {
-      ...user.gym.services[index],
-      serviceName: trimmedServiceName,
-      description: trimmedServiceDescription,
-      serviceImage: serviceImage,
-    };
+    if (serviceImage.length > 0 && typeof serviceImage === "string") {
+      const uploadRes = await cloudinary.uploader.upload(serviceImage, {
+        upload_preset: "service",
+      });
 
-    // Save the updated user
-    // const updatedService = await user.save();
-    await user.save();
+      user.gym.services[index] = {
+        ...user.gym.services[index],
+        serviceName: trimmedServiceName,
+        description: trimmedServiceDescription,
+        serviceImage: uploadRes,
+      };
 
-    res.status(200).json({ message: "Successfully updated a service!" });
+      // Save the updated user
+      await user.save();
+
+      await cloudinary.uploader.destroy(publicId);
+
+      return res.status(200).json({ message: "Successfully updated service!" });
+    } else {
+      user.gym.services[index] = {
+        ...user.gym.services[index],
+        serviceName: trimmedServiceName,
+        description: trimmedServiceDescription,
+        serviceImage: user.gym.services[index].serviceImage,
+      };
+
+      // Save the updated user
+      await user.save();
+
+      await cloudinary.uploader.destroy(publicId);
+
+      return res.status(200).json({ message: "Successfully updated service!" });
+    }
   } else {
-    res.status(404).json({ error: "Service not found" });
+    res.status(404).json({ error: "Failed to update service" });
+    throw new Error("Failed to update service");
   }
 });
 
 const deleteGymServices = asyncHandler(async (req, res) => {
   const user = await GymOwner.findById(req.user._id);
-  const { id } = req.body;
+  const { id, publicId } = req.body;
 
   if (!user) {
     res.status(404).json({ error: "User not found." });
@@ -598,9 +552,15 @@ const deleteGymServices = asyncHandler(async (req, res) => {
 
   user.gym.services = [...remainingServices];
 
-  await user.save();
+  const deleteImage = await cloudinary.uploader.destroy(publicId);
 
-  res.status(200).json({ message: "Successfully deleted service" });
+  if (deleteImage) {
+    await user.save();
+    return res.status(200).json({ message: "Successfully deleted service" });
+  } else {
+    res.status(400).json({ message: "Failed to delete service" });
+    throw new Error("Failed to delete service");
+  }
 });
 
 // AMENITIES //
@@ -793,35 +753,49 @@ const addGymEquipments = asyncHandler(async (req, res) => {
   // Extract the new equipment data from the request body
   const { equipmentName, description, equipmentImage } = req.body;
 
-  const trimmedEquipment = validator.trim(equipmentName);
-  const trimmedEquipmentDescription = validator.trim(description);
+  const trimmedEquipmentName = validator.trim(equipmentName);
+  const trimmedDescription = validator.trim(description);
 
-  if (!validator.isLength(trimmedEquipment, { min: 1 })) {
+  if (!validator.isLength(trimmedEquipmentName, { min: 1 })) {
     return res.status(400).json({ error: "Equipment name is required." });
   }
 
-  if (!validator.isLength(trimmedEquipmentDescription, { min: 1 })) {
+  if (!validator.isLength(trimmedDescription, { min: 1 })) {
     return res
       .status(400)
       .json({ error: "Equipment description is required." });
   }
 
-  const newEquipment = {
-    equipmentName: trimmedEquipment,
-    description: trimmedEquipmentDescription,
-    equipmentImage: equipmentImage,
-  };
+  if (!validator.isLength(equipmentImage, { min: 1 })) {
+    return res.status(400).json({ error: "Equipment image is required." });
+  }
 
-  // Add the new equipment to the existing equipment list
-  user.gym.equipments.push(newEquipment);
+  if (equipmentImage) {
+    const uploadRes = await cloudinary.uploader.upload(equipmentImage, {
+      upload_preset: "equipment",
+    });
 
-  // Save the updated user with the new equipment
-  await user.save();
+    if (uploadRes) {
+      const newEquipment = {
+        equipmentName: trimmedEquipmentName,
+        description: trimmedDescription,
+        equipmentImage: uploadRes,
+      };
 
-  // Respond with the updated user profile
-  res.status(200).json({
-    message: "Successfully added new equipment",
-  });
+      user.gym.equipments.push(newEquipment);
+
+      await user.save();
+
+      return res.status(200).json({
+        message: "Successfully added new equipment",
+      });
+    } else {
+      res.status(400).json({
+        message: "Failed to add new equipment",
+      });
+      throw new Error("Failed to add new equipment");
+    }
+  }
 });
 
 const updateGymEquipments = asyncHandler(async (req, res) => {
@@ -832,17 +806,19 @@ const updateGymEquipments = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  const { id, equipmentName, description, equipmentImage } = req.body;
+  const { id, equipmentName, description, equipmentImage, publicId } = req.body;
 
   const trimmedEquipmentName = validator.trim(equipmentName);
   const trimmedEquipmentDescription = validator.trim(description);
 
   if (!validator.isLength(trimmedEquipmentName, { min: 1 })) {
-    return res.status(400).json({ error: "Equipment name is invalid." });
+    return res.status(400).json({ error: "Equipment name is required." });
   }
 
   if (!validator.isLength(trimmedEquipmentDescription, { min: 1 })) {
-    return res.status(400).json({ error: "Equipment description is invalid." });
+    return res
+      .status(400)
+      .json({ error: "Equipment description is required." });
   }
 
   const index = user.gym.equipments.findIndex(
@@ -851,20 +827,46 @@ const updateGymEquipments = asyncHandler(async (req, res) => {
 
   if (index !== -1) {
     // Update the service at the found index
-    user.gym.equipments[index] = {
-      id: id,
-      equipmentName: trimmedEquipmentName,
-      description: trimmedEquipmentDescription,
-      equipmentImage: equipmentImage,
-    };
+    if (equipmentImage.length > 0 && typeof equipmentImage === "string") {
+      const uploadRes = await cloudinary.uploader.upload(equipmentImage, {
+        upload_preset: "equipment",
+      });
 
-    // Save the updated user
-    // const updatedService = await user.save();
-    await user.save();
+      user.gym.equipments[index] = {
+        ...user.gym.equipments[index],
+        equipmentName: trimmedEquipmentName,
+        description: trimmedEquipmentDescription,
+        equipmentImage: uploadRes,
+      };
 
-    res.status(200).json({ message: "Successfully updated equipment!" });
+      // Save the updated user
+      await user.save();
+
+      await cloudinary.uploader.destroy(publicId);
+
+      return res
+        .status(200)
+        .json({ message: "Successfully updated equipment!" });
+    } else {
+      user.gym.equipments[index] = {
+        ...user.gym.equipments[index],
+        equipmentName: trimmedEquipmentName,
+        description: trimmedEquipmentDescription,
+        equipmentImage: user.gym.equipments[index].equipmentImage,
+      };
+
+      // Save the updated user
+      await user.save();
+
+      await cloudinary.uploader.destroy(publicId);
+
+      return res
+        .status(200)
+        .json({ message: "Successfully updated equipment!" });
+    }
   } else {
-    res.status(404).json({ error: "Equipment not found" });
+    res.status(404).json({ error: "Failed to update equipment" });
+    throw new Error("Failed to update equipment");
   }
 });
 
@@ -890,9 +892,15 @@ const deleteGymEquipment = asyncHandler(async (req, res) => {
 
   user.gym.equipments = [...remainingEquipments];
 
-  await user.save();
+  const deleteImage = await cloudinary.uploader.destroy(publicId);
 
-  res.status(200).json({ message: "Successfully deleted equipment" });
+  if (deleteImage) {
+    await user.save();
+    return res.status(200).json({ message: "Successfully deleted equipment" });
+  } else {
+    res.status(400).json({ message: "Failed to delete equipment" });
+    throw new Error("Failed to delete equipment");
+  }
 });
 
 // Gym Plans

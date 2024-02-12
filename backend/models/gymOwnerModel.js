@@ -86,7 +86,7 @@ const serviceSchema = mongoose.Schema({
     required: true,
   },
   serviceImage: {
-    type: String,
+    type: Object,
     required: true,
   },
 });
@@ -116,7 +116,7 @@ const equipmentSchema = mongoose.Schema({
     required: true,
   },
   equipmentImage: {
-    type: String,
+    type: Object,
     required: true,
   },
 });

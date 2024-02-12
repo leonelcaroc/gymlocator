@@ -1,23 +1,24 @@
 import { useState } from "react";
 import {
-  Text,
-  Textarea,
   Box,
   Button,
+  Divider,
   Flex,
   Heading,
   Input,
-  Table,
+  Image,
+  Stack,
+  Spinner,
+  Textarea,
   TableContainer,
+  Table,
+  Text,
+  Thead,
   Td,
   Th,
-  Thead,
   Tr,
   Tbody,
   Modal,
-  Select,
-  Spinner,
-  Stack,
   ModalOverlay,
   ModalContent,
   ModalHeader,
@@ -38,6 +39,18 @@ import {
 const GymOwnerServices = () => {
   const toast = useToast();
   const queryClient = useQueryClient();
+
+  const [newService, setNewService] = useState({
+    serviceName: "",
+    description: "",
+    serviceImage: "",
+    imageName: "",
+    imageType: "",
+  });
+  const [selectedService, setSelectedService] = useState(null);
+  const [selectedDeleteService, setSelectedDeleteService] = useState(null);
+  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
+
   const {
     isOpen: isAddServiceOpen,
     onOpen: openAddService,
@@ -53,14 +66,11 @@ const GymOwnerServices = () => {
     onOpen: openDeleteService,
     onClose: closeDeleteService,
   } = useDisclosure();
-
-  const [newService, setNewService] = useState({
-    serviceName: "",
-    description: "",
-    serviceImage: null,
-  });
-  const [selectedService, setSelectedService] = useState(null);
-  const [selectedDeleteService, setSelectedDeleteService] = useState(null);
+  const {
+    isOpen: isImageOpen,
+    onOpen: openImage,
+    onClose: closeImage,
+  } = useDisclosure();
 
   const { data, isLoading, isError } = useQuery(
     "serviceData",
@@ -82,15 +92,16 @@ const GymOwnerServices = () => {
 
   const addServiceMutation = useMutation(
     async (formData) => {
-      return await addGymServices(formData);
+      return addGymServices(
+        formData.serviceName,
+        formData.description,
+        formData.serviceImage
+      );
     },
     {
       onSuccess: (data) => {
-        setNewService({
-          serviceName: "",
-          description: "",
-          serviceImage: null,
-        });
+        handleCloseNewService();
+
         toast({
           title: data.message,
           status: "success",
@@ -102,11 +113,7 @@ const GymOwnerServices = () => {
         queryClient.invalidateQueries("serviceData");
       },
       onError: (error) => {
-        setNewService({
-          serviceName: "",
-          description: "",
-          serviceImage: null,
-        });
+        handleCloseNewService();
         toast({
           title: error.response.data.error || "Something went wrong",
           status: "error",
@@ -123,12 +130,13 @@ const GymOwnerServices = () => {
         formData._id,
         formData.serviceName,
         formData.description,
-        formData.serviceImage
+        formData.newServiceImage,
+        formData.serviceImage.public_id
       );
     },
     {
       onSuccess: (data) => {
-        setSelectedService(null);
+        handleCloseEdit();
         toast({
           title: data.message,
           status: "success",
@@ -140,7 +148,7 @@ const GymOwnerServices = () => {
         queryClient.invalidateQueries("serviceData");
       },
       onError: (error) => {
-        setSelectedService(null);
+        handleCloseEdit();
         toast({
           title: error.response.data.error || "Something went wrong",
           status: "error",
@@ -153,7 +161,7 @@ const GymOwnerServices = () => {
 
   const deleteServiceMutation = useMutation(
     async (formData) => {
-      return deleteGymService(formData._id);
+      return deleteGymService(formData._id, formData.serviceImage.public_id);
     },
     {
       onSuccess: (data) => {
@@ -180,43 +188,30 @@ const GymOwnerServices = () => {
     }
   );
 
-  const handleSubmitNewService = async (e) => {
-    e.preventDefault();
-
-    const newServiceFormData = new FormData();
-    newServiceFormData.append("serviceName", newService.serviceName);
-    newServiceFormData.append("description", newService.description);
-    newServiceFormData.append("serviceImage", newService.serviceImage);
-    // addServiceMutation.mutate(newServiceFormData);
-
-    // console.log(newServiceFormData.serviceName);
-    // console.log(newServiceFormData.description);
-    // console.log(newServiceFormData.serviceImage);
-
-    // console.log(newService.serviceName);
-    // console.log(newService.description);
-    // console.log(newService.serviceImage);
+  const handleAddNewService = () => {
+    addServiceMutation.mutate(newService);
   };
 
   const handleCloseNewService = () => {
     setNewService({
       serviceName: "",
       description: "",
-      serviceImage: null,
+      serviceImage: "",
+      imageName: "",
+      imageType: "",
     });
 
     closeAddService();
   };
 
   const handleOpenEdit = (service) => {
-    setSelectedService(service);
+    setSelectedService({ ...service, newServiceImage: "" });
+
     openEditService();
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     updateServiceMutation.mutate(selectedService);
-    setSelectedService(null);
-    closeEditService();
   };
 
   const handleCloseEdit = () => {
@@ -242,29 +237,90 @@ const GymOwnerServices = () => {
     // Reset the edited data to the original data or fetch from your backend
   };
 
-  const handleFileChange = (e) => {
-    setNewService((prevService) => ({
-      ...prevService,
-      serviceImage: e.target.files[0],
-    }));
+  const handleFileChange = (event) => {
+    const files = event.target.files;
 
-    // if (file) {
-    //   const { name, size, type } = file;
+    if (files.length === 0) {
+      // User canceled file selection
+      return;
+    }
 
-    //   setNewService((prevService) => ({
-    //     ...prevService,
-    //     serviceImage: { name: name, size: size, type: type },
-    //   }));
-    // }
+    const file = files[0];
+    const allowedFileTypes = ["image/png", "image/jpeg", "image/jpg"];
 
-    // if (file && isValidFileType(file)) {
-    //   setSelectedFile(file);
-    //   // Additional actions with the valid file
-    // } else {
-    //   // Clear selected file if not valid
-    //   setSelectedFile(null);
-    //   alert("Please select a valid PNG or JPG file.");
-    // }
+    if (!allowedFileTypes.includes(file?.type)) {
+      return toast({
+        title: "Please select a valid jpg, jpeg, or png file.",
+        status: "error",
+        duration: 2000,
+        position: "bottom-right",
+      });
+    }
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setNewService((prevService) => {
+        return {
+          ...prevService,
+          serviceImage: reader.result,
+          imageName:
+            file.name.length > 15
+              ? file.name.split(".")[0].concat("...")
+              : file.name.split(".")[0],
+          imageType: file.type.split("/")[1],
+        };
+      });
+    };
+  };
+
+  const handleEditFileChange = (event) => {
+    const files = event.target.files;
+
+    if (files.length === 0) {
+      // User canceled file selection
+      return;
+    }
+
+    const file = files[0];
+    const allowedFileTypes = ["image/png", "image/jpeg", "image/jpg"];
+
+    if (!allowedFileTypes.includes(file?.type)) {
+      return toast({
+        title: "Please select a valid jpg, jpeg, or png file.",
+        status: "error",
+        duration: 2000,
+        position: "bottom-right",
+      });
+    }
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setSelectedService((prevService) => {
+        return {
+          ...prevService,
+          newServiceImage: reader.result,
+          imageName:
+            file.name.length > 15
+              ? file.name.split(".")[0].concat("...")
+              : file.name.split(".")[0],
+          imageType: file.type.split("/")[1],
+        };
+      });
+    };
+  };
+
+  const handleOpenImage = (url) => {
+    setSelectedImageUrl(url);
+    openImage();
+  };
+
+  const handleCloseImage = () => {
+    setSelectedImageUrl(null);
+    closeImage();
   };
 
   return (
@@ -274,7 +330,7 @@ const GymOwnerServices = () => {
       <Modal isOpen={isAddServiceOpen} onClose={handleCloseNewService}>
         <ModalOverlay />
         <ModalContent paddingInline="2rem" maxWidth="35rem">
-          <ModalHeader>Add Services</ModalHeader>
+          <ModalHeader>Add Service</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Stack spacing="1rem">
@@ -312,15 +368,16 @@ const GymOwnerServices = () => {
                     display="none"
                     onChange={handleFileChange}
                   />
-                  <Text
-                    id="upload-service-image"
-                    as="label"
-                    htmlFor="upload-service"
-                    marginInline="0.8rem 1.2rem"
-                    width="fit-content"
-                  >
-                    Choose file
+                  <Text>
+                    Image Name:{" "}
+                    {newService.imageName.length !== 0
+                      ? newService.imageName.concat(`.${newService.imageType}`)
+                      : "No image uploaded"}
                   </Text>
+
+                  <Button as="label" htmlFor="upload-service" cursor="pointer">
+                    Choose file
+                  </Button>
                 </Flex>
               </Box>
             </Stack>
@@ -332,7 +389,8 @@ const GymOwnerServices = () => {
             <Button
               bgColor="brand.100"
               color="neutral.100"
-              onClick={handleSubmitNewService}
+              onClick={handleAddNewService}
+              isLoading={addServiceMutation.isLoading}
             >
               Add Service
             </Button>
@@ -385,17 +443,25 @@ const GymOwnerServices = () => {
                     id="upload-edit-service"
                     type="file"
                     display="none"
-                    // onChange={handleFileChange}
+                    onChange={handleEditFileChange}
                   />
-                  <Text
-                    id="upload-edit-service-image"
+
+                  <Text>
+                    Image Name:{" "}
+                    {selectedService?.imageName?.length !== 0
+                      ? selectedService?.imageName?.concat(
+                          `.${selectedService?.imageType}`
+                        )
+                      : "No image uploaded"}
+                  </Text>
+
+                  <Button
                     as="label"
                     htmlFor="upload-edit-service"
-                    marginInline="0.8rem 1.2rem"
-                    width="fit-content"
+                    cursor="pointer"
                   >
                     Choose file
-                  </Text>
+                  </Button>
                 </Flex>
               </Box>
             </Stack>
@@ -408,6 +474,7 @@ const GymOwnerServices = () => {
               bgColor="brand.100"
               color="neutral.100"
               onClick={handleSaveEdit}
+              isLoading={updateServiceMutation.isLoading}
             >
               Save
             </Button>
@@ -415,7 +482,7 @@ const GymOwnerServices = () => {
         </ModalContent>
       </Modal>
 
-      {/* Delete Service */}
+      {/* Delete Amenity*/}
 
       <Modal isOpen={isDeleteServiceOpen} onClose={handleCloseDelete}>
         <ModalOverlay />
@@ -442,6 +509,25 @@ const GymOwnerServices = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* Open Image Modal */}
+
+      <Modal isOpen={isImageOpen} onClose={handleCloseImage}>
+        <ModalOverlay />
+        <ModalContent>
+          <Image
+            src={selectedImageUrl}
+            alt=""
+            boxSize="100%"
+            position="absolute"
+            width="600px"
+            height="400px"
+            top="0"
+            left="0"
+          />
+        </ModalContent>
+      </Modal>
+
       <Text color="brand.200" fontSize="2rem" marginBottom="1rem">
         Services
       </Text>
@@ -453,57 +539,65 @@ const GymOwnerServices = () => {
         {isLoading ? (
           <Spinner size="lg" mt="4rem" />
         ) : (
-          <TableContainer marginTop="2rem">
+          <TableContainer marginTop="1.5rem">
             <Heading as="h3" size="lg" marginBottom="1rem">
               List of Services
             </Heading>
             <Table variant="simple">
               <Thead>
                 <Tr>
-                  <Th whiteSpace="normal">Service Name</Th>
+                  <Th>Service Name</Th>
                   <Th>Description</Th>
                   <Th>Image</Th>
                   <Th>Action</Th>
                 </Tr>
               </Thead>
               <Tbody>
-                {data?.map((item) => (
-                  <Tr key={item._id}>
-                    <Td whiteSpace="normal">{item.serviceName}</Td>
-                    <Td whiteSpace="normal">{item.description}</Td>
-                    <Td color="brand.100">
-                      <Text
-                        _hover={{ textDecoration: "underline" }}
-                        cursor="pointer"
-                      >
-                        {item.serviceImage}
-                      </Text>
-                    </Td>
-                    <Td display="flex" gap="0.5rem">
-                      <Button
-                        bgColor="blue"
-                        color="neutral.100"
-                        marginBottom="1rem"
-                        onClick={() => handleOpenEdit(item)}
-                        isLoading={
-                          updateServiceMutation.isLoading &&
-                          updateServiceMutation.variables?._id === item._id
-                        }
-                        width="5rem"
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        bgColor="red"
-                        color="white"
-                        width="5rem"
-                        onClick={() => handleOpenDelete(item)}
-                      >
-                        Delete
-                      </Button>
+                {data?.length !== 0 ? (
+                  data?.map((item) => (
+                    <Tr key={item._id}>
+                      <Td>{item.serviceName}</Td>
+                      <Td>{item.description}</Td>
+                      <Td color="brand.100">
+                        <Text
+                          _hover={{ textDecoration: "underline" }}
+                          cursor="pointer"
+                          onClick={() => handleOpenImage(item.serviceImage.url)}
+                        >
+                          View
+                        </Text>
+                      </Td>
+                      <Td display="flex" gap="0.5rem">
+                        <Button
+                          bgColor="blue"
+                          color="neutral.100"
+                          marginBottom="1rem"
+                          onClick={() => handleOpenEdit(item)}
+                          isLoading={
+                            updateServiceMutation.isLoading &&
+                            updateServiceMutation.variables?._id === item._id
+                          }
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          bgColor="red"
+                          color="white"
+                          onClick={() => handleOpenDelete(item)}
+                          isLoading={deleteServiceMutation.isLoading}
+                        >
+                          Delete
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))
+                ) : (
+                  <Tr>
+                    <Td textAlign="center" colSpan="4">
+                      n/a
                     </Td>
                   </Tr>
-                ))}
+                )}
               </Tbody>
             </Table>
           </TableContainer>

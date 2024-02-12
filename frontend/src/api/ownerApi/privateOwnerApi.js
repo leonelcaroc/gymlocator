@@ -115,12 +115,16 @@ export const getGymServices = async () => {
   }
 };
 
-export const addGymServices = async (formData) => {
+export const addGymServices = async (
+  serviceName,
+  description,
+  serviceImage
+) => {
   try {
-    const { data } = await privateOwnerApi.post("/services", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+    const { data } = await privateOwnerApi.post("/services", {
+      serviceName: serviceName,
+      description: description,
+      serviceImage: serviceImage,
     });
     return data;
   } catch (error) {
@@ -133,14 +137,16 @@ export const updateGymServices = async (
   id,
   serviceName,
   description,
-  serviceImage
+  serviceImage,
+  publicId
 ) => {
   try {
-    const { data } = await privateOwnerApi.put("/services", {
+    const { data } = await privateOwnerApi.patch("/services", {
       id: id,
       serviceName: serviceName,
       description: description,
       serviceImage: serviceImage,
+      publicId: publicId,
     });
     return data;
   } catch (error) {
@@ -149,10 +155,10 @@ export const updateGymServices = async (
   }
 };
 
-export const deleteGymService = async (id) => {
+export const deleteGymService = async (id, publicId) => {
   try {
     const { data } = await privateOwnerApi.delete("/services", {
-      data: { id },
+      data: { id, publicId },
     });
     return data;
   } catch (error) {
