@@ -19,7 +19,16 @@ connectDB();
 
 const app = express();
 
-app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    useDefaults: true,
+    directives: {
+      "img-src": ["https://gymlocator.co", "https://res.cloudinary.com/"],
+      upgradeInsecureRequests: [],
+    },
+    reportOnly: false,
+  })
+);
 
 app.disable("x-powered-by");
 
