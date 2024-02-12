@@ -13,6 +13,7 @@ import {
   userJoinGym,
   userJoinClass,
   userWithdrawClass,
+  getUserAnnouncements,
 } from "../controllers/userController.js";
 import { protectUser } from "../middleware/authMiddleware.js";
 
@@ -32,5 +33,6 @@ router
   .route("/joinclass")
   .post(protectUser, userJoinClass)
   .patch(protectUser, userWithdrawClass);
+router.get("/announcements", protectUser, getUserAnnouncements);
 
 export default router;

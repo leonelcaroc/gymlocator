@@ -202,7 +202,7 @@ const App = () => {
                   element={<UserProfile />}
                 />
                 <Route path="classes" element={<UserClasses />} />
-                <Route path="bookings" element={<UserBookings />} />
+                {/* <Route path="bookings" element={<UserBookings />} /> */}
                 <Route path="subscriptions" element={<UserSubscriptions />} />
                 <Route path="announcements" element={<UserAnnouncements />} />
               </Route>

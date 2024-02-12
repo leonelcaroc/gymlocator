@@ -20,9 +20,17 @@ import {
   Tbody,
   TableContainer,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
+import { useQuery } from "react-query";
+import { getUserAnnouncements } from "../../api/userApi/privateUserApi";
+import formatDateToCustomFormat from "../../utils/formatDateToCustomFormat";
+import convertTo12HourFormat from "../../utils/convertTo12HourFormat";
+import { formattedTime } from "../../utils/convertToAmericanTime";
+import { format, parseISO } from "date-fns";
 
 const UserAnnouncements = () => {
+  const toast = useToast();
   const [selectedItem, setSelectedItem] = useState(null);
 
   const {
@@ -31,8 +39,26 @@ const UserAnnouncements = () => {
     onClose: closeSelectedItem,
   } = useDisclosure();
 
+  const { data, isLoading, isError } = useQuery(
+    "userAnnouncements",
+    async () => {
+      return getUserAnnouncements();
+    },
+    {
+      refetchOnWindowFocus: false,
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
   const handleOpenItem = (item) => {
-    // setSelectedSub(item);
+    setSelectedItem(item);
     openSelectedItem();
   };
 
@@ -41,6 +67,8 @@ const UserAnnouncements = () => {
     closeSelectedItem();
   };
 
+  console.log(data);
+
   return (
     <Box padding="2rem">
       {/* Show Gym Announcement Modal */}
@@ -48,18 +76,10 @@ const UserAnnouncements = () => {
       <Modal isOpen={isSelectedItemOpen} onClose={handleCloseItem}>
         <ModalOverlay />
         <ModalContent paddingInline="2rem" maxWidth="35rem">
-          <ModalHeader>Ben's Gym</ModalHeader>
+          <ModalHeader>{selectedItem?.gymname}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-              reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-              sunt in culpa qui officia deserunt mollit anim id est laborum.
-            </Text>
+            <Text>{selectedItem?.announcement}</Text>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="gray" mr={3} onClick={handleCloseItem}>
@@ -70,7 +90,7 @@ const UserAnnouncements = () => {
       </Modal>
 
       <Text color="brand.200" fontSize="2rem" marginBottom="2rem">
-        Gym Announcements
+        Announcements
       </Text>
 
       <TableContainer>
@@ -83,26 +103,25 @@ const UserAnnouncements = () => {
             </Tr>
           </Thead>
           <Tbody>
-            <Tr
-              _hover={{ bgColor: "gray.300" }}
-              cursor="pointer"
-              onClick={handleOpenItem}
-            >
-              <Td whiteSpace="normal">Mary's Gym</Td>
-              <Td whiteSpace="normal">
-                {`Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                sunt in culpa qui officia deserunt mollit anim id est laborum.`.slice(
-                  0,
-                  80
-                ) + `.....`}
-              </Td>
-              <Td>February 6, 2024</Td>
-            </Tr>
+            {data?.map((item) => (
+              <Tr
+                key={item._id}
+                _hover={{ bgColor: "gray.300" }}
+                cursor="pointer"
+                onClick={() => handleOpenItem(item)}
+              >
+                <Td whiteSpace="normal">{item.gymname}</Td>
+                <Td whiteSpace="normal">
+                  {item.announcement.length > 20
+                    ? item.announcement.slice(0, 20).concat("...")
+                    : item.announcement}
+                </Td>
+                <Td>{`${formatDateToCustomFormat(item.createdAt)} - ${format(
+                  parseISO(item.createdAt),
+                  "h:mm a"
+                )}`}</Td>
+              </Tr>
+            ))}
           </Tbody>
         </Table>
       </TableContainer>

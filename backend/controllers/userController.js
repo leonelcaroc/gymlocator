@@ -563,6 +563,61 @@ const userWithdrawClass = asyncHandler(async (req, res) => {
   }
 });
 
+const getUserAnnouncements = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  const aggregationPipeline = [
+    {
+      $match: {
+        _id: user._id,
+      },
+    },
+    {
+      $unwind: "$memberships",
+    },
+    {
+      $lookup: {
+        from: "gymowners",
+        localField: "memberships.gym.ownerId",
+        foreignField: "_id",
+        as: "gymInfo",
+      },
+    },
+    {
+      $unwind: "$gymInfo",
+    },
+    {
+      $unwind: "$gymInfo.gym.announcements",
+    },
+    {
+      $project: {
+        _id: "$gymInfo.gym.announcements._id",
+        announcement: "$gymInfo.gym.announcements.announcement",
+        createdAt: "$gymInfo.gym.announcements.createdAt",
+        gymname: "$gymInfo.gym.gymname",
+      },
+    },
+    {
+      $sort: {
+        createdAt: 1,
+      },
+    },
+  ];
+
+  const result = await User.aggregate(aggregationPipeline);
+
+  if (result) {
+    return res.status(200).json(result);
+  } else {
+    res.status(400).json({ error: "Failed to get announcements" });
+    throw new Error("Failed to get announcements");
+  }
+});
+
 export {
   authUser,
   registerUser,
@@ -576,25 +631,49 @@ export {
   userJoinGym,
   userJoinClass,
   userWithdrawClass,
+  getUserAnnouncements,
 };
 
-// const a = [
-//   {
-//     firstname: "Maria",
-//     middlename: "Santos",
-//     lastname: "Clara",
-//     memberships: [{ gym: { gymname: "Ben's Gym", ownerId: "123" } }],
-//   },
-//   {
-//     firstname: "Honey",
-//     middlename: "Jean",
-//     lastname: "Dort",
-//     memberships: [{ gym: { gymname: "Mark's Gym", ownerId: "456" } }],
-//   },
-// ];
+const a = [
+  {
+    firstname: "Maria",
+    middlename: "Santos",
+    lastname: "Clara",
+    memberships: [{ gym: { gymname: "Ben's Gym", ownerId: "123" } }],
+  },
+  {
+    firstname: "Honey",
+    middlename: "Jean",
+    lastname: "Dort",
+    memberships: [{ gym: { gymname: "Mark's Gym", ownerId: "456" } }],
+  },
+];
 
-// const b = ;[
-//   { gymname: "Ben's Gym", _id: "123" },
-//   { gymname: "Mark's Gym", _id: "456" },
-//   { gymname: "Leo's Gym", _id: "789" },
-// ]
+const b = [
+  {
+    _id: "123",
+    gym: {
+      gymname: "Ben's Gym",
+      announcements: [
+        {
+          announcement: "asdasd",
+          createdAt: "2024-02-12T06:47:49.076Z",
+          _id: "65c9bfdf6f2c11715fcd38cc",
+        },
+        {
+          announcement: "Hello World",
+          createdAt: "2024-02-14T06:47:49.076Z",
+          _id: "65cghrs2c11715fcdg34sd",
+        },
+      ],
+    },
+  },
+  {
+    _id: "456",
+    gym: { gymname: "Mark's Gym", announcements: [] },
+  },
+  {
+    _id: "789",
+    gym: { gymname: "Laila's Gym", announcements: [] },
+  },
+];

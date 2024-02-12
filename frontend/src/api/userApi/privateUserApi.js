@@ -138,4 +138,14 @@ export const postUserWithdrawClass = async (classId) => {
   }
 };
 
+export const getUserAnnouncements = async () => {
+  try {
+    const { data } = await privateUserApi.get("/announcements");
+    return data;
+  } catch (error) {
+    console.error("Error fetching gyms:", error);
+    throw error;
+  }
+};
+
 export default privateUserApi;
