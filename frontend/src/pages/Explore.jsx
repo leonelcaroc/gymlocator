@@ -279,7 +279,7 @@ const Explore = () => {
 
   // console.log(selectedGym);
 
-  // console.log(data);
+  console.log(approvedGyms);
   // console.log(TokenService.getUserLocal()?.token);
   // console.log(allGyms);
 

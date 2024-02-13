@@ -69,26 +69,31 @@ const AdminManageModal = ({
           </Text>
           <Text>Address: {owner.gym.address}</Text>
           <Text>Contact: {owner.gym.contact}</Text>
-          {/* <Flex>
-            <Text>Business Permit: </Text>
-            <Text
-              color="brand.100"
-              cursor="pointer"
-              _hover={{ textDecoration: "underline" }}
-            >
-              View Attachment
-            </Text>
-          </Flex> */}
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="green" mr={3} onClick={handleApproveGym}>
+          <Button
+            colorScheme="green"
+            mr={3}
+            onClick={handleApproveGym}
+            isLoading={updateGymStatusMutation.isLoading}
+          >
             Approve
           </Button>
-          <Button colorScheme="red" mr={3} onClick={handleRejectGym}>
+          <Button
+            colorScheme="red"
+            mr={3}
+            onClick={handleRejectGym}
+            isLoading={updateGymStatusMutation.isLoading}
+          >
             Reject
           </Button>
-          <Button colorScheme="gray" mr={3} onClick={onClose}>
+          <Button
+            colorScheme="gray"
+            mr={3}
+            onClick={onClose}
+            // isLoading={updateGymStatusMutation.isLoading}
+          >
             Close
           </Button>
         </ModalFooter>

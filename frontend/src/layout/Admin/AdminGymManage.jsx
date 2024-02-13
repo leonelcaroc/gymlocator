@@ -135,10 +135,9 @@ const AdminGymManage = () => {
             <Tr>
               <Th>Gym Name</Th>
               <Th>Owner Name</Th>
-              {/* <Th>Address</Th> */}
-              {/* <Th>Contact</Th> */}
+
               <Th>Permit</Th>
-              {/* <Th>Gym Image</Th> */}
+
               <Th>Status</Th>
               <Th>Manage</Th>
             </Tr>
@@ -151,8 +150,6 @@ const AdminGymManage = () => {
                   <Td whiteSpace="normal">
                     {owner.firstname} {owner.lastname}
                   </Td>
-                  {/* <Td whiteSpace="normal">{owner.gym.address}</Td> */}
-                  {/* <Td>{owner.gym.contact}</Td> */}
                   <Td
                     color="brand.100"
                     cursor="pointer"
@@ -161,14 +158,6 @@ const AdminGymManage = () => {
                   >
                     View Permit
                   </Td>
-                  {/* <Td
-                    color="brand.100"
-                    cursor="pointer"
-                    onClick={() => handleOpenImage(owner.gym.gymImage?.url)}
-                    _hover={{ textDecoration: "underline" }}
-                  >
-                    View Gym Image
-                  </Td> */}
                   <Td>{owner.gym.isApproved}</Td>
                   <Td>
                     <Button
