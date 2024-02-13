@@ -28,7 +28,11 @@ app.use(
         "https://res.cloudinary.com/",
         "https://maps.gstatic.com",
       ],
-      "script-src": ["self", "https://maps.googleapis.com"],
+      "script-src": [
+        "self",
+        "https://maps.googleapis.com",
+        "https://gymlocator.co",
+      ],
       "connect-src": ["self", "https://maps.googleapis.com"],
       upgradeInsecureRequests: [],
     },
