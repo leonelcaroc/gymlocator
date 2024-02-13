@@ -24,11 +24,8 @@ app.use(
     useDefaults: true,
     directives: {
       "img-src": ["https://gymlocator.co", "https://res.cloudinary.com/"],
-      "script-src": [
-        "self",
-        "https://gymlocator.co",
-        "https://maps.googleapis.com",
-      ],
+      "script-src": ["https://gymlocator.co", "https://maps.googleapis.com"],
+      "connect-src": ["https://gymlocator.co", "https://maps.googleapis.com"],
       upgradeInsecureRequests: [],
     },
     reportOnly: false,
