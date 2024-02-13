@@ -6,7 +6,7 @@ import GymSignUpPermit from "./GymSignUpPermit";
 import gym from "../assets/images/background.webp";
 
 const GymOwnerSignUp = () => {
-  const [state, setState] = useState("permit");
+  const [state, setState] = useState("details");
   const [signUpForm, setSignUpForm] = useState({
     firstname: "",
     middlename: "",
