@@ -22,6 +22,48 @@ export const postLoginOwner = async (email, password) => {
   }
 };
 
+export const postRegisterOwner = async (
+  firstname,
+  middlename,
+  lastname,
+  email,
+  password,
+  gymname,
+  contact,
+  address,
+  gymLocation,
+  description,
+  startday,
+  endday,
+  opentime,
+  closetime,
+  permitImage
+) => {
+  try {
+    const { data } = await ownerApi.post("/register", {
+      firstname: firstname,
+      middlename: middlename,
+      lastname: lastname,
+      email: email,
+      password: password,
+      gymname: gymname,
+      contact: contact,
+      address: address,
+      gymLocation: gymLocation,
+      description: description,
+      startday: startday,
+      endday: endday,
+      opentime: opentime,
+      closetime: closetime,
+      permitImage: permitImage,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error registering owner", error);
+    throw error;
+  }
+};
+
 export const postLogoutOwner = async () => {
   try {
     const { data } = await adminApi.post("/logout");

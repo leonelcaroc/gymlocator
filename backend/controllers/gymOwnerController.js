@@ -84,7 +84,7 @@ const registerOwner = asyncHandler(async (req, res) => {
     endday,
     opentime,
     closetime,
-    base64Data,
+    permitImage,
   } = req.body;
 
   const trimmedFirstName = validator.trim(firstname);
@@ -96,30 +96,6 @@ const registerOwner = asyncHandler(async (req, res) => {
   const trimmedDesc = validator.trim(description);
   const trimmedAddress = validator.trim(address);
 
-  if (!validator.isLength(trimmedGymName, { min: 1 })) {
-    return res.status(400).json({ error: "Gym name is required." });
-  }
-
-  if (!validator.isLength(trimmedContact, { min: 1 })) {
-    return res.status(400).json({ error: "Contact number is invalid" });
-  }
-
-  if (!Array.isArray(gymLocation)) {
-    return res.status(400).json({ error: "Location is invalid" });
-  }
-
-  if (!validator.isLength(trimmedDesc, { min: 1 })) {
-    return res.status(400).json({ error: "Gym Description is required." });
-  }
-
-  if (!validator.isLength(trimmedAddress, { min: 1 })) {
-    return res.status(400).json({ error: "Gym Address is required." });
-  }
-
-  if (!validator.isEmail(email)) {
-    return res.status(400).json({ error: "Invalid email address" });
-  }
-
   if (!validator.isLength(trimmedFirstName, { min: 1 })) {
     return res.status(400).json({ error: "First name is required." });
   }
@@ -130,6 +106,46 @@ const registerOwner = asyncHandler(async (req, res) => {
 
   if (!validator.isLength(trimmedLastName, { min: 1 })) {
     return res.status(400).json({ error: "Last name is required." });
+  }
+
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ error: "Invalid email address" });
+  }
+
+  if (!validator.isLength(trimmedGymName, { min: 1 })) {
+    return res.status(400).json({ error: "Gym name is required." });
+  }
+
+  if (!validator.isLength(trimmedContact, { min: 1 })) {
+    return res.status(400).json({ error: "Contact number is invalid" });
+  }
+
+  if (!validator.isLength(trimmedAddress, { min: 1 })) {
+    return res.status(400).json({ error: "Gym Address is required." });
+  }
+
+  if (!Array.isArray(gymLocation) && gymLocation.length === 0) {
+    return res.status(400).json({ error: "Location is invalid" });
+  }
+
+  if (!validator.isLength(trimmedDesc, { min: 1 })) {
+    return res.status(400).json({ error: "Gym Description is required." });
+  }
+
+  if (!validator.isLength(startday, { min: 1 })) {
+    return res.status(400).json({ error: "Opening day is required." });
+  }
+
+  if (!validator.isLength(endday, { min: 1 })) {
+    return res.status(400).json({ error: "Closing day is required." });
+  }
+
+  if (!validator.isLength(opentime, { min: 1 })) {
+    return res.status(400).json({ error: "Opening time is required." });
+  }
+
+  if (!validator.isLength(closetime, { min: 1 })) {
+    return res.status(400).json({ error: "Closing time is required." });
   }
 
   const hasUpperCase = /[A-Z]/.test(trimmedPassword);
@@ -152,66 +168,45 @@ const registerOwner = asyncHandler(async (req, res) => {
     res.status(400).json({ error: "User already exists." });
     throw new Error("User already exists.");
   }
-  const newUser = await GymOwner.create({
-    _id: newMongoDbUserId,
-    firstname: trimmedFirstName,
-    middlename: trimmedMiddleName,
-    lastname: trimmedLastName,
-    email: email,
-    password: trimmedPassword,
-    gym: {
-      gymname: trimmedGymName,
-      contact: trimmedContact,
-      description: trimmedDesc,
-      address: trimmedAddress,
-      gymLocation: gymLocation,
-      permitBase64: base64Data,
-      schedule: {
-        startday: startday,
-        endday: endday,
-        opentime: opentime,
-        closetime: closetime,
-      },
-    },
-  });
 
-  if (newUser) {
-    const mainFolderPath = path.join(
-      process.cwd(),
-      "backend",
-      "uploads",
-      newMongoDbUserId.toString()
-    );
+  if (permitImage) {
+    const uploadRes = await cloudinary.uploader.upload(permitImage, {
+      upload_preset: "business-permits",
+    });
 
-    const subfolders = ["permit", "services", "amenities", "equipments"];
+    if (uploadRes) {
+      const newUser = await GymOwner.create({
+        firstname: trimmedFirstName,
+        middlename: trimmedMiddleName,
+        lastname: trimmedLastName,
+        email: email,
+        password: trimmedPassword,
+        gym: {
+          gymname: trimmedGymName,
+          contact: trimmedContact,
+          description: trimmedDesc,
+          address: trimmedAddress,
+          gymLocation: gymLocation,
+          permitImage: uploadRes,
+          schedule: {
+            startday: startday,
+            endday: endday,
+            opentime: opentime,
+            closetime: closetime,
+          },
+        },
+      });
 
-    try {
-      // Create the main folder if it doesn't exist
-      if (!fs.existsSync(mainFolderPath)) {
-        await fs.promises.mkdir(mainFolderPath);
-
-        // Create subfolders
-        for (const subfolder of subfolders) {
-          const subfolderPath = path.join(mainFolderPath, subfolder);
-          await fs.promises.mkdir(subfolderPath);
-          // Additional logic for each subfolder can be added here
-        }
-
-        res.status(201).json({
-          message: "Account Created Successfully!",
-        });
-      } else {
-        res.status(400).json({ error: "Folder is already existing." });
-        throw new Error("Folder is already existing.");
-      }
-    } catch (error) {
-      // Handle the error appropriately
-      console.error("Error creating folders:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+      return res.status(201).json({
+        message: "Successfully created new account",
+        gymname: newUser.gym.gymname,
+      });
+    } else {
+      res.status(400).json({
+        message: "Failed to create account",
+      });
+      throw new Error("Failed to create account");
     }
-  } else {
-    res.status(400).json({ error: "Invalid user data." });
-    throw new Error("Invalid user data.");
   }
 });
 

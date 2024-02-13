@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -10,13 +9,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 
-const GymSignUpDetails = ({ setState, setForm, signUpForm }) => {
-  const [firstName, setFirstName] = useState("");
-  const [middleName, setMiddleName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
+const GymSignUpDetails = ({ setState, setSignUpForm, signUpForm }) => {
   const toast = useToast();
 
   return (
@@ -42,24 +35,39 @@ const GymSignUpDetails = ({ setState, setForm, signUpForm }) => {
             placeholder="First name"
             bgColor="neutral.100"
             height="45px"
-            onChange={(e) => setFirstName(e.target.value)}
-            value={firstName}
+            onChange={(e) =>
+              setSignUpForm({
+                ...signUpForm,
+                firstname: e.target.value,
+              })
+            }
+            value={signUpForm.firstname}
           />
           <Input
             type="text"
             placeholder="Middle name"
             bgColor="neutral.100"
             height="45px"
-            onChange={(e) => setMiddleName(e.target.value)}
-            value={middleName}
+            onChange={(e) =>
+              setSignUpForm({
+                ...signUpForm,
+                middlename: e.target.value,
+              })
+            }
+            value={signUpForm.middlename}
           />
           <Input
             type="text"
             placeholder="Last name"
             bgColor="neutral.100"
             height="45px"
-            onChange={(e) => setLastName(e.target.value)}
-            value={lastName}
+            onChange={(e) =>
+              setSignUpForm({
+                ...signUpForm,
+                lastname: e.target.value,
+              })
+            }
+            value={signUpForm.lastname}
           />
         </Flex>
         <Input
@@ -67,16 +75,26 @@ const GymSignUpDetails = ({ setState, setForm, signUpForm }) => {
           placeholder="Email Address"
           bgColor="neutral.100"
           height="45px"
-          onChange={(e) => setEmail(e.target.value)}
-          value={email}
+          onChange={(e) =>
+            setSignUpForm({
+              ...signUpForm,
+              email: e.target.value,
+            })
+          }
+          value={signUpForm.email}
         />
         <Input
           type="password"
           placeholder="Password"
           bgColor="neutral.100"
           height="45px"
-          onChange={(e) => setPassword(e.target.value)}
-          value={password}
+          onChange={(e) =>
+            setSignUpForm({
+              ...signUpForm,
+              password: e.target.value,
+            })
+          }
+          value={signUpForm.password}
         />
       </VStack>
       <Button
@@ -88,7 +106,13 @@ const GymSignUpDetails = ({ setState, setForm, signUpForm }) => {
         _hover={{ bgColor: "gray.400", color: "brand.200" }}
         fontSize="1.1rem"
         onClick={() => {
-          if (!firstName || !middleName || !lastName || !email || !password) {
+          if (
+            signUpForm.firstname.length === 0 ||
+            signUpForm.middlename.length === 0 ||
+            signUpForm.lastname.length === 0 ||
+            signUpForm.email.length === 0 ||
+            signUpForm.password.length === 0
+          ) {
             toast({
               title: "All fields are required",
               status: "error",
@@ -97,14 +121,6 @@ const GymSignUpDetails = ({ setState, setForm, signUpForm }) => {
             });
             return;
           } else {
-            setForm({
-              ...signUpForm,
-              firstname: firstName,
-              middlename: middleName,
-              lastname: lastName,
-              email,
-              password,
-            });
             setState("info");
           }
         }}

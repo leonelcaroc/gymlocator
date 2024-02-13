@@ -1,111 +1,115 @@
-import React, { useState } from "react";
 import {
   Box,
   Button,
   Text,
-  Center,
   Input,
   Flex,
-  VStack,
   Divider,
-  Modal,
-  ModalOverlay,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMap,
-  useMapEvents,
-} from "react-leaflet";
-import L from "leaflet";
-import { Icon } from "leaflet";
-import GetCoordinates from "../components/GetCoordinates/GetCoordinates";
+
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "react-query";
-import axios from "axios";
-const apiUrl =
-  import.meta.env.MODE === "production"
-    ? "https://gymlocator.co/api"
-    : "http://localhost:5000/api";
+import { postRegisterOwner } from "../api/ownerApi/ownerApi";
+import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
 
-const GymSignUpPermit = ({ setState, signUpForm, setForm }) => {
+const center = { lat: 6.919008776885199, lng: 122.07734107888048 };
+
+const GymSignUpPermit = ({ setState, signUpForm, setSignUpForm }) => {
   const navigate = useNavigate();
   const toast = useToast();
 
   const queryClient = useQueryClient();
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const [gymLocation, setGymLocation] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-
-  const isValidFileType = (file) => {
-    const allowedFileTypes = ["image/png", "image/jpeg", "image/jpg"];
-    return allowedFileTypes.includes(file.type);
-  };
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAP_API_KEY,
+  });
 
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
+    const files = event.target.files;
 
-    if (file && isValidFileType(file)) {
-      setSelectedFile(file);
-      setForm({ ...signUpForm, base64Data: file.name });
-      // Additional actions with the valid file
-    } else {
-      // Clear selected file if not valid
-      setSelectedFile(null);
-      toast({
-        title: "Please select a valid PNG or JPG file.",
+    if (files.length === 0) {
+      return;
+    }
+
+    const file = files[0];
+    const allowedFileTypes = ["image/jpeg", "image/jpg"];
+
+    if (!allowedFileTypes.includes(file?.type)) {
+      return toast({
+        title: "Please select a valid jpg, or jpeg file.",
         status: "error",
         duration: 2000,
         position: "bottom-right",
       });
     }
-  };
 
-  const customIcon = new Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
-    iconSize: [38, 38],
-  });
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setSignUpForm((form) => {
+        return {
+          ...form,
+          permitImage: reader.result,
+          imageName:
+            file.name.length > 15
+              ? file.name.split(".")[0]
+              : file.name.split(".")[0],
+          imageType: file.type.split("/")[1],
+        };
+      });
+    };
+  };
 
   const registerMutation = useMutation(
     async (formData) => {
-      const response = await axios.post(
-        // "http://localhost:5000/api/gymowner/register",
-        `${apiUrl}/gymowner/register`,
-
-        formData
+      return postRegisterOwner(
+        formData.firstname,
+        formData.middlename,
+        formData.lastname,
+        formData.email,
+        formData.password,
+        formData.gymname,
+        formData.contact,
+        formData.address,
+        formData.gymLocation,
+        formData.description,
+        formData.startday,
+        formData.endday,
+        formData.opentime,
+        formData.closetime,
+        formData.permitImage
       );
-      return response.data;
     },
     {
       onSuccess: (data) => {
-        // Save the data to localStorage or perform other actions
+        setSignUpForm({
+          firstname: "",
+          middlename: "",
+          lastname: "",
+          email: "",
+          password: "",
+          gymname: "",
+          contact: "",
+          address: "",
+          gymLocation: [],
+          description: "",
+          startday: "",
+          endday: "",
+          opentime: "",
+          closetime: "",
+          permitImage: "",
+        });
+
         toast({
           title: data.message,
           status: "success",
           duration: 3000,
           position: "bottom-right",
         });
-        setGymLocation(null);
-        setSelectedFile(null);
-        setForm(() => {
-          return {};
-        });
 
         navigate("/gym/login");
-
-        // Invalidate and refetch any queries that depend on the user data
-        queryClient.invalidateQueries("gymOwnerData");
       },
       onError: (error) => {
         toast({
@@ -119,81 +123,40 @@ const GymSignUpPermit = ({ setState, signUpForm, setForm }) => {
   );
 
   const handleRegisterOwner = async () => {
-    if (!selectedFile) {
-      toast({
-        title: "Please upload a business permit.",
+    if (signUpForm.permitImage.length === 0) {
+      return toast({
+        title: "Please upload your business permit.",
         status: "error",
         duration: 2000,
         position: "bottom-right",
       });
-    } else if (!gymLocation) {
-      toast({
+    }
+
+    if (signUpForm.gymLocation?.length === 0) {
+      return toast({
         title: "Please pin your gym location.",
         status: "error",
         duration: 2000,
         position: "bottom-right",
       });
-    } else {
-      registerMutation.mutate(signUpForm);
-
-      // console.log(signUpForm);
     }
+
+    registerMutation.mutate(signUpForm);
   };
 
+  const onMapClick = (e) => {
+    setSignUpForm((prev) => ({
+      ...prev,
+      gymLocation: [e.latLng.lat(), e.latLng.lng()],
+    }));
+  };
+
+  if (!isLoaded) {
+    return;
+  }
+
   return (
-    <>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent minWidth="35rem" minHeight="1rem">
-          <ModalHeader>Pin Your Gym Location</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Box
-              height="30rem"
-              width="100%"
-              borderRadius="10px"
-              padding="10px"
-              bgColor="gray.100"
-            >
-              <MapContainer
-                center={[6.90572175274272, 122.07578659057619]}
-                zoom={13}
-                scrollWheelZoom={true}
-                animate={true}
-                easeLinearity={0.35}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-
-                {gymLocation ? (
-                  <Marker icon={customIcon} position={gymLocation} />
-                ) : null}
-                <GetCoordinates setPosition={setGymLocation} />
-              </MapContainer>
-            </Box>
-          </ModalBody>
-
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button
-              color="neutral.100"
-              bgColor="brand.100"
-              onClick={() => {
-                setForm((prev) => {
-                  return { ...prev, gymLocation: gymLocation };
-                });
-                onClose();
-              }}
-            >
-              Pin Location
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+    <Flex alignItems="center" gap={8}>
       <Box marginBottom="3rem">
         <Text color="gray.100" fontSize="3rem" fontWeight="800">
           Welcome to{" "}
@@ -211,7 +174,7 @@ const GymSignUpPermit = ({ setState, signUpForm, setForm }) => {
 
         <Flex alignItems="center" marginBottom="1.5rem">
           <Text fontSize="1.1rem" color="gray.300">
-            Select a PDF, JPG, or PNG file:
+            Select a JPEG or JPG file:
           </Text>
           <Input
             id="upload-permit"
@@ -219,32 +182,35 @@ const GymSignUpPermit = ({ setState, signUpForm, setForm }) => {
             display="none"
             onChange={handleFileChange}
           />
-          <Text
-            id="upload-permit-id"
+          <Button
             as="label"
             htmlFor="upload-permit"
             marginInline="0.8rem 1.2rem"
+            cursor="pointer"
+            disabled={registerMutation.isLoading}
           >
             Choose file
-          </Text>
-          <Text color="neutral.100" fontSize="1.1rem">
-            {selectedFile
-              ? `${selectedFile.name.slice(0, 5)}...${selectedFile.name
-                  .split(".")[0]
-                  .slice(-5)}.${selectedFile.name.split(".")[1]}`
-              : "None"}
-          </Text>
+          </Button>
+
+          {signUpForm?.imageName?.length > 0 ? (
+            <Text color="neutral.100">
+              {signUpForm?.imageName?.length > 10
+                ? signUpForm?.imageName
+                    .slice(0, 10)
+                    .concat(`...${signUpForm?.imageType}`)
+                : signUpForm?.imageName?.concat(`.${signUpForm?.imageType}`)}
+            </Text>
+          ) : (
+            <Text color="neutral.100">No file uploaded</Text>
+          )}
         </Flex>
         <Flex gap="1rem" alignItems="center">
           <Text fontSize="1.1rem" color="gray.300">
-            Pin Your Location
+            *Please pin Your Location*
           </Text>
-          <Button onClick={onOpen} fontSize="1.1rem" color="black">
-            {gymLocation ? "Location Pinned" : "Pin Location"}
-          </Button>
         </Flex>
 
-        <Flex justifyContent="space-between">
+        <Flex justifyContent="space-between" mt="3rem">
           <Button
             width="48%"
             bgColor="brand.100"
@@ -254,6 +220,7 @@ const GymSignUpPermit = ({ setState, signUpForm, setForm }) => {
             _hover={{ bgColor: "gray.400", color: "brand.200" }}
             fontSize="1.1rem"
             onClick={() => setState("info")}
+            disabled={registerMutation.isLoading}
           >
             Previous
           </Button>
@@ -272,7 +239,33 @@ const GymSignUpPermit = ({ setState, signUpForm, setForm }) => {
           </Button>
         </Flex>
       </Box>
-    </>
+      <Box
+        position="relative"
+        height="30rem"
+        width="30rem"
+        borderRadius="10px"
+        padding="1rem"
+        bgColor="neutral.100"
+      >
+        <Box position="absolute" left="0" top="0" h="100%" w="100%">
+          <GoogleMap
+            center={center}
+            zoom={14}
+            mapContainerStyle={{ width: "100%", height: "100%" }}
+            onClick={onMapClick}
+          >
+            {signUpForm.gymLocation.length !== 0 && (
+              <Marker
+                position={{
+                  lat: signUpForm.gymLocation[0],
+                  lng: signUpForm.gymLocation[1],
+                }}
+              />
+            )}
+          </GoogleMap>
+        </Box>
+      </Box>
+    </Flex>
   );
 };
 

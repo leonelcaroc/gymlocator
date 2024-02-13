@@ -43,40 +43,8 @@ import {
   addNewMember,
 } from "../controllers/gymOwnerController.js";
 import { protectOwner } from "../middleware/gymOwnerAuthMiddleware.js";
-import multer from "multer";
 
-const multerUpload = (pathFolder) => {
-  const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      const destinationPath = `backend/uploads/${req.user._id}/${pathFolder}`;
-
-      console.log(req.user._id);
-      console.log(req.body.serviceName);
-      console.log(req.body.description);
-      console.log(file);
-
-      // cb(null, destinationPath);
-    },
-    filename: (req, file, cb) => {
-      cb(
-        null,
-        file.fieldname + "_" + Date.now() + path.extname(file.originalname)
-      );
-    },
-  });
-
-  const upload = multer({
-    storage: storage,
-  });
-
-  return upload;
-};
-
-router.post(
-  "/register",
-  // upload.single("file"),
-  registerOwner
-);
+router.post("/register", registerOwner);
 router.post("/auth", authOwner);
 // router.post("/logout", logoutOwner);
 router.route("/dashboard").get(protectOwner, getOwnerDashboard);

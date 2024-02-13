@@ -12,21 +12,45 @@ const apiUrl =
 
 const GymOwnerSignUp = () => {
   const [state, setState] = useState("details");
-  const [signUpForm, setForm] = useState({});
+  const [signUpForm, setSignUpForm] = useState({
+    firstname: "",
+    middlename: "",
+    lastname: "",
+    email: "",
+    password: "",
+    gymname: "",
+    contact: "",
+    address: "",
+    gymLocation: [],
+    description: "",
+    startday: "",
+    endday: "",
+    opentime: "",
+    closetime: "",
+    permitImage: "",
+  });
 
-  // const apiUrl =
-  // import.meta.env.MODE === "production"
-  //   ? "https://gymlocator.co/api"
-  //   : "http://localhost:5000/api";
-
-  // const apiUrl = import.meta.env.MODE;
-  // const apiUrl = import.meta.env.DEV;
-  // const apiUrl = import.meta.env.PROD;
-  // const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
-
-  // const apiUrl = import.meta.env.VITE_API_DEV_URL;
-
-  // console.log(apiUrl);
+  useEffect(() => {
+    return () => {
+      setSignUpForm({
+        firstname: "",
+        middlename: "",
+        lastname: "",
+        email: "",
+        password: "",
+        gymname: "",
+        contact: "",
+        address: "",
+        gymLocation: [],
+        description: "",
+        startday: "",
+        endday: "",
+        opentime: "",
+        closetime: "",
+        permitImage: "",
+      });
+    };
+  }, []);
 
   return (
     <Center
@@ -40,21 +64,21 @@ const GymOwnerSignUp = () => {
       {state === "details" && (
         <GymSignUpDetails
           setState={setState}
-          setForm={setForm}
+          setSignUpForm={setSignUpForm}
           signUpForm={signUpForm}
         />
       )}
       {state === "info" && (
         <GymSignUpInfo
           setState={setState}
-          setForm={setForm}
+          setSignUpForm={setSignUpForm}
           signUpForm={signUpForm}
         />
       )}
       {state === "permit" && (
         <GymSignUpPermit
           setState={setState}
-          setForm={setForm}
+          setSignUpForm={setSignUpForm}
           signUpForm={signUpForm}
         />
       )}

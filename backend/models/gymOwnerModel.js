@@ -165,8 +165,8 @@ const gymSchema = mongoose.Schema({
     type: scheduleSchema,
     required: true,
   },
-  permitBase64: {
-    type: String,
+  permitImage: {
+    type: Object,
     required: true,
   },
   equipments: {

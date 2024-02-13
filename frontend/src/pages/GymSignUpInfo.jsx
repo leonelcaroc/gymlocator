@@ -13,18 +13,8 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import gym from "../assets/images/background.webp";
-import { useNavigate } from "react-router-dom";
 
-const GymSignUpInfo = ({ setState, signUpForm, setForm }) => {
-  const [gymName, setGymName] = useState("");
-  const [contactNumber, setContactNumber] = useState("");
-  const [address, setAddress] = useState("");
-  const [gymDescription, setGymDescription] = useState("");
-  const [daysOpen, setDaysOpen] = useState("");
-  const [daysClose, setDaysClose] = useState("");
-  const [openingTime, setOpeningTime] = useState("");
-  const [closingTime, setClosingTime] = useState("");
-
+const GymSignUpInfo = ({ setState, signUpForm, setSignUpForm }) => {
   const toast = useToast();
 
   return (
@@ -50,8 +40,13 @@ const GymSignUpInfo = ({ setState, signUpForm, setForm }) => {
           bgColor="neutral.100"
           height="45px"
           width="100%"
-          onChange={(e) => setGymName(e.target.value)}
-          value={gymName}
+          onChange={(e) =>
+            setSignUpForm({
+              ...signUpForm,
+              gymname: e.target.value,
+            })
+          }
+          value={signUpForm.gymname}
         />
         <Input
           type="text"
@@ -59,8 +54,13 @@ const GymSignUpInfo = ({ setState, signUpForm, setForm }) => {
           bgColor="neutral.100"
           height="45px"
           width="100%"
-          onChange={(e) => setContactNumber(e.target.value)}
-          value={contactNumber}
+          onChange={(e) =>
+            setSignUpForm({
+              ...signUpForm,
+              contact: e.target.value,
+            })
+          }
+          value={signUpForm.contact}
         />
         <Input
           type="text"
@@ -68,8 +68,13 @@ const GymSignUpInfo = ({ setState, signUpForm, setForm }) => {
           bgColor="neutral.100"
           height="45px"
           width="100%"
-          onChange={(e) => setAddress(e.target.value)}
-          value={address}
+          onChange={(e) =>
+            setSignUpForm({
+              ...signUpForm,
+              address: e.target.value,
+            })
+          }
+          value={signUpForm.address}
         />
         <Input
           type="text"
@@ -77,8 +82,13 @@ const GymSignUpInfo = ({ setState, signUpForm, setForm }) => {
           bgColor="neutral.100"
           height="45px"
           width="100%"
-          onChange={(e) => setGymDescription(e.target.value)}
-          value={gymDescription}
+          onChange={(e) =>
+            setSignUpForm({
+              ...signUpForm,
+              description: e.target.value,
+            })
+          }
+          value={signUpForm.description}
         />
         <HStack>
           <HStack width="50%">
@@ -90,8 +100,13 @@ const GymSignUpInfo = ({ setState, signUpForm, setForm }) => {
                 placeholder="Select option"
                 bgColor="neutral.100"
                 height="45px"
-                onChange={(e) => setDaysOpen(e.target.value)}
-                value={daysOpen}
+                onChange={(e) =>
+                  setSignUpForm({
+                    ...signUpForm,
+                    startday: e.target.value,
+                  })
+                }
+                value={signUpForm.startday}
               >
                 <option value="Monday">Monday</option>
                 <option value="Tuesday">Tuesday</option>
@@ -111,8 +126,13 @@ const GymSignUpInfo = ({ setState, signUpForm, setForm }) => {
                 placeholder="Select option"
                 bgColor="neutral.100"
                 height="45px"
-                onChange={(e) => setDaysClose(e.target.value)}
-                value={daysClose}
+                onChange={(e) =>
+                  setSignUpForm({
+                    ...signUpForm,
+                    endday: e.target.value,
+                  })
+                }
+                value={signUpForm.endday}
               >
                 <option value="Monday">Monday</option>
                 <option value="Tuesday">Tuesday</option>
@@ -135,8 +155,13 @@ const GymSignUpInfo = ({ setState, signUpForm, setForm }) => {
                 type="time"
                 bgColor="neutral.100"
                 height="45px"
-                onChange={(e) => setOpeningTime(e.target.value)}
-                value={openingTime}
+                onChange={(e) =>
+                  setSignUpForm({
+                    ...signUpForm,
+                    opentime: e.target.value,
+                  })
+                }
+                value={signUpForm.opentime}
               />
             </Box>
             <Box>
@@ -149,8 +174,13 @@ const GymSignUpInfo = ({ setState, signUpForm, setForm }) => {
                 type="time"
                 bgColor="neutral.100"
                 height="45px"
-                onChange={(e) => setClosingTime(e.target.value)}
-                value={closingTime}
+                onChange={(e) =>
+                  setSignUpForm({
+                    ...signUpForm,
+                    closetime: e.target.value,
+                  })
+                }
+                value={signUpForm.closetime}
               />
             </Box>
           </HStack>
@@ -179,14 +209,14 @@ const GymSignUpInfo = ({ setState, signUpForm, setForm }) => {
           fontSize="1.1rem"
           onClick={() => {
             if (
-              !gymName ||
-              !contactNumber ||
-              !address ||
-              !gymDescription ||
-              !daysOpen ||
-              !daysClose ||
-              !openingTime ||
-              !closingTime
+              signUpForm.gymname.length === 0 ||
+              signUpForm.contact.length === 0 ||
+              signUpForm.address.length === 0 ||
+              signUpForm.description.length === 0 ||
+              signUpForm.startday.length === 0 ||
+              signUpForm.endday.length === 0 ||
+              signUpForm.opentime.length === 0 ||
+              signUpForm.closetime.length === 0
             ) {
               toast({
                 title: "All fields are required",
@@ -196,17 +226,6 @@ const GymSignUpInfo = ({ setState, signUpForm, setForm }) => {
               });
               return;
             } else {
-              setForm({
-                ...signUpForm,
-                gymname: gymName,
-                contact: contactNumber,
-                description: gymDescription,
-                startday: daysOpen,
-                endday: daysClose,
-                opentime: openingTime,
-                closetime: closingTime,
-                address: address,
-              });
               setState("permit");
             }
           }}
