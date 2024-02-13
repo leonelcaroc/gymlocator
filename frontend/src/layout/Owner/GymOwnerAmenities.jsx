@@ -1,10 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Box,
   Button,
-  Divider,
   Flex,
-  Heading,
   Input,
   Image,
   Stack,
@@ -39,6 +37,14 @@ import {
 const GymOwnerAmenities = () => {
   const toast = useToast();
   const queryClient = useQueryClient();
+
+  const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastPost = currentPage * itemsPerPage;
+  const indexOfFirstPost = indexOfLastPost - itemsPerPage;
+  const currentPosts = posts?.slice(indexOfFirstPost, indexOfLastPost);
 
   const [newAmenity, setNewAmenity] = useState({
     amenityName: "",
@@ -212,7 +218,6 @@ const GymOwnerAmenities = () => {
 
   const handleSaveEdit = async () => {
     updateAmenityMutation.mutate(selectedAmenity);
-    // console.log(selectedAmenity);
   };
 
   const handleCloseEdit = () => {
@@ -242,7 +247,6 @@ const GymOwnerAmenities = () => {
     const files = event.target.files;
 
     if (files.length === 0) {
-      // User canceled file selection
       return;
     }
 
@@ -323,6 +327,10 @@ const GymOwnerAmenities = () => {
     setSelectedImageUrl(null);
     closeImage();
   };
+
+  useEffect(() => {
+    setPosts(data);
+  }, [data]);
 
   return (
     <Box padding="2rem">
@@ -551,8 +559,8 @@ const GymOwnerAmenities = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {data?.length !== 0 ? (
-                  data?.map((item) => (
+                {currentPosts?.length !== 0 ? (
+                  currentPosts?.map((item) => (
                     <Tr key={item._id}>
                       <Td>{item.amenityName}</Td>
                       <Td>{item.description}</Td>
@@ -582,7 +590,10 @@ const GymOwnerAmenities = () => {
                           bgColor="red"
                           color="white"
                           onClick={() => handleOpenDelete(item)}
-                          isLoading={deleteAmenityMutation.isLoading}
+                          isLoading={
+                            deleteAmenityMutation.isLoading &&
+                            deleteAmenityMutation.variables?._id === item._id
+                          }
                         >
                           Delete
                         </Button>
@@ -600,6 +611,37 @@ const GymOwnerAmenities = () => {
             </Table>
           </TableContainer>
         )}
+
+        {data?.length !== 0 && !isLoading ? (
+          <Flex
+            alignItems="center"
+            gap={5}
+            mt={5}
+            justifyContent="center"
+            mr={10}
+          >
+            <Button
+              isDisabled={currentPage === 1}
+              onClick={() => {
+                if (currentPage !== 1) setCurrentPage(currentPage - 1);
+              }}
+            >
+              Previous
+            </Button>
+            {currentPage} of {Math.ceil(data?.length / itemsPerPage)}
+            <Button
+              isDisabled={
+                currentPage === Math.ceil(data?.length / itemsPerPage)
+              }
+              onClick={() => {
+                if (currentPage !== posts.length)
+                  setCurrentPage(currentPage + 1);
+              }}
+            >
+              Next
+            </Button>
+          </Flex>
+        ) : null}
       </Box>
     </Box>
   );

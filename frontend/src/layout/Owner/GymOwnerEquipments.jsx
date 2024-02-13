@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -40,6 +40,13 @@ const GymOwnerEquipments = () => {
   const toast = useToast();
   const queryClient = useQueryClient();
 
+  const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastPost = currentPage * itemsPerPage;
+  const indexOfFirstPost = indexOfLastPost - itemsPerPage;
+  const currentPosts = posts?.slice(indexOfFirstPost, indexOfLastPost);
   const [newEquipment, setNewEquipment] = useState({
     equipmentName: "",
     description: "",
@@ -326,6 +333,10 @@ const GymOwnerEquipments = () => {
     closeImage();
   };
 
+  useEffect(() => {
+    setPosts(data);
+  }, [data]);
+
   return (
     <Box padding="2rem">
       {/* Add Amenity */}
@@ -563,8 +574,8 @@ const GymOwnerEquipments = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {data?.length !== 0 ? (
-                  data?.map((item) => (
+                {currentPosts?.length !== 0 ? (
+                  currentPosts?.map((item) => (
                     <Tr key={item._id}>
                       <Td>{item.equipmentName}</Td>
                       <Td>{item.description}</Td>
@@ -615,6 +626,33 @@ const GymOwnerEquipments = () => {
           </TableContainer>
         )}
       </Box>
+      {data?.length !== 0 && !isLoading ? (
+        <Flex
+          alignItems="center"
+          gap={5}
+          mt={5}
+          justifyContent="center"
+          mr={10}
+        >
+          <Button
+            isDisabled={currentPage === 1}
+            onClick={() => {
+              if (currentPage !== 1) setCurrentPage(currentPage - 1);
+            }}
+          >
+            Previous
+          </Button>
+          {currentPage} of {Math.ceil(data?.length / itemsPerPage)}
+          <Button
+            isDisabled={currentPage === Math.ceil(data?.length / itemsPerPage)}
+            onClick={() => {
+              if (currentPage !== posts.length) setCurrentPage(currentPage + 1);
+            }}
+          >
+            Next
+          </Button>
+        </Flex>
+      ) : null}
     </Box>
   );
 };

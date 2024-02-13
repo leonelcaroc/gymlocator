@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Text,
   Box,
@@ -24,6 +24,14 @@ import { postAddNewMember } from "../../api/ownerApi/privateOwnerApi";
 const GymOwnerMemberManagement = () => {
   const toast = useToast();
   const queryClient = useQueryClient();
+
+  const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastPost = currentPage * itemsPerPage;
+  const indexOfFirstPost = indexOfLastPost - itemsPerPage;
+  const currentPosts = posts?.slice(indexOfFirstPost, indexOfLastPost);
 
   const {
     isOpen: isAddMemberOpen,
@@ -105,6 +113,10 @@ const GymOwnerMemberManagement = () => {
     }
   );
 
+  useEffect(() => {
+    setPosts(gymMembers);
+  }, [gymMembers]);
+
   return (
     <Box padding="2rem">
       {/* Add Member */}
@@ -158,7 +170,7 @@ const GymOwnerMemberManagement = () => {
           </Thead>
           <Tbody>
             {gymMembers?.length > 0 ? (
-              gymMembers?.map((item) => (
+              currentPosts?.map((item) => (
                 <Tr key={item.user._id}>
                   <Td whiteSpace="normal">
                     {item.user.firstname} {item.user.lastname}
@@ -206,6 +218,35 @@ const GymOwnerMemberManagement = () => {
           </Tbody>
         </Table>
       </TableContainer>
+      {gymMembers?.length !== 0 && !gymMemberLoading ? (
+        <Flex
+          alignItems="center"
+          gap={5}
+          mt={5}
+          justifyContent="center"
+          mr={10}
+        >
+          <Button
+            isDisabled={currentPage === 1}
+            onClick={() => {
+              if (currentPage !== 1) setCurrentPage(currentPage - 1);
+            }}
+          >
+            Previous
+          </Button>
+          {currentPage} of {Math.ceil(gymMembers?.length / itemsPerPage)}
+          <Button
+            isDisabled={
+              currentPage === Math.ceil(gymMembers?.length / itemsPerPage)
+            }
+            onClick={() => {
+              if (currentPage !== posts.length) setCurrentPage(currentPage + 1);
+            }}
+          >
+            Next
+          </Button>
+        </Flex>
+      ) : null}
     </Box>
   );
 };

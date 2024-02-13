@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Text,
   Box,
@@ -39,6 +39,15 @@ const GymOwnerAnnouncement = () => {
   const toast = useToast();
   const queryClient = useQueryClient();
 
+  const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastPost = currentPage * itemsPerPage;
+  const indexOfFirstPost = indexOfLastPost - itemsPerPage;
+  const currentPosts = posts?.slice(indexOfFirstPost, indexOfLastPost);
+
+  const [selectedItem, setSelectedItem] = useState(null);
   const [newAnnouncement, setNewAnnouncement] = useState("");
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [selectedDeleteAnnouncement, setSelectedDeleteAnnouncement] =
@@ -150,6 +159,11 @@ const GymOwnerAnnouncement = () => {
   );
 
   const {
+    isOpen: isSelectedItemOpen,
+    onOpen: openSelectedItem,
+    onClose: closeSelectedItem,
+  } = useDisclosure();
+  const {
     isOpen: isAddAnnouncementOpen,
     onOpen: openAddAnnouncement,
     onClose: closeAddAnnouncement,
@@ -215,8 +229,39 @@ const GymOwnerAnnouncement = () => {
     // Reset the edited data to the original data or fetch from your backend
   };
 
+  const handleOpenItem = (item) => {
+    setSelectedItem(item);
+    openSelectedItem();
+  };
+
+  const handleCloseItem = () => {
+    setSelectedItem(null);
+    closeSelectedItem();
+  };
+
+  useEffect(() => {
+    setPosts(data);
+  }, [data]);
+
   return (
     <Box padding="2rem">
+      {/* Show Gym Announcement Modal */}
+      <Modal isOpen={isSelectedItemOpen} onClose={handleCloseItem}>
+        <ModalOverlay />
+        <ModalContent paddingInline="2rem" maxWidth="35rem">
+          <ModalHeader>{selectedItem?.gymname}</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>{selectedItem?.announcement}</Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="gray" mr={3} onClick={handleCloseItem}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
       {/* Add Announcement */}
 
       <Modal
@@ -348,9 +393,18 @@ const GymOwnerAnnouncement = () => {
                     </Td>
                   </Tr>
                 ) : (
-                  data?.map((item) => (
-                    <Tr key={item._id}>
-                      <Td whiteSpace="normal">{item.announcement}</Td>
+                  currentPosts?.map((item) => (
+                    <Tr
+                      key={item._id}
+                      _hover={{ bgColor: "gray.300" }}
+                      cursor="pointer"
+                      onClick={() => handleOpenItem(item)}
+                    >
+                      <Td whiteSpace="normal">
+                        {item.announcement.length > 15
+                          ? item.announcement.slice(0, 15).concat("...")
+                          : item.announcement}
+                      </Td>
                       <Td whiteSpace="normal">
                         {format(item.createdAt, "MMMM d, yyyy - h:mma")}
                       </Td>
@@ -383,6 +437,36 @@ const GymOwnerAnnouncement = () => {
             </Table>
           </TableContainer>
         )}
+        {data?.length !== 0 && !isLoading ? (
+          <Flex
+            alignItems="center"
+            gap={5}
+            mt={5}
+            justifyContent="center"
+            mr={10}
+          >
+            <Button
+              isDisabled={currentPage === 1}
+              onClick={() => {
+                if (currentPage !== 1) setCurrentPage(currentPage - 1);
+              }}
+            >
+              Previous
+            </Button>
+            {currentPage} of {Math.ceil(data?.length / itemsPerPage)}
+            <Button
+              isDisabled={
+                currentPage === Math.ceil(data?.length / itemsPerPage)
+              }
+              onClick={() => {
+                if (currentPage !== posts.length)
+                  setCurrentPage(currentPage + 1);
+              }}
+            >
+              Next
+            </Button>
+          </Flex>
+        ) : null}
       </Box>
     </Box>
   );

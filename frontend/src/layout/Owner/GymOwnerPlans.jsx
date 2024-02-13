@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Text,
   Box,
@@ -37,6 +37,14 @@ import {
 const GymOwnerPlans = () => {
   const toast = useToast();
   const queryClient = useQueryClient();
+
+  const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastPost = currentPage * itemsPerPage;
+  const indexOfFirstPost = indexOfLastPost - itemsPerPage;
+  const currentPosts = posts?.slice(indexOfFirstPost, indexOfLastPost);
 
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [selectedDeletePlan, setSelectedDeletePlan] = useState(null);
@@ -218,6 +226,10 @@ const GymOwnerPlans = () => {
     closeDeletePlan();
     // Reset the edited data to the original data or fetch from your backend
   };
+
+  useEffect(() => {
+    setPosts(data);
+  }, [data]);
 
   return (
     <Box padding="2rem">
@@ -502,7 +514,7 @@ const GymOwnerPlans = () => {
                     </Td>
                   </Tr>
                 ) : (
-                  data?.map((item) => (
+                  currentPosts?.map((item) => (
                     <Tr key={item._id}>
                       <Td whiteSpace="normal">{item.planName}</Td>
                       <Td whiteSpace="normal">{item.duration}</Td>
@@ -542,6 +554,36 @@ const GymOwnerPlans = () => {
             </Table>
           </TableContainer>
         )}
+        {data?.length !== 0 && !isLoading ? (
+          <Flex
+            alignItems="center"
+            gap={5}
+            mt={5}
+            justifyContent="center"
+            mr={10}
+          >
+            <Button
+              isDisabled={currentPage === 1}
+              onClick={() => {
+                if (currentPage !== 1) setCurrentPage(currentPage - 1);
+              }}
+            >
+              Previous
+            </Button>
+            {currentPage} of {Math.ceil(data?.length / itemsPerPage)}
+            <Button
+              isDisabled={
+                currentPage === Math.ceil(data?.length / itemsPerPage)
+              }
+              onClick={() => {
+                if (currentPage !== posts.length)
+                  setCurrentPage(currentPage + 1);
+              }}
+            >
+              Next
+            </Button>
+          </Flex>
+        ) : null}
       </Box>
     </Box>
   );

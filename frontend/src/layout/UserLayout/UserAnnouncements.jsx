@@ -67,7 +67,7 @@ const UserAnnouncements = () => {
     closeSelectedItem();
   };
 
-  console.log(data);
+  // console.log(data);
 
   return (
     <Box padding="2rem">

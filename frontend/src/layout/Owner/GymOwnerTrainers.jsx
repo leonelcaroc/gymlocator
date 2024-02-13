@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   CloseButton,
   Box,
@@ -43,6 +43,14 @@ const GymOwnerTrainers = () => {
   const queryClient = useQueryClient();
 
   const newUniqueId = uuidv4();
+
+  const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastPost = currentPage * itemsPerPage;
+  const indexOfFirstPost = indexOfLastPost - itemsPerPage;
+  const currentPosts = posts?.slice(indexOfFirstPost, indexOfLastPost);
 
   // const [selectedTrainer, setSelectedTrainer] = useState(null);
   const [selectedDeleteTrainer, setSelectedDeleteTrainer] = useState(null);
@@ -267,6 +275,10 @@ const GymOwnerTrainers = () => {
     setSelectedDeleteTrainer(null);
     closeDeleteTrainer();
   };
+
+  useEffect(() => {
+    setPosts(data);
+  }, [data]);
 
   return (
     <Box padding="2rem">
@@ -553,6 +565,7 @@ const GymOwnerTrainers = () => {
               bgColor="brand.100"
               color="neutral.100"
               onClick={handleSubmitNewTrainer}
+              isLoading={addGymTrainerMutation.isLoading}
             >
               Add Trainer
             </Button>
@@ -597,7 +610,7 @@ const GymOwnerTrainers = () => {
         bgColor="brand.100"
         color="neutral.100"
         onClick={openAddNewTrainer}
-        isLoading={addGymTrainerMutation.isLoading}
+        // isLoading={addGymTrainerMutation.isLoading}
       >
         Add Trainer
       </Button>
@@ -620,7 +633,7 @@ const GymOwnerTrainers = () => {
                 </Td>
               </Tr>
             ) : (
-              data?.map((item) => (
+              currentPosts?.map((item) => (
                 <Tr key={item._id}>
                   <Td whiteSpace="normal">{item.firstname}</Td>
                   <Td whiteSpace="normal">{item.lastname}</Td>
@@ -667,6 +680,34 @@ const GymOwnerTrainers = () => {
           </Tbody>
         </Table>
       </TableContainer>
+
+      {data?.length !== 0 && !isLoading ? (
+        <Flex
+          alignItems="center"
+          gap={5}
+          mt={5}
+          justifyContent="center"
+          mr={10}
+        >
+          <Button
+            isDisabled={currentPage === 1}
+            onClick={() => {
+              if (currentPage !== 1) setCurrentPage(currentPage - 1);
+            }}
+          >
+            Previous
+          </Button>
+          {currentPage} of {Math.ceil(data?.length / itemsPerPage)}
+          <Button
+            isDisabled={currentPage === Math.ceil(data?.length / itemsPerPage)}
+            onClick={() => {
+              if (currentPage !== posts.length) setCurrentPage(currentPage + 1);
+            }}
+          >
+            Next
+          </Button>
+        </Flex>
+      ) : null}
     </Box>
   );
 };
