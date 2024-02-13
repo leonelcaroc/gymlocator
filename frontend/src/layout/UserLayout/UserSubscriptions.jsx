@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -32,6 +32,14 @@ import TokenService from "../../services/token";
 const UserSubscriptions = () => {
   const toast = useToast();
   const queryClient = useQueryClient();
+
+  const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastPost = currentPage * itemsPerPage;
+  const indexOfFirstPost = indexOfLastPost - itemsPerPage;
+  const currentPosts = posts?.slice(indexOfFirstPost, indexOfLastPost);
 
   const [selectedSub, setSelectedSub] = useState(null);
 
@@ -108,6 +116,10 @@ const UserSubscriptions = () => {
   //   // Reset the edited data to the original data or fetch from your backend
   // };
 
+  useEffect(() => {
+    setPosts(data);
+  }, [data]);
+
   return (
     <Box padding="2rem">
       {/* Cancel Sub Modal*/}
@@ -152,7 +164,7 @@ const UserSubscriptions = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {data?.map((item) => (
+            {currentPosts?.map((item) => (
               <Tr key={item._id}>
                 <Td whiteSpace="normal">{item.gym.gymname}</Td>
                 <Td>{formatDateToCustomFormat(item.myPlan.endTime)}</Td>
@@ -179,6 +191,33 @@ const UserSubscriptions = () => {
           </Tbody>
         </Table>
       </TableContainer>
+      {data?.length !== 0 && !isLoading ? (
+        <Flex
+          alignItems="center"
+          gap={5}
+          mt={5}
+          justifyContent="center"
+          mr={10}
+        >
+          <Button
+            isDisabled={currentPage === 1}
+            onClick={() => {
+              if (currentPage !== 1) setCurrentPage(currentPage - 1);
+            }}
+          >
+            Previous
+          </Button>
+          {currentPage} of {Math.ceil(data?.length / itemsPerPage)}
+          <Button
+            isDisabled={currentPage === Math.ceil(data?.length / itemsPerPage)}
+            onClick={() => {
+              if (currentPage !== posts.length) setCurrentPage(currentPage + 1);
+            }}
+          >
+            Next
+          </Button>
+        </Flex>
+      ) : null}
     </Box>
   );
 };

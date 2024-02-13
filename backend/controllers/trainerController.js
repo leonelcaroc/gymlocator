@@ -7,6 +7,7 @@ import asyncHandler from "express-async-handler";
 import Trainer from "../models/trainerModel.js";
 // import calculateEndTime from "../utils/calculateEndTime.js";
 // import { ObjectId } from "mongodb";
+import Class from "../models/classModel.js";
 import createToken from "../utils/createToken.js";
 // import stringifySafe from "json-stringify-safe";
 
@@ -45,7 +46,11 @@ const getMyClasses = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  res.status(200).json(user);
+  const assignedClasses = await Class.find({
+    _id: { $in: user.classes },
+  }).exec(); // Use exec() to execute the query and return a promise
+
+  res.status(200).json(assignedClasses);
 });
 
 export { authTrainer, getMyClasses };

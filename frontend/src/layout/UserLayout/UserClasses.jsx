@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import {
   Text,
   Box,
@@ -26,6 +26,14 @@ import TokenService from "../../services/token";
 const UserClasses = () => {
   const toast = useToast();
   const queryClient = useQueryClient();
+
+  const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastPost = currentPage * itemsPerPage;
+  const indexOfFirstPost = indexOfLastPost - itemsPerPage;
+  const currentPosts = posts?.slice(indexOfFirstPost, indexOfLastPost);
 
   const { data, isLoading, isError } = useQuery(
     "userClasses",
@@ -107,8 +115,9 @@ const UserClasses = () => {
     userWithdrawClassMutation.mutate(classItem._id);
   };
 
-  // console.log(data);
-
+  useEffect(() => {
+    setPosts(data);
+  }, [data]);
   return (
     <Box padding="2rem">
       <Text color="brand.200" fontSize="2rem" marginBottom="2rem">
@@ -127,60 +136,95 @@ const UserClasses = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {data?.map((item) => (
-              <Tr key={item._id}>
-                <Td whiteSpace="normal">{item.gymname}</Td>
-                <Td whiteSpace="normal">{item.classname}</Td>
-                <Td whiteSpace="normal">{item.instructor}</Td>
-                <Td
-                  whiteSpace="normal"
-                  display="flex"
-                  flexDir="column"
-                  gap="5px"
-                >
-                  <Text>{formatDateToCustomFormat(item.date)}</Text>
-                  <Text>
-                    {convertTo12HourFormat(item.starttime)} -{" "}
-                    {convertTo12HourFormat(item.endtime)}
-                  </Text>
-                </Td>
-                <Td>{`${item.joinedMember.length}/${item.capacity}`}</Td>
-                <Td display="flex">
-                  {item.joinedMember.includes(
-                    JSON.parse(TokenService.getUserLocal())._id
-                  ) ? (
-                    <Button
-                      bgColor="red"
-                      color="neutral.100"
-                      _hover={{ color: "red", bgColor: "gray.200" }}
-                      onClick={() => handleWithdrawClass(item)}
-                      isLoading={userWithdrawClassMutation.isLoading}
-                    >
-                      Withdraw
-                    </Button>
-                  ) : (
-                    <Button
-                      bgColor="brand.100"
-                      color="neutral.100"
-                      _hover={{ color: "brand.100", bgColor: "gray.200" }}
-                      onClick={() => handleJoinNow(item)}
-                      isLoading={userJoinClassMutation.isLoading}
-                    >
-                      Join Now
-                    </Button>
-                  )}
+            {data?.length !== 0 && !isLoading ? (
+              currentPosts?.map((item) => (
+                <Tr key={item._id}>
+                  <Td whiteSpace="normal">{item.gymname}</Td>
+                  <Td whiteSpace="normal">{item.classname}</Td>
+                  <Td whiteSpace="normal">{item.instructor}</Td>
+                  <Td
+                    whiteSpace="normal"
+                    display="flex"
+                    flexDir="column"
+                    gap="5px"
+                  >
+                    <Text>{formatDateToCustomFormat(item.date)}</Text>
+                    <Text>
+                      {convertTo12HourFormat(item.starttime)} -{" "}
+                      {convertTo12HourFormat(item.endtime)}
+                    </Text>
+                  </Td>
+                  <Td>{`${item.joinedMember.length}/${item.capacity}`}</Td>
+                  <Td display="flex">
+                    {item.joinedMember.includes(
+                      JSON.parse(TokenService.getUserLocal())._id
+                    ) ? (
+                      <Button
+                        bgColor="red"
+                        color="neutral.100"
+                        _hover={{ color: "red", bgColor: "gray.200" }}
+                        onClick={() => handleWithdrawClass(item)}
+                        isLoading={userWithdrawClassMutation.isLoading}
+                      >
+                        Withdraw
+                      </Button>
+                    ) : (
+                      <Button
+                        bgColor="brand.100"
+                        color="neutral.100"
+                        _hover={{ color: "brand.100", bgColor: "gray.200" }}
+                        onClick={() => handleJoinNow(item)}
+                        isLoading={userJoinClassMutation.isLoading}
+                      >
+                        Join Now
+                      </Button>
+                    )}
 
-                  {/* <Button
+                    {/* <Button
                   
                 >
                   Cancel
                 </Button> */}
+                  </Td>
+                </Tr>
+              ))
+            ) : (
+              <Tr>
+                <Td colSpan="6" textAlign="center">
+                  n/a
                 </Td>
               </Tr>
-            ))}
+            )}
           </Tbody>
         </Table>
       </TableContainer>
+      {posts?.length !== 0 && !isLoading ? (
+        <Flex
+          alignItems="center"
+          gap={5}
+          mt={5}
+          justifyContent="center"
+          mr={10}
+        >
+          <Button
+            isDisabled={currentPage === 1}
+            onClick={() => {
+              if (currentPage !== 1) setCurrentPage(currentPage - 1);
+            }}
+          >
+            Previous
+          </Button>
+          {currentPage} of {Math.ceil(data?.length / itemsPerPage)}
+          <Button
+            isDisabled={currentPage === Math.ceil(data?.length / itemsPerPage)}
+            onClick={() => {
+              if (currentPage !== posts.length) setCurrentPage(currentPage + 1);
+            }}
+          >
+            Next
+          </Button>
+        </Flex>
+      ) : null}
     </Box>
   );
 };

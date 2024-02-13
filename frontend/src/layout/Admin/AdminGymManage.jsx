@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Button,
   Text,
@@ -17,6 +17,7 @@ import {
   TableContainer,
   useDisclosure,
   useToast,
+  Spinner,
 } from "@chakra-ui/react";
 import AdminManageModal from "../../components/AdminManageModal/AdminManageModal";
 
@@ -30,18 +31,41 @@ const apiUrl =
     : "http://localhost:5000/api";
 
 const AdminGymManage = () => {
+  const toast = useToast();
+  const queryClient = useQueryClient();
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedOwner, setSelectedOwner] = useState(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState(null);
 
-  const toast = useToast();
-  const queryClient = useQueryClient();
+  const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastPost = currentPage * itemsPerPage;
+  const indexOfFirstPost = indexOfLastPost - itemsPerPage;
+  const currentPosts = posts?.slice(indexOfFirstPost, indexOfLastPost);
 
   const {
     isOpen: isImageOpen,
     onOpen: openImage,
     onClose: closeImage,
   } = useDisclosure();
+
+  const { data, isLoading, isError, refetch } = useQuery(
+    "ownersList",
+    async () => {
+      return axios
+        .get(`${apiUrl}/admin/owners`, {
+          headers: {
+            Authorization: `Bearer ${
+              JSON.parse(localStorage.getItem("adminInfo")).token
+            }`,
+          },
+        })
+        .then((res) => res.data);
+    }
+  );
 
   const updateGymStatusMutation = useMutation(
     async (data) => updateGymStatus(data.action, data.id),
@@ -71,21 +95,6 @@ const AdminGymManage = () => {
     }
   );
 
-  const { data, isLoading, isError, refetch } = useQuery(
-    "ownersList",
-    async () => {
-      return axios
-        .get(`${apiUrl}/admin/owners`, {
-          headers: {
-            Authorization: `Bearer ${
-              JSON.parse(localStorage.getItem("adminInfo")).token
-            }`,
-          },
-        })
-        .then((res) => res.data);
-    }
-  );
-
   const handleManageClick = (owner) => {
     setSelectedOwner(owner);
     onOpen();
@@ -100,6 +109,10 @@ const AdminGymManage = () => {
     setSelectedImageUrl(null);
     closeImage();
   };
+
+  useEffect(() => {
+    setPosts(data);
+  }, [data]);
 
   return (
     <Box padding="3rem">
@@ -143,38 +156,71 @@ const AdminGymManage = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {data?.map((owner) => {
-              return (
-                <Tr key={owner._id}>
-                  <Td whiteSpace="normal">{owner.gym.gymname}</Td>
-                  <Td whiteSpace="normal">
-                    {owner.firstname} {owner.lastname}
-                  </Td>
-                  <Td
-                    color="brand.100"
-                    cursor="pointer"
-                    onClick={() => handleOpenImage(owner.gym.permitImage?.url)}
-                    _hover={{ textDecoration: "underline" }}
-                  >
-                    View Permit
-                  </Td>
-                  <Td>{owner.gym.isApproved}</Td>
-                  <Td>
-                    <Button
-                      bgColor="brand.100"
-                      color="neutral.100"
-                      _hover={{ color: "brand.200", bgColor: "gray.300" }}
-                      onClick={() => handleManageClick(owner)}
+            {!isLoading ? (
+              currentPosts?.map((owner) => {
+                return (
+                  <Tr key={owner._id}>
+                    <Td whiteSpace="normal">{owner.gym.gymname}</Td>
+                    <Td whiteSpace="normal">
+                      {owner.firstname} {owner.lastname}
+                    </Td>
+                    <Td
+                      color="brand.100"
+                      cursor="pointer"
+                      onClick={() =>
+                        handleOpenImage(owner.gym.permitImage?.url)
+                      }
+                      _hover={{ textDecoration: "underline" }}
                     >
-                      Manage
-                    </Button>
-                  </Td>
-                </Tr>
-              );
-            })}
+                      View Permit
+                    </Td>
+                    <Td>{owner.gym.isApproved}</Td>
+                    <Td>
+                      <Button
+                        bgColor="brand.100"
+                        color="neutral.100"
+                        _hover={{ color: "brand.200", bgColor: "gray.300" }}
+                        onClick={() => handleManageClick(owner)}
+                      >
+                        Manage
+                      </Button>
+                    </Td>
+                  </Tr>
+                );
+              })
+            ) : (
+              <Spinner margin="1rem" size="lg" />
+            )}
           </Tbody>
         </Table>
       </TableContainer>
+      {data?.length !== 0 && !isLoading ? (
+        <Flex
+          alignItems="center"
+          gap={5}
+          mt={5}
+          justifyContent="center"
+          mr={10}
+        >
+          <Button
+            isDisabled={currentPage === 1}
+            onClick={() => {
+              if (currentPage !== 1) setCurrentPage(currentPage - 1);
+            }}
+          >
+            Previous
+          </Button>
+          {currentPage} of {Math.ceil(data?.length / itemsPerPage)}
+          <Button
+            isDisabled={currentPage === Math.ceil(data?.length / itemsPerPage)}
+            onClick={() => {
+              if (currentPage !== posts.length) setCurrentPage(currentPage + 1);
+            }}
+          >
+            Next
+          </Button>
+        </Flex>
+      ) : null}
     </Box>
   );
 };

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Text,
   Box,
@@ -32,6 +32,14 @@ import { format, parseISO } from "date-fns";
 const UserAnnouncements = () => {
   const toast = useToast();
   const [selectedItem, setSelectedItem] = useState(null);
+
+  const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastPost = currentPage * itemsPerPage;
+  const indexOfFirstPost = indexOfLastPost - itemsPerPage;
+  const currentPosts = posts?.slice(indexOfFirstPost, indexOfLastPost);
 
   const {
     isOpen: isSelectedItemOpen,
@@ -67,7 +75,9 @@ const UserAnnouncements = () => {
     closeSelectedItem();
   };
 
-  // console.log(data);
+  useEffect(() => {
+    setPosts(data);
+  }, [data]);
 
   return (
     <Box padding="2rem">
@@ -103,7 +113,7 @@ const UserAnnouncements = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {data?.map((item) => (
+            {currentPosts?.map((item) => (
               <Tr
                 key={item._id}
                 _hover={{ bgColor: "gray.300" }}
@@ -125,6 +135,33 @@ const UserAnnouncements = () => {
           </Tbody>
         </Table>
       </TableContainer>
+      {data?.length !== 0 && !isLoading ? (
+        <Flex
+          alignItems="center"
+          gap={5}
+          mt={5}
+          justifyContent="center"
+          mr={10}
+        >
+          <Button
+            isDisabled={currentPage === 1}
+            onClick={() => {
+              if (currentPage !== 1) setCurrentPage(currentPage - 1);
+            }}
+          >
+            Previous
+          </Button>
+          {currentPage} of {Math.ceil(data?.length / itemsPerPage)}
+          <Button
+            isDisabled={currentPage === Math.ceil(data?.length / itemsPerPage)}
+            onClick={() => {
+              if (currentPage !== posts.length) setCurrentPage(currentPage + 1);
+            }}
+          >
+            Next
+          </Button>
+        </Flex>
+      ) : null}
     </Box>
   );
 };
