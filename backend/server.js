@@ -33,7 +33,11 @@ app.use(
         "https://maps.googleapis.com",
         "https://gymlocator.co",
       ],
-      "connect-src": ["self", "https://maps.googleapis.com"],
+      "connect-src": [
+        "self",
+        "https://maps.googleapis.com",
+        "https://gymlocator.co",
+      ],
       upgradeInsecureRequests: [],
     },
     reportOnly: false,
