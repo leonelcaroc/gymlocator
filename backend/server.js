@@ -27,6 +27,7 @@ app.use(
         "https://gymlocator.co",
         "https://res.cloudinary.com/",
         "https://maps.gstatic.com",
+        "https://maps.googleapis.com",
         "data:",
       ],
       "script-src": [
