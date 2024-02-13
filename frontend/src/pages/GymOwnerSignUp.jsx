@@ -22,6 +22,7 @@ const GymOwnerSignUp = () => {
     endday: "",
     opentime: "",
     closetime: "",
+    gymImage: "",
     permitImage: "",
   });
 
@@ -42,6 +43,7 @@ const GymOwnerSignUp = () => {
         endday: "",
         opentime: "",
         closetime: "",
+        gymImage: "",
         permitImage: "",
       });
     };

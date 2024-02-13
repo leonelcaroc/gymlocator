@@ -84,6 +84,7 @@ const registerOwner = asyncHandler(async (req, res) => {
     endday,
     opentime,
     closetime,
+    gymImage,
     permitImage,
   } = req.body;
 
@@ -169,44 +170,49 @@ const registerOwner = asyncHandler(async (req, res) => {
     throw new Error("User already exists.");
   }
 
-  if (permitImage) {
-    const uploadRes = await cloudinary.uploader.upload(permitImage, {
-      upload_preset: "business-permits",
+  if (permitImage && gymImage) {
+    const [uploadPermitImage, uploadGymImage] = await Promise.all([
+      cloudinary.uploader.upload(permitImage, {
+        upload_preset: "business-permits",
+      }),
+      cloudinary.uploader.upload(gymImage, { upload_preset: "gym-image" }),
+    ]);
+
+    if (!uploadPermitImage || !uploadGymImage) {
+      throw new Error("Failed to upload one or more images");
+    }
+
+    const newUser = await GymOwner.create({
+      firstname: trimmedFirstName,
+      middlename: trimmedMiddleName,
+      lastname: trimmedLastName,
+      email: email,
+      password: trimmedPassword,
+      gym: {
+        gymname: trimmedGymName,
+        contact: trimmedContact,
+        description: trimmedDesc,
+        address: trimmedAddress,
+        gymLocation: gymLocation,
+        permitImage: uploadPermitImage,
+        gymImage: uploadGymImage,
+        schedule: {
+          startday: startday,
+          endday: endday,
+          opentime: opentime,
+          closetime: closetime,
+        },
+      },
     });
 
-    if (uploadRes) {
-      const newUser = await GymOwner.create({
-        firstname: trimmedFirstName,
-        middlename: trimmedMiddleName,
-        lastname: trimmedLastName,
-        email: email,
-        password: trimmedPassword,
-        gym: {
-          gymname: trimmedGymName,
-          contact: trimmedContact,
-          description: trimmedDesc,
-          address: trimmedAddress,
-          gymLocation: gymLocation,
-          permitImage: uploadRes,
-          schedule: {
-            startday: startday,
-            endday: endday,
-            opentime: opentime,
-            closetime: closetime,
-          },
-        },
-      });
-
-      return res.status(201).json({
-        message: "Successfully created new account",
-        gymname: newUser.gym.gymname,
-      });
-    } else {
-      res.status(400).json({
-        message: "Failed to create account",
-      });
-      throw new Error("Failed to create account");
-    }
+    return res.status(201).json({
+      message: "Successfully created new account",
+      gymname: newUser.gym.gymname,
+    });
+  } else {
+    res.status(400).json({
+      message: "Missing image files",
+    });
   }
 });
 

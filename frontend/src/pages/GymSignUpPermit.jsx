@@ -53,11 +53,48 @@ const GymSignUpPermit = ({ setState, signUpForm, setSignUpForm }) => {
         return {
           ...form,
           permitImage: reader.result,
-          imageName:
+          permitImageName:
             file.name.length > 15
               ? file.name.split(".")[0]
               : file.name.split(".")[0],
-          imageType: file.type.split("/")[1],
+          permitImageType: file.type.split("/")[1],
+        };
+      });
+    };
+  };
+
+  const handleGymImageChange = (event) => {
+    const files = event.target.files;
+
+    if (files.length === 0) {
+      return;
+    }
+
+    const file = files[0];
+    const allowedFileTypes = ["image/jpeg", "image/jpg"];
+
+    if (!allowedFileTypes.includes(file?.type)) {
+      return toast({
+        title: "Please select a valid jpg, or jpeg file.",
+        status: "error",
+        duration: 2000,
+        position: "bottom-right",
+      });
+    }
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setSignUpForm((form) => {
+        return {
+          ...form,
+          gymImage: reader.result,
+          gymImageName:
+            file.name.length > 15
+              ? file.name.split(".")[0]
+              : file.name.split(".")[0],
+          gymImageType: file.type.split("/")[1],
         };
       });
     };
@@ -80,6 +117,7 @@ const GymSignUpPermit = ({ setState, signUpForm, setSignUpForm }) => {
         formData.endday,
         formData.opentime,
         formData.closetime,
+        formData.gymImage,
         formData.permitImage
       );
     },
@@ -100,6 +138,7 @@ const GymSignUpPermit = ({ setState, signUpForm, setSignUpForm }) => {
           endday: "",
           opentime: "",
           closetime: "",
+          gymImage: "",
           permitImage: "",
         });
 
@@ -127,6 +166,15 @@ const GymSignUpPermit = ({ setState, signUpForm, setSignUpForm }) => {
     if (signUpForm.permitImage.length === 0) {
       return toast({
         title: "Please upload your business permit.",
+        status: "error",
+        duration: 2000,
+        position: "bottom-right",
+      });
+    }
+
+    if (signUpForm.gymImage.length === 0) {
+      return toast({
+        title: "Please upload your gym image.",
         status: "error",
         duration: 2000,
         position: "bottom-right",
@@ -169,13 +217,10 @@ const GymSignUpPermit = ({ setState, signUpForm, setSignUpForm }) => {
           Please sign up to continue
         </Text>
         <Divider />
-        <Text fontSize="1.1rem" color="gray.300" marginBlock="0.8rem">
-          Upload Business Permit
-        </Text>
 
-        <Flex alignItems="center" marginBottom="1.5rem">
+        <Flex alignItems="center" marginBottom="1.5rem" mt="1.5rem">
           <Text fontSize="1.1rem" color="gray.300">
-            Select a JPEG or JPG file:
+            Business Permit:
           </Text>
           <Input
             id="upload-permit"
@@ -193,13 +238,50 @@ const GymSignUpPermit = ({ setState, signUpForm, setSignUpForm }) => {
             Choose file
           </Button>
 
-          {signUpForm?.imageName?.length > 0 ? (
+          {signUpForm?.permitImageName?.length > 0 ? (
             <Text color="neutral.100">
-              {signUpForm?.imageName?.length > 10
-                ? signUpForm?.imageName
+              {signUpForm?.permitImageName?.length > 10
+                ? signUpForm?.permitImageName
                     .slice(0, 10)
-                    .concat(`...${signUpForm?.imageType}`)
-                : signUpForm?.imageName?.concat(`.${signUpForm?.imageType}`)}
+                    .concat(`...${signUpForm?.permitImageType}`)
+                : signUpForm?.permitImageName?.concat(
+                    `.${signUpForm?.permitImageType}`
+                  )}
+            </Text>
+          ) : (
+            <Text color="neutral.100">No file uploaded</Text>
+          )}
+        </Flex>
+
+        <Flex alignItems="center" marginBottom="1.5rem">
+          <Text fontSize="1.1rem" color="gray.300">
+            Gym Image:
+          </Text>
+          <Input
+            id="upload-gym-image"
+            type="file"
+            display="none"
+            onChange={handleGymImageChange}
+          />
+          <Button
+            as="label"
+            htmlFor="upload-gym-image"
+            marginInline="0.8rem 1.2rem"
+            cursor="pointer"
+            disabled={registerMutation.isLoading}
+          >
+            Choose file
+          </Button>
+
+          {signUpForm?.gymImageName?.length > 0 ? (
+            <Text color="neutral.100">
+              {signUpForm?.gymImageName?.length > 10
+                ? signUpForm?.gymImageName
+                    .slice(0, 10)
+                    .concat(`...${signUpForm?.gymImageType}`)
+                : signUpForm?.gymImageName?.concat(
+                    `.${signUpForm?.gymImageType}`
+                  )}
             </Text>
           ) : (
             <Text color="neutral.100">No file uploaded</Text>

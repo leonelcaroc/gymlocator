@@ -37,6 +37,7 @@ export const postRegisterOwner = async (
   endday,
   opentime,
   closetime,
+  gymImage,
   permitImage
 ) => {
   try {
@@ -55,6 +56,7 @@ export const postRegisterOwner = async (
       endday: endday,
       opentime: opentime,
       closetime: closetime,
+      gymImage: gymImage,
       permitImage: permitImage,
     });
     return data;

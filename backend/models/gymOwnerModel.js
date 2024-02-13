@@ -169,6 +169,10 @@ const gymSchema = mongoose.Schema({
     type: Object,
     required: true,
   },
+  gymImage: {
+    type: Object,
+    required: true,
+  },
   equipments: {
     type: [equipmentSchema],
     default: [],

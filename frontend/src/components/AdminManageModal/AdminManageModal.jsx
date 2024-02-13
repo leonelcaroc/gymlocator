@@ -54,7 +54,7 @@ const AdminManageModal = ({
         <ModalBody>
           <Box width="full" marginBottom="1rem">
             <Image
-              src={gym}
+              src={owner.gym.gymImage.url}
               alt="This is a gym"
               borderRadius="lg"
               width="100%"
@@ -69,7 +69,7 @@ const AdminManageModal = ({
           </Text>
           <Text>Address: {owner.gym.address}</Text>
           <Text>Contact: {owner.gym.contact}</Text>
-          <Flex>
+          {/* <Flex>
             <Text>Business Permit: </Text>
             <Text
               color="brand.100"
@@ -78,7 +78,7 @@ const AdminManageModal = ({
             >
               View Attachment
             </Text>
-          </Flex>
+          </Flex> */}
         </ModalBody>
 
         <ModalFooter>

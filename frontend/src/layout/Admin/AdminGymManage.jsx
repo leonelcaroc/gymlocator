@@ -4,6 +4,10 @@ import {
   Text,
   Box,
   Flex,
+  Image,
+  Modal,
+  ModalContent,
+  ModalOverlay,
   Table,
   Td,
   Th,
@@ -28,9 +32,16 @@ const apiUrl =
 const AdminGymManage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedOwner, setSelectedOwner] = useState(null);
+  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
 
   const toast = useToast();
   const queryClient = useQueryClient();
+
+  const {
+    isOpen: isImageOpen,
+    onOpen: openImage,
+    onClose: closeImage,
+  } = useDisclosure();
 
   const updateGymStatusMutation = useMutation(
     async (data) => updateGymStatus(data.action, data.id),
@@ -80,8 +91,35 @@ const AdminGymManage = () => {
     onOpen();
   };
 
+  const handleOpenImage = (url) => {
+    setSelectedImageUrl(url);
+    openImage();
+  };
+
+  const handleCloseImage = () => {
+    setSelectedImageUrl(null);
+    closeImage();
+  };
+
   return (
     <Box padding="3rem">
+      {/* Open Image Modal */}
+
+      <Modal isOpen={isImageOpen} onClose={handleCloseImage}>
+        <ModalOverlay />
+        <ModalContent>
+          <Image
+            src={selectedImageUrl}
+            alt=""
+            boxSize="100%"
+            position="absolute"
+            width="600px"
+            height="400px"
+            top="0"
+            left="0"
+          />
+        </ModalContent>
+      </Modal>
       <AdminManageModal
         isOpen={isOpen}
         onClose={onClose}
@@ -97,8 +135,10 @@ const AdminGymManage = () => {
             <Tr>
               <Th>Gym Name</Th>
               <Th>Owner Name</Th>
-              <Th>Address</Th>
-              <Th>Contact</Th>
+              {/* <Th>Address</Th> */}
+              {/* <Th>Contact</Th> */}
+              <Th>Permit</Th>
+              {/* <Th>Gym Image</Th> */}
               <Th>Status</Th>
               <Th>Manage</Th>
             </Tr>
@@ -111,8 +151,24 @@ const AdminGymManage = () => {
                   <Td whiteSpace="normal">
                     {owner.firstname} {owner.lastname}
                   </Td>
-                  <Td whiteSpace="normal">{owner.gym.address}</Td>
-                  <Td>{owner.gym.contact}</Td>
+                  {/* <Td whiteSpace="normal">{owner.gym.address}</Td> */}
+                  {/* <Td>{owner.gym.contact}</Td> */}
+                  <Td
+                    color="brand.100"
+                    cursor="pointer"
+                    onClick={() => handleOpenImage(owner.gym.permitImage?.url)}
+                    _hover={{ textDecoration: "underline" }}
+                  >
+                    View Permit
+                  </Td>
+                  {/* <Td
+                    color="brand.100"
+                    cursor="pointer"
+                    onClick={() => handleOpenImage(owner.gym.gymImage?.url)}
+                    _hover={{ textDecoration: "underline" }}
+                  >
+                    View Gym Image
+                  </Td> */}
                   <Td>{owner.gym.isApproved}</Td>
                   <Td>
                     <Button
