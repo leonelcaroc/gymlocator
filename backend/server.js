@@ -23,9 +23,13 @@ app.use(
   helmet.contentSecurityPolicy({
     useDefaults: true,
     directives: {
-      "img-src": ["https://gymlocator.co", "https://res.cloudinary.com/"],
-      "script-src": ["https://gymlocator.co", "https://maps.googleapis.com"],
-      "connect-src": ["https://gymlocator.co", "https://maps.googleapis.com"],
+      "img-src": [
+        "https://gymlocator.co",
+        "https://res.cloudinary.com/",
+        "https://maps.gstatic.com",
+      ],
+      "script-src": ["self", "https://maps.googleapis.com"],
+      "connect-src": ["self", "https://maps.googleapis.com"],
       upgradeInsecureRequests: [],
     },
     reportOnly: false,
