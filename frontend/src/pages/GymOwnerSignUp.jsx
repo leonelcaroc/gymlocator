@@ -5,11 +5,6 @@ import GymSignUpInfo from "./GymSignUpInfo";
 import GymSignUpPermit from "./GymSignUpPermit";
 import gym from "../assets/images/background.webp";
 
-const apiUrl =
-  import.meta.env.MODE === "production"
-    ? "https://gymlocator.co/api"
-    : "http://localhost:5000/api";
-
 const GymOwnerSignUp = () => {
   const [state, setState] = useState("details");
   const [signUpForm, setSignUpForm] = useState({

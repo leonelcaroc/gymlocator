@@ -22,7 +22,8 @@ const GymSignUpPermit = ({ setState, signUpForm, setSignUpForm }) => {
   const queryClient = useQueryClient();
 
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAP_API_KEY,
+    // googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAP_API_KEY,
+    googleMapsApiKey: "AIzaSyDrEoMAjf6lO-05iin-Gat1FlMqVHQJ2LU",
   });
 
   const handleFileChange = (event) => {
