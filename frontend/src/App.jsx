@@ -32,6 +32,7 @@ import UserAnnouncements from "./layout/UserLayout/UserAnnouncements";
 import UserLogin from "./pages/UserLogin";
 import "leaflet/dist/leaflet.css";
 import UserSubscriptions from "./layout/UserLayout/UserSubscriptions";
+import UserReviews from "./layout/UserLayout/UserReviews";
 
 import Trainer from "./pages/Trainer";
 import TrainerLogin from "./pages/TrainerLogin";
@@ -205,6 +206,7 @@ const App = () => {
                 {/* <Route path="bookings" element={<UserBookings />} /> */}
                 <Route path="subscriptions" element={<UserSubscriptions />} />
                 <Route path="announcements" element={<UserAnnouncements />} />
+                <Route path="reviews" element={<UserReviews />} />
               </Route>
             </Route>
           </Route>

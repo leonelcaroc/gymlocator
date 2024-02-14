@@ -60,6 +60,7 @@ const User = () => {
           <UserNav route="/user/classes" name="Classes" />
           <UserNav route="/user/subscriptions" name="Subscriptions" />
           <UserNav route="/user/announcements" name="Announcements" />
+          <UserNav route="/user/reviews" name="Reviews" />
         </Box>
       </Box>
       <Box height="100px" width="full" bgColor="neutral.100">
