@@ -8,6 +8,7 @@ import calculateEndTime from "../utils/calculateEndTime.js";
 import { ObjectId } from "mongodb";
 import createToken from "../utils/createToken.js";
 import stringifySafe from "json-stringify-safe";
+import cloudinary from "../utils/cloudinary.js";
 
 // desc     Auth user/set token
 // route    POST /api/users/auth
@@ -57,6 +58,7 @@ const registerUser = asyncHandler(async (req, res) => {
     gender,
     password,
     gymId,
+    paymentImage,
   } = req.body;
 
   const verifiedGymOwner = await GymOwner.findById(gymId);
@@ -80,7 +82,7 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("Gym plan doesn't exists to your chosen gym");
   }
 
-  const userEmailExists = await User.findOne({ email });
+  const userEmailExists = await User.findOne({ email: email.toLowerCase() });
 
   if (userEmailExists) {
     res.status(400);
@@ -142,7 +144,9 @@ const registerUser = asyncHandler(async (req, res) => {
       .json({ error: "Password must be between 8 and 16 characters" });
   }
 
-  // const alreadySubscribed = verifiedGymOwner?.filter(item);
+  const uploadPayment = await cloudinary.uploader.upload(paymentImage, {
+    upload_preset: "payment-image",
+  });
 
   const membershipPlan = [
     {
@@ -154,10 +158,13 @@ const registerUser = asyncHandler(async (req, res) => {
         planName: plan.planName,
         amount: plan.amount,
         duration: plan.duration,
-        startTime: Date.now(),
-        endTime: calculateEndTime(plan.duration),
-        planStatus: "active",
-        paymentStatus: "paid",
+        // startTime: Date.now(),
+        // endTime: calculateEndTime(plan.duration),
+        // startTime: "",
+        // endTime: "",
+        planStatus: "pending",
+        paymentStatus: "pending",
+        proofOfPayment: uploadPayment,
       },
     },
   ];
@@ -167,7 +174,7 @@ const registerUser = asyncHandler(async (req, res) => {
     firstname: trimmedFirstname,
     middlename: trimmedMiddlename,
     lastname: trimmedLastname,
-    email: email,
+    email: email.toLowerCase(),
     contact: trimmedContact,
     address: trimmedAddress,
     dateOfBirth: dateOfBirth,
@@ -206,10 +213,13 @@ const registerUser = asyncHandler(async (req, res) => {
         planName: plan.planName,
         amount: plan.amount,
         duration: plan.duration,
-        startTime: Date.now(),
-        endTime: calculateEndTime(plan.duration),
-        planStatus: "active",
-        paymentStatus: "paid",
+        // startTime: Date.now(),
+        // endTime: calculateEndTime(plan.duration),
+        // startTime: "",
+        // endTime: "",
+        planStatus: "pending",
+        paymentStatus: "pending",
+        proofOfPayment: uploadPayment,
       },
     });
     await verifiedGymOwner.save();

@@ -169,7 +169,7 @@ const registerOwner = asyncHandler(async (req, res) => {
     });
   }
 
-  const userExists = await GymOwner.findOne({ email });
+  const userExists = await GymOwner.findOne({ email: email.toLowerCase() });
 
   if (userExists) {
     res.status(400).json({ error: "User already exists." });
@@ -192,7 +192,7 @@ const registerOwner = asyncHandler(async (req, res) => {
       firstname: trimmedFirstName,
       middlename: trimmedMiddleName,
       lastname: trimmedLastName,
-      email: email,
+      email: email.toLowerCase(),
       password: trimmedPassword,
       gym: {
         gymname: trimmedGymName,
@@ -1119,7 +1119,7 @@ const addGymTrainers = asyncHandler(async (req, res) => {
     return res.status(400).json({ error: "Invalid email address" });
   }
 
-  const userEmailExists = await Trainer.findOne({ email });
+  const userEmailExists = await Trainer.findOne({ email: email.toLowerCase() });
 
   if (userEmailExists) {
     res.status(400);
@@ -1170,7 +1170,7 @@ const addGymTrainers = asyncHandler(async (req, res) => {
     firstname: trimmedFirstname,
     middlename: trimmedMiddlename,
     lastname: trimmedLastname,
-    email: email,
+    email: email.toLowerCase(),
     contact: trimmedContact,
     address: trimmedAddress,
     dateOfBirth: dateOfBirth,
@@ -1621,7 +1621,7 @@ const addNewMember = asyncHandler(async (req, res) => {
     throw new Error("Gym plan doesn't exists to your chosen gym");
   }
 
-  const userEmailExists = await User.findOne({ email });
+  const userEmailExists = await User.findOne({ email: email.toLowerCase() });
 
   if (userEmailExists) {
     res.status(400).json({ error: "Email already exists." });
@@ -1697,6 +1697,7 @@ const addNewMember = asyncHandler(async (req, res) => {
         endTime: calculateEndTime(plan.duration),
         planStatus: "active",
         paymentStatus: "paid",
+        // proofOfPayment: "",
       },
     },
   ];
@@ -1706,7 +1707,7 @@ const addNewMember = asyncHandler(async (req, res) => {
     firstname: trimmedFirstname,
     middlename: trimmedMiddlename,
     lastname: trimmedLastname,
-    email: email,
+    email: email.toLowerCase(),
     contact: trimmedContact,
     address: trimmedAddress,
     dateOfBirth: dateOfBirth,
@@ -1743,6 +1744,7 @@ const addNewMember = asyncHandler(async (req, res) => {
         endTime: calculateEndTime(plan.duration),
         planStatus: "active",
         paymentStatus: "paid",
+        // proofOfPayment: "",
       },
     });
     await verifiedGymOwner.save();
@@ -1767,6 +1769,81 @@ const getMyGym = asyncHandler(async (req, res) => {
   }
 
   res.status(200).json(user);
+});
+
+const updatePendingMemberStatus = asyncHandler(async (req, res) => {
+  const owner = await GymOwner.findById(req.user._id);
+
+  if (!owner) {
+    res.status(404).json({ error: "Gym not found" });
+    throw new Error("Gym not found");
+  }
+
+  const { userId, action } = req.body;
+
+  const member = await User.findById(userId);
+
+  if (!member) {
+    res.status(404).json({ error: "User not found" });
+    throw new Error("User not found");
+  }
+
+  // console.log(
+  //   member.memberships[0].gym.ownerId.toString() === owner._id.toString()
+  // );
+  // console.log(owner._id);
+
+  const memberIndex = member.memberships.findIndex(
+    (member) => member.gym.ownerId.toString() === owner._id.toString()
+  );
+
+  const ownerIndex = owner.gym.members.findIndex(
+    (owner) => owner.user._id.toString() === member._id.toString()
+  );
+
+  console.log("memberIndex", memberIndex);
+  console.log("ownerIndex", ownerIndex);
+
+  try {
+    if (action === "reject") {
+      member.memberships[memberIndex].myPlan.planStatus = "rejected";
+      member.memberships[memberIndex].myPlan.paymentStatus = "rejected";
+
+      owner.gym.members[ownerIndex].plan.planStatus = "rejected";
+      owner.gym.members[ownerIndex].plan.paymentStatus = "rejected";
+
+      await member.save();
+      await owner.save();
+
+      return res
+        .status(200)
+        .json({ message: "Successfully updated member status" });
+    } else if (action === "approve") {
+      member.memberships[memberIndex].myPlan.planStatus = "active";
+      member.memberships[memberIndex].myPlan.paymentStatus = "paid";
+      member.memberships[memberIndex].myPlan.startTime = new Date();
+      member.memberships[memberIndex].myPlan.endTime = calculateEndTime(
+        member.memberships[memberIndex].myPlan.duration
+      );
+
+      owner.gym.members[ownerIndex].plan.planStatus = "active";
+      owner.gym.members[ownerIndex].plan.paymentStatus = "paid";
+      owner.gym.members[ownerIndex].plan.startTime = new Date();
+      owner.gym.members[ownerIndex].plan.endTime = calculateEndTime(
+        owner.gym.members[memberIndex].plan.duration
+      );
+
+      await member.save();
+      await owner.save();
+
+      return res
+        .status(200)
+        .json({ message: "Successfully updated member status" });
+    }
+  } catch (error) {
+    // res.status(400).json({ error: "Failed to update member status." });
+    throw new Error(error);
+  }
 });
 
 // Payment Stripe
@@ -1833,4 +1910,5 @@ export {
   deleteGymClass,
   getMyGym,
   addNewMember,
+  updatePendingMemberStatus,
 };

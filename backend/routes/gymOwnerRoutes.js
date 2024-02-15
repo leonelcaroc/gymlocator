@@ -41,6 +41,7 @@ import {
   deleteGymClass,
   getMyGym,
   addNewMember,
+  updatePendingMemberStatus,
 } from "../controllers/gymOwnerController.js";
 import { protectOwner } from "../middleware/gymOwnerAuthMiddleware.js";
 
@@ -101,8 +102,11 @@ router
   .post(protectOwner, addGymPlans)
   .put(protectOwner, updateGymPlans)
   .delete(protectOwner, deleteGymPlan);
-router.route("/members").get(protectOwner, getGymMembers);
-router.route("/members").post(protectOwner, addNewMember);
+router
+  .route("/members")
+  .get(protectOwner, getGymMembers)
+  .post(protectOwner, addNewMember);
 router.route("/ownergym").get(protectOwner, getMyGym);
+router.route("/memberstatus").patch(protectOwner, updatePendingMemberStatus);
 
 export default router;

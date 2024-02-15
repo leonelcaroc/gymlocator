@@ -16,23 +16,28 @@ const memberPlanSchema = mongoose.Schema({
   },
   startTime: {
     type: Date,
-    required: true,
-    // default: "",
+    // required: true,
+    default: null,
   },
   endTime: {
     type: Date,
-    required: true,
-    // default: "",
+    // required: true,
+    default: null,
   },
   planStatus: {
     type: String,
-    enum: ["active", "expired", "pending", "cancelled"],
-    // default: "pending",
+    enum: ["active", "expired", "pending", "rejected"],
+    default: "pending",
+  },
+  proofOfPayment: {
+    type: mongoose.Schema.Types.Mixed,
+    // required: true,
+    default: null,
   },
   paymentStatus: {
     type: String,
-    enum: ["paid", "cancelled", "pending"],
-    // default: "pending",
+    enum: ["paid", "cancelled", "pending", "rejected"],
+    default: "pending",
   },
   _id: false,
 });
@@ -40,7 +45,44 @@ const memberPlanSchema = mongoose.Schema({
 const memberSchema = mongoose.Schema(
   {
     user: {
-      type: Object,
+      type: {
+        _id: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+        },
+        firstname: {
+          type: String,
+          required: true,
+        },
+        middlename: {
+          type: String,
+          required: true,
+        },
+        lastname: {
+          type: String,
+          required: true,
+        },
+        address: {
+          type: String,
+          required: true,
+        },
+        email: {
+          type: String,
+          required: true,
+        },
+        contact: {
+          type: String,
+          required: true,
+        },
+        gender: {
+          type: String,
+          required: true,
+        },
+        dateOfBirth: {
+          type: Date,
+          required: true,
+        },
+      },
       required: true,
     },
     plan: {

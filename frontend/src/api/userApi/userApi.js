@@ -33,7 +33,8 @@ export const postRegisterUser = async (
   plan,
   gender,
   password,
-  gymId
+  gymId,
+  paymentImage
 ) => {
   try {
     const { data } = await userApi.post("/register", {
@@ -48,6 +49,7 @@ export const postRegisterUser = async (
       gender,
       password,
       gymId,
+      paymentImage,
     });
     return data;
   } catch (error) {

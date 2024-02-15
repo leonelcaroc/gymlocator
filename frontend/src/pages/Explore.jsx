@@ -106,7 +106,8 @@ const Explore = () => {
         formData.plan,
         formData.gender,
         formData.password,
-        formData.gymId
+        formData.gymId,
+        formData.paymentImage
       );
     },
     {

@@ -600,4 +600,17 @@ export const getMyGym = async () => {
   }
 };
 
+export const updatePendingMember = async (userId, action) => {
+  try {
+    const { data } = await privateOwnerApi.patch("/memberstatus", {
+      userId: userId,
+      action: action,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error updating member status:", error);
+    throw error;
+  }
+};
+
 export default privateOwnerApi;

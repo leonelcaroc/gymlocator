@@ -14,7 +14,7 @@ import createToken from "../utils/createToken.js";
 const authTrainer = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await Trainer.findOne({ email });
+  const user = await Trainer.findOne({ email: email });
 
   if (!user) {
     return res.status(404).json({ error: "Email is not yet registered." });

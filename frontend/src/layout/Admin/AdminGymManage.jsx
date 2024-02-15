@@ -174,7 +174,20 @@ const AdminGymManage = () => {
                     >
                       View Permit
                     </Td>
-                    <Td>{owner.gym.isApproved}</Td>
+                    <Td
+                      color={
+                        owner.gym.isApproved === "approved"
+                          ? "brand.100"
+                          : owner.gym.isApproved === "pending"
+                          ? "yellow.500"
+                          : owner.gym.isApproved === "rejected"
+                          ? "red"
+                          : null
+                      }
+                      fontWeight="bold"
+                    >
+                      {owner.gym.isApproved}
+                    </Td>
                     <Td>
                       <Button
                         bgColor="brand.100"

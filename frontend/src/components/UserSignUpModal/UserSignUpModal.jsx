@@ -245,41 +245,44 @@ const UserSignUpModal = ({
                 disabled
               />
             </Box>
-            <Box>
-              <Text fontWeight="bold">Proof of Payment</Text>
-              <Text>Owner GCash Number: {selectedGym?.gym.gcashNumber}</Text>
-              <Flex alignItems="center" mt="1rem">
-                <Input
-                  id="upload-payment"
-                  type="file"
-                  display="none"
-                  onChange={handleFileChange}
-                />
-                <Button
-                  as="label"
-                  htmlFor="upload-payment"
-                  marginInline="0.8rem 1.2rem"
-                  cursor="pointer"
-                  // disabled={registerMutation.isLoading}
-                >
-                  Choose file
-                </Button>
+            {modalName !== "Add New Member" ? (
+              <Box>
+                <Text fontWeight="bold">Proof of Payment</Text>
+                <Text>Owner GCash Number: {selectedGym?.gym.gcashNumber}</Text>
+                <Flex alignItems="center" mt="1rem">
+                  <Input
+                    id="upload-payment"
+                    type="file"
+                    display="none"
+                    onChange={handleFileChange}
+                  />
+                  <Button
+                    as="label"
+                    htmlFor="upload-payment"
+                    marginInline="0.8rem 1.2rem"
+                    cursor="pointer"
+                    // disabled={registerMutation.isLoading}
+                  >
+                    Choose file
+                  </Button>
 
-                {signUpUser?.paymentImageName?.length > 0 ? (
-                  <Text>
-                    {signUpUser?.paymentImageName?.length > 10
-                      ? signUpUser?.paymentImageName
-                          .slice(0, 10)
-                          .concat(`...${signUpUser?.paymentImageType}`)
-                      : signUpUser?.paymentImageName?.concat(
-                          `.${signUpUser?.paymentImageType}`
-                        )}
-                  </Text>
-                ) : (
-                  <Text>No file uploaded</Text>
-                )}
-              </Flex>
-            </Box>
+                  {signUpUser?.paymentImageName?.length > 0 ? (
+                    <Text>
+                      {signUpUser?.paymentImageName?.length > 10
+                        ? signUpUser?.paymentImageName
+                            .slice(0, 10)
+                            .concat(`...${signUpUser?.paymentImageType}`)
+                        : signUpUser?.paymentImageName?.concat(
+                            `.${signUpUser?.paymentImageType}`
+                          )}
+                    </Text>
+                  ) : (
+                    <Text>No file uploaded</Text>
+                  )}
+                </Flex>
+              </Box>
+            ) : null}
+
             <Box>
               <Text fontWeight="bold">Gender</Text>
               <Select
@@ -318,8 +321,8 @@ const UserSignUpModal = ({
             bgColor="brand.100"
             color="neutral.100"
             isLoading={mutationFunc.isLoading}
-            // onClick={() => mutationFunc.mutate(signUpUser)}
-            onClick={() => console.log(signUpUser)}
+            onClick={() => mutationFunc.mutate(signUpUser)}
+            // onClick={() => console.log(signUpUser)}
           >
             Sign Up
           </Button>

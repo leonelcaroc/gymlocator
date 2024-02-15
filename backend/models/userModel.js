@@ -25,7 +25,16 @@ const reviewSchema = mongoose.Schema({
 const membershipSchema = mongoose.Schema(
   {
     gym: {
-      type: Object,
+      type: {
+        gymname: {
+          type: String,
+          required: true,
+        },
+        ownerId: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+        },
+      },
       required: true,
     },
     myPlan: {
@@ -44,27 +53,27 @@ const membershipSchema = mongoose.Schema(
         },
         startTime: {
           type: Date,
-          required: true,
-          // default: "",
+          // required: true,
+          default: null,
         },
         endTime: {
           type: Date,
-          required: true,
-          // default: "",
+          // required: true,
+          default: null,
         },
         planStatus: {
           type: String,
           enum: ["active", "expired", "pending", "rejected"],
-          // default: "pending",
+          default: "pending",
         },
         proofOfPayment: {
           type: mongoose.Schema.Types.Mixed,
-          required: true,
-          default: "",
+          // required: true,
+          default: null,
         },
         paymentStatus: {
           type: String,
-          enum: ["paid", "cancelled", "pending"],
+          enum: ["paid", "cancelled", "pending", "rejected"],
           default: "pending",
         },
         _id: false,

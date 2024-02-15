@@ -22,27 +22,57 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import { getGymMembers, getMyGym } from "../../api/ownerApi/privateOwnerApi";
+import {
+  getGymMembers,
+  getMyGym,
+  updatePendingMember,
+} from "../../api/ownerApi/privateOwnerApi";
 import { format } from "date-fns";
 import UserSignUpModal from "../../components/UserSignUpModal/UserSignUpModal";
 import { postAddNewMember } from "../../api/ownerApi/privateOwnerApi";
+import PendingMemberModal from "../../components/PendingMemberModal/PendingMemberModal";
 
 const GymOwnerMemberManagement = () => {
   const toast = useToast();
   const queryClient = useQueryClient();
 
-  const [posts, setPosts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedMember, setSelectedMember] = useState(null);
+
+  // useStates for Active Members
+
+  const [activePosts, setActivePosts] = useState([]);
+  const [currentActivePostsPage, setCurrentActivePostsPage] = useState(1);
   const itemsPerPage = 5;
 
-  const indexOfLastPost = currentPage * itemsPerPage;
-  const indexOfFirstPost = indexOfLastPost - itemsPerPage;
-  const currentPosts = posts?.slice(indexOfFirstPost, indexOfLastPost);
+  const indexOfLastActivePost = currentActivePostsPage * itemsPerPage;
+  const indexOfFirstActivePost = indexOfLastActivePost - itemsPerPage;
+  const currentActivePosts = activePosts?.slice(
+    indexOfFirstActivePost,
+    indexOfLastActivePost
+  );
+
+  // useStates for Pending Members
+
+  const [pendingPosts, setPendingPosts] = useState([]);
+  const [currentPendingPostsPage, setCurrentPendingPostsPage] = useState(1);
+  // const itemsPerPage = 5;
+
+  const indexOfLastPendingPost = currentPendingPostsPage * itemsPerPage;
+  const indexOfFirstPendingPost = indexOfLastPendingPost - itemsPerPage;
+  const currentPendingPosts = pendingPosts?.slice(
+    indexOfFirstPendingPost,
+    indexOfLastPendingPost
+  );
 
   const {
     isOpen: isAddMemberOpen,
     onOpen: openAddMember,
     onClose: closeAddMember,
+  } = useDisclosure();
+  const {
+    isOpen: isPendingMemberOpen,
+    onOpen: openPendingMember,
+    onClose: closePendingMember,
   } = useDisclosure();
 
   const { data: gymMembers, isLoading: gymMemberLoading } = useQuery(
@@ -119,9 +149,41 @@ const GymOwnerMemberManagement = () => {
     }
   );
 
-  useEffect(() => {
-    setPosts(gymMembers);
-  }, [gymMembers]);
+  const updatePendingMemberMutation = useMutation(
+    async (formData) => {
+      return updatePendingMember(formData.userId, formData.action);
+    },
+    {
+      onSuccess: (data) => {
+        setSelectedMember(null);
+        closePendingMember();
+        queryClient.invalidateQueries("gymMembers");
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  const handleOpenPendingMember = (member) => {
+    setSelectedMember(member);
+    openPendingMember();
+  };
+
+  // useEffect(() => {
+  //   setPosts(gymMembers);
+  // }, [gymMembers]);
 
   const returnMembers = (status) => {
     const members = gymMembers?.filter(
@@ -130,7 +192,13 @@ const GymOwnerMemberManagement = () => {
     return members;
   };
 
-  console.log(returnMembers("active"));
+  useEffect(() => {
+    setActivePosts(returnMembers("active"));
+    setPendingPosts(returnMembers("pending"));
+  }, [gymMembers]);
+
+  // console.log(gymMembers);
+  // console.log(returnMembers("pending"));
 
   return (
     <Box padding="2rem">
@@ -142,6 +210,13 @@ const GymOwnerMemberManagement = () => {
         closeModal={closeAddMember}
         selectedGym={ownerGym}
         mutationFunc={addMemberMutation}
+      />
+
+      <PendingMemberModal
+        isOpen={isPendingMemberOpen}
+        onClose={closePendingMember}
+        member={selectedMember}
+        updateMemberStatusMutation={updatePendingMemberMutation}
       />
 
       <Text color="brand.200" fontSize="2rem" marginBottom="2rem">
@@ -171,8 +246,8 @@ const GymOwnerMemberManagement = () => {
         <TabList>
           <Tab>Active</Tab>
           <Tab>Pending</Tab>
-          <Tab>Expired</Tab>
-          <Tab>Rejected</Tab>
+          {/* <Tab>Expired</Tab>
+          <Tab>Rejected</Tab> */}
         </TabList>
         <TabIndicator
           mt="-1.5px"
@@ -190,15 +265,15 @@ const GymOwnerMemberManagement = () => {
                     <Th>Address</Th>
                     <Th whiteSpace="normal">Phone Number</Th>
                     <Th whiteSpace="normal">Email</Th>
-                    <Th whiteSpace="normal">Start</Th>
+                    {/* <Th whiteSpace="normal">Start</Th> */}
                     <Th whiteSpace="normal">End</Th>
                     <Th whiteSpace="normal">Membership Type</Th>
                     <Th whiteSpace="normal">Status</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {gymMembers?.length > 0 ? (
-                    currentPosts?.map((item) => (
+                  {activePosts?.length > 0 ? (
+                    currentActivePosts?.map((item) => (
                       <Tr key={item.user._id}>
                         <Td whiteSpace="normal">
                           {item.user.firstname} {item.user.lastname}
@@ -206,9 +281,9 @@ const GymOwnerMemberManagement = () => {
                         <Td whiteSpace="normal">{item.user.address}</Td>
                         <Td>{item.user.contact}</Td>
                         <Td>{item.user.email}</Td>
-                        <Td whiteSpace="normal">
+                        {/* <Td whiteSpace="normal">
                           {format(item.plan.startTime, "MMMM d, yyyy")}
-                        </Td>
+                        </Td> */}
                         <Td whiteSpace="normal">
                           {format(item.plan.endTime, "MMMM d, yyyy")}
                         </Td>
@@ -226,7 +301,7 @@ const GymOwnerMemberManagement = () => {
                 </Tbody>
               </Table>
             </TableContainer>
-            {gymMembers?.length !== 0 && !gymMemberLoading ? (
+            {activePosts?.length !== 0 && !gymMemberLoading ? (
               <Flex
                 alignItems="center"
                 gap={5}
@@ -235,21 +310,24 @@ const GymOwnerMemberManagement = () => {
                 mr={10}
               >
                 <Button
-                  isDisabled={currentPage === 1}
+                  isDisabled={currentActivePostsPage === 1}
                   onClick={() => {
-                    if (currentPage !== 1) setCurrentPage(currentPage - 1);
+                    if (currentActivePostsPage !== 1)
+                      setCurrentActivePostsPage(currentActivePostsPage - 1);
                   }}
                 >
                   Previous
                 </Button>
-                {currentPage} of {Math.ceil(gymMembers?.length / itemsPerPage)}
+                {currentActivePostsPage} of{" "}
+                {Math.ceil(activePosts?.length / itemsPerPage)}
                 <Button
                   isDisabled={
-                    currentPage === Math.ceil(gymMembers?.length / itemsPerPage)
+                    currentActivePostsPage ===
+                    Math.ceil(activePosts?.length / itemsPerPage)
                   }
                   onClick={() => {
-                    if (currentPage !== posts.length)
-                      setCurrentPage(currentPage + 1);
+                    if (currentActivePostsPage !== activePosts?.length)
+                      setCurrentActivePostsPage(currentActivePostsPage + 1);
                   }}
                 >
                   Next
@@ -266,71 +344,16 @@ const GymOwnerMemberManagement = () => {
                     <Th>Address</Th>
                     <Th whiteSpace="normal">Phone Number</Th>
                     <Th whiteSpace="normal">Email</Th>
-                    <Th whiteSpace="normal">Membership Type</Th>
-                    <Th whiteSpace="normal">Amount</Th>
-                    <Th whiteSpace="normal">Proof of Payment</Th>
-                    <Th whiteSpace="normal">Status</Th>
-
-                    <Th>Action</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {gymMembers?.length > 0 ? (
-                    currentPosts?.map((item) => (
-                      <Tr key={item.user._id}>
-                        <Td whiteSpace="normal">
-                          {item.user.firstname} {item.user.lastname}
-                        </Td>
-                        <Td whiteSpace="normal">{item.user.address}</Td>
-                        <Td>{item.user.contact}</Td>
-                        <Td>{item.user.email}</Td>
-
-                        <Td>{item.plan.planName}</Td>
-                        <Td>10,000</Td>
-                        <Td>
-                          <Text
-                            color="brand.100"
-                            cursor="pointer"
-                            _hover={{ textDecoration: "underline" }}
-                          >
-                            View
-                          </Text>
-                        </Td>
-                        <Td>pending</Td>
-                        <Td>
-                          <Button>Manage</Button>
-                        </Td>
-                      </Tr>
-                    ))
-                  ) : (
-                    <Tr>
-                      <Td colSpan="9" textAlign="center">
-                        n/a
-                      </Td>
-                    </Tr>
-                  )}
-                </Tbody>
-              </Table>
-            </TableContainer>
-          </TabPanel>
-          <TabPanel>
-            <TableContainer>
-              <Table variant="simple" size="sm">
-                <Thead>
-                  <Tr>
-                    <Th whiteSpace="normal">Member Name</Th>
-                    <Th>Address</Th>
-                    <Th whiteSpace="normal">Phone Number</Th>
-                    <Th whiteSpace="normal">Email</Th>
                     <Th whiteSpace="normal">Start</Th>
                     <Th whiteSpace="normal">End</Th>
                     <Th whiteSpace="normal">Membership Type</Th>
                     <Th whiteSpace="normal">Status</Th>
+                    <Th>Action</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {gymMembers?.length > 0 ? (
-                    currentPosts?.map((item) => (
+                  {pendingPosts?.length > 0 ? (
+                    currentPendingPosts?.map((item) => (
                       <Tr key={item.user._id}>
                         <Td whiteSpace="normal">
                           {item.user.firstname} {item.user.lastname}
@@ -338,14 +361,19 @@ const GymOwnerMemberManagement = () => {
                         <Td whiteSpace="normal">{item.user.address}</Td>
                         <Td>{item.user.contact}</Td>
                         <Td>{item.user.email}</Td>
-                        <Td whiteSpace="normal">
-                          {format(item.plan.startTime, "MMMM d, yyyy")}
-                        </Td>
-                        <Td whiteSpace="normal">
-                          {format(item.plan.endTime, "MMMM d, yyyy")}
-                        </Td>
                         <Td>{item.plan.planName}</Td>
-                        <Td>expired</Td>
+                        <Td>{item.plan.planStatus}</Td>
+                        <Td>
+                          <Button
+                            bgColor="brand.100"
+                            color="neutral.100"
+                            _hover={{ color: "brand.100", bgColor: "gray.200" }}
+                            size="sm"
+                            onClick={() => handleOpenPendingMember(item)}
+                          >
+                            Manage
+                          </Button>
+                        </Td>
                       </Tr>
                     ))
                   ) : (
@@ -358,8 +386,42 @@ const GymOwnerMemberManagement = () => {
                 </Tbody>
               </Table>
             </TableContainer>
+
+            {pendingPosts?.length !== 0 && !gymMemberLoading ? (
+              <Flex
+                alignItems="center"
+                gap={5}
+                mt={5}
+                justifyContent="center"
+                mr={10}
+              >
+                <Button
+                  isDisabled={currentPendingPostsPage === 1}
+                  onClick={() => {
+                    if (currentPendingPostsPage !== 1)
+                      setCurrentPendingPostsPage(currentPendingPostsPage - 1);
+                  }}
+                >
+                  Previous
+                </Button>
+                {currentPendingPostsPage} of{" "}
+                {Math.ceil(pendingPosts?.length / itemsPerPage)}
+                <Button
+                  isDisabled={
+                    currentPendingPostsPage ===
+                    Math.ceil(pendingPosts?.length / itemsPerPage)
+                  }
+                  onClick={() => {
+                    if (currentPendingPostsPage !== pendingPosts?.length)
+                      setCurrentPendingPostsPage(currentPendingPostsPage + 1);
+                  }}
+                >
+                  Next
+                </Button>
+              </Flex>
+            ) : null}
           </TabPanel>
-          <TabPanel>
+          {/* <TabPanel>
             <TableContainer>
               <Table variant="simple" size="sm">
                 <Thead>
@@ -404,7 +466,7 @@ const GymOwnerMemberManagement = () => {
                 </Tbody>
               </Table>
             </TableContainer>
-          </TabPanel>
+          </TabPanel> */}
         </TabPanels>
       </Tabs>
     </Box>
