@@ -1,6 +1,5 @@
 import axiosInstance from "../axiosConfig";
 import TokenService from "../../services/token";
-import { add } from "date-fns";
 
 const privateOwnerApi = axiosInstance.create({
   baseURL: `${axiosInstance.defaults.baseURL}/gymowner`,

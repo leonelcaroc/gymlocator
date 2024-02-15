@@ -17,10 +17,12 @@ const memberPlanSchema = mongoose.Schema({
   startTime: {
     type: Date,
     required: true,
+    // default: "",
   },
   endTime: {
     type: Date,
     required: true,
+    // default: "",
   },
   planStatus: {
     type: String,
@@ -30,6 +32,7 @@ const memberPlanSchema = mongoose.Schema({
   paymentStatus: {
     type: String,
     enum: ["paid", "cancelled", "pending"],
+    // default: "pending",
   },
   _id: false,
 });
@@ -149,6 +152,10 @@ const gymSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  gcashNumber: {
+    type: String,
+    required: true,
+  },
   description: {
     type: String,
     required: true,
@@ -212,6 +219,7 @@ const gymSchema = mongoose.Schema({
   },
   reviews: {
     type: Array,
+    required: true,
     default: [],
   },
 });

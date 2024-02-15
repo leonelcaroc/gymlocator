@@ -49,7 +49,7 @@ const GymSignUpInfo = ({ setState, signUpForm, setSignUpForm }) => {
           value={signUpForm.gymname}
         />
         <Input
-          type="text"
+          type="number"
           placeholder="Contact Number"
           bgColor="neutral.100"
           height="45px"
@@ -61,6 +61,20 @@ const GymSignUpInfo = ({ setState, signUpForm, setSignUpForm }) => {
             })
           }
           value={signUpForm.contact}
+        />
+        <Input
+          type="number"
+          placeholder="GCash Number"
+          bgColor="neutral.100"
+          height="45px"
+          width="100%"
+          onChange={(e) =>
+            setSignUpForm({
+              ...signUpForm,
+              gcashNumber: e.target.value,
+            })
+          }
+          value={signUpForm.gcashNumber}
         />
         <Input
           type="text"

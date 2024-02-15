@@ -143,7 +143,30 @@ export const getUserAnnouncements = async () => {
     const { data } = await privateUserApi.get("/announcements");
     return data;
   } catch (error) {
-    console.error("Error fetching gyms:", error);
+    console.error("Error fetching announcements:", error);
+    throw error;
+  }
+};
+
+export const getUserReviews = async () => {
+  try {
+    const { data } = await privateUserApi.get("/reviews");
+    return data;
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    throw error;
+  }
+};
+
+export const submitUserReview = async (gymId, rating) => {
+  try {
+    const { data } = await privateUserApi.patch("/reviews", {
+      gymId,
+      rating,
+    });
+    return data;
+  } catch (error) {
+    console.error("Error submitting review:", error);
     throw error;
   }
 };

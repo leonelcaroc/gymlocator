@@ -79,6 +79,7 @@ const registerOwner = asyncHandler(async (req, res) => {
     contact,
     address,
     gymLocation,
+    gcashNumber,
     description,
     startday,
     endday,
@@ -94,6 +95,7 @@ const registerOwner = asyncHandler(async (req, res) => {
   const trimmedPassword = validator.trim(password);
   const trimmedGymName = validator.trim(gymname);
   const trimmedContact = validator.trim(contact);
+  const trimmedGCashNumber = validator.trim(gcashNumber);
   const trimmedDesc = validator.trim(description);
   const trimmedAddress = validator.trim(address);
 
@@ -118,7 +120,11 @@ const registerOwner = asyncHandler(async (req, res) => {
   }
 
   if (!validator.isLength(trimmedContact, { min: 1 })) {
-    return res.status(400).json({ error: "Contact number is invalid" });
+    return res.status(400).json({ error: "Contact number is required" });
+  }
+
+  if (!validator.isLength(trimmedGCashNumber, { min: 1 })) {
+    return res.status(400).json({ error: "GCash number is required" });
   }
 
   if (!validator.isLength(trimmedAddress, { min: 1 })) {
@@ -191,6 +197,7 @@ const registerOwner = asyncHandler(async (req, res) => {
       gym: {
         gymname: trimmedGymName,
         contact: trimmedContact,
+        gcashNumber: trimmedGCashNumber,
         description: trimmedDesc,
         address: trimmedAddress,
         gymLocation: gymLocation,

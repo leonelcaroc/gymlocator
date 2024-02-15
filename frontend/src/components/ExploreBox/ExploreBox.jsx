@@ -18,11 +18,12 @@ const ExploreBox = ({
   setExploreState,
   selectedGym,
   setSelectedGym,
+  openUserSignUp,
 }) => {
   return (
     <Flex
       flexDirection="column"
-      width="30rem"
+      width="32rem"
       bgColor="neutral.100"
       padding="2rem"
       borderRadius="10px"
@@ -112,6 +113,7 @@ const ExploreBox = ({
               setExploreState={setExploreState}
               setSelectedGym={setSelectedGym}
               selectedGym={selectedGym}
+              openUserSignUp={openUserSignUp}
             />
           ))
         )}

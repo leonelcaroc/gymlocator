@@ -8,6 +8,7 @@ import {
   ModalBody,
   Stack,
   Box,
+  Flex,
   Text,
   Input,
   Textarea,
@@ -44,6 +45,7 @@ const UserSignUpModal = ({
     plan: null,
     gender: "",
     password: "",
+    paymentImage: "",
   });
 
   useEffect(() => {
@@ -65,6 +67,7 @@ const UserSignUpModal = ({
         plan: null,
         gender: "",
         password: "",
+        paymentImage: "",
       });
     };
   }, [selectedGym]);
@@ -80,6 +83,43 @@ const UserSignUpModal = ({
       ...signUpUser,
       plan: selectedPlanObject,
     });
+  };
+
+  const handleFileChange = (event) => {
+    const files = event.target.files;
+
+    if (files.length === 0) {
+      return;
+    }
+
+    const file = files[0];
+    const allowedFileTypes = ["image/jpeg", "image/jpg"];
+
+    if (!allowedFileTypes.includes(file?.type)) {
+      return toast({
+        title: "Please select a valid jpg, or jpeg file.",
+        status: "error",
+        duration: 2000,
+        position: "bottom-right",
+      });
+    }
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setSignUpUser((form) => {
+        return {
+          ...form,
+          paymentImage: reader.result,
+          paymentImageName:
+            file.name.length > 15
+              ? file.name.split(".")[0]
+              : file.name.split(".")[0],
+          paymentImageType: file.type.split("/")[1],
+        };
+      });
+    };
   };
 
   return (
@@ -192,6 +232,7 @@ const UserSignUpModal = ({
                 ))}
               </Select>
             </Box>
+
             <Box>
               <Text fontWeight="bold">Membership Fee</Text>
               <Input
@@ -203,6 +244,41 @@ const UserSignUpModal = ({
                 type="text"
                 disabled
               />
+            </Box>
+            <Box>
+              <Text fontWeight="bold">Proof of Payment</Text>
+              <Text>Owner GCash Number: {selectedGym?.gym.gcashNumber}</Text>
+              <Flex alignItems="center" mt="1rem">
+                <Input
+                  id="upload-payment"
+                  type="file"
+                  display="none"
+                  onChange={handleFileChange}
+                />
+                <Button
+                  as="label"
+                  htmlFor="upload-payment"
+                  marginInline="0.8rem 1.2rem"
+                  cursor="pointer"
+                  // disabled={registerMutation.isLoading}
+                >
+                  Choose file
+                </Button>
+
+                {signUpUser?.paymentImageName?.length > 0 ? (
+                  <Text>
+                    {signUpUser?.paymentImageName?.length > 10
+                      ? signUpUser?.paymentImageName
+                          .slice(0, 10)
+                          .concat(`...${signUpUser?.paymentImageType}`)
+                      : signUpUser?.paymentImageName?.concat(
+                          `.${signUpUser?.paymentImageType}`
+                        )}
+                  </Text>
+                ) : (
+                  <Text>No file uploaded</Text>
+                )}
+              </Flex>
             </Box>
             <Box>
               <Text fontWeight="bold">Gender</Text>
@@ -242,7 +318,8 @@ const UserSignUpModal = ({
             bgColor="brand.100"
             color="neutral.100"
             isLoading={mutationFunc.isLoading}
-            onClick={() => mutationFunc.mutate(signUpUser)}
+            // onClick={() => mutationFunc.mutate(signUpUser)}
+            onClick={() => console.log(signUpUser)}
           >
             Sign Up
           </Button>

@@ -174,6 +174,12 @@ const registerUser = asyncHandler(async (req, res) => {
     memberships: membershipPlan,
     gender: gender,
     password: password,
+    reviews: [
+      {
+        gymname: verifiedGymOwner.gym.gymname,
+        _id: verifiedGymOwner._id,
+      },
+    ],
   });
 
   if (user) {
@@ -618,6 +624,59 @@ const getUserAnnouncements = asyncHandler(async (req, res) => {
   }
 });
 
+const getUserReviews = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json(user.reviews);
+});
+
+const submitUserReview = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const { gymId, rating } = req.body;
+  const specificGym = await GymOwner.findById(new ObjectId(gymId));
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  if (!specificGym) {
+    res.status(404);
+    throw new Error("Gym not found");
+  }
+
+  const existingUserRatingIndex = user.reviews.findIndex(
+    (item) => item._id.toString() === gymId
+  );
+
+  if (existingUserRatingIndex !== -1) {
+    // Update existing rating
+    user.reviews[existingUserRatingIndex].rating = rating;
+    user.reviews[existingUserRatingIndex].status = true;
+
+    specificGym.gym.reviews.push(rating);
+
+    // Save both user and specificGym
+    const saveUser = await user.save();
+    const saveGym = await specificGym.save();
+
+    if (saveUser && saveGym) {
+      return res.status(200).json({ message: "Successfully submitted review" });
+    } else {
+      res.status(400).json({ message: "Failed to submit review" });
+      throw new Error("Failed to submit review");
+    }
+  } else {
+    res.status(400).json({ message: "Review does not exist" });
+    throw new Error("Review does not exist");
+  }
+});
+
 export {
   authUser,
   registerUser,
@@ -632,48 +691,6 @@ export {
   userJoinClass,
   userWithdrawClass,
   getUserAnnouncements,
+  getUserReviews,
+  submitUserReview,
 };
-
-const a = [
-  {
-    firstname: "Maria",
-    middlename: "Santos",
-    lastname: "Clara",
-    memberships: [{ gym: { gymname: "Ben's Gym", ownerId: "123" } }],
-  },
-  {
-    firstname: "Honey",
-    middlename: "Jean",
-    lastname: "Dort",
-    memberships: [{ gym: { gymname: "Mark's Gym", ownerId: "456" } }],
-  },
-];
-
-const b = [
-  {
-    _id: "123",
-    gym: {
-      gymname: "Ben's Gym",
-      announcements: [
-        {
-          announcement: "asdasd",
-          createdAt: "2024-02-12T06:47:49.076Z",
-          _id: "65c9bfdf6f2c11715fcd38cc",
-        },
-        {
-          announcement: "Hello World",
-          createdAt: "2024-02-14T06:47:49.076Z",
-          _id: "65cghrs2c11715fcdg34sd",
-        },
-      ],
-    },
-  },
-  {
-    _id: "456",
-    gym: { gymname: "Mark's Gym", announcements: [] },
-  },
-  {
-    _id: "789",
-    gym: { gymname: "Laila's Gym", announcements: [] },
-  },
-];

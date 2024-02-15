@@ -14,6 +14,8 @@ import {
   userJoinClass,
   userWithdrawClass,
   getUserAnnouncements,
+  getUserReviews,
+  submitUserReview,
 } from "../controllers/userController.js";
 import { protectUser } from "../middleware/authMiddleware.js";
 
@@ -34,5 +36,9 @@ router
   .post(protectUser, userJoinClass)
   .patch(protectUser, userWithdrawClass);
 router.get("/announcements", protectUser, getUserAnnouncements);
+router
+  .route("/reviews")
+  .get(protectUser, getUserReviews)
+  .patch(protectUser, submitUserReview);
 
 export default router;

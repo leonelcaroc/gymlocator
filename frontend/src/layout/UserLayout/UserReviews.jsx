@@ -10,6 +10,7 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalFooter,
+  Spinner,
   Text,
   Table,
   Thead,
@@ -22,17 +23,21 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import {
-  getUserSubscription,
-  // updateUserSub,
-} from "../../api/userApi/privateUserApi";
+
 import formatDateToCustomFormat from "../../utils/formatDateToCustomFormat";
 import TokenService from "../../services/token";
 import StarRating from "../../components/StarRating/StarRating";
+import ReviewStarRating from "../../components/StarRating/ReviewStarRating";
+import {
+  getUserReviews,
+  submitUserReview,
+} from "../../api/userApi/privateUserApi";
 
 const UserReviews = () => {
   const toast = useToast();
   const queryClient = useQueryClient();
+
+  const [rating, setRating] = useState(0);
 
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -42,7 +47,7 @@ const UserReviews = () => {
   const indexOfFirstPost = indexOfLastPost - itemsPerPage;
   const currentPosts = posts?.slice(indexOfFirstPost, indexOfLastPost);
 
-  const [selectedSub, setSelectedSub] = useState(null);
+  const [selectedReview, setSelectedReview] = useState(null);
 
   const {
     isOpen: isGymReviewOpen,
@@ -51,9 +56,9 @@ const UserReviews = () => {
   } = useDisclosure();
 
   const { data, isLoading, isError } = useQuery(
-    "userSubscription",
+    "userReviews",
     async () => {
-      return getUserSubscription();
+      return getUserReviews();
     },
     {
       refetchOnWindowFocus: false,
@@ -68,6 +73,50 @@ const UserReviews = () => {
     }
   );
 
+  const submitReviewMutation = useMutation(
+    async (formData) => {
+      return submitUserReview(formData.gymId, formData.rating);
+    },
+    {
+      onSuccess: (data) => {
+        handleCloseReview();
+
+        toast({
+          title: data.message,
+          status: "success",
+          duration: 2000,
+          position: "bottom-right",
+        });
+
+        // Invalidate and refetch any queries that depend on the user data
+        queryClient.invalidateQueries("userReviews");
+      },
+      onError: (error) => {
+        handleCloseReview();
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  const handleOpenReview = (item) => {
+    setSelectedReview(item);
+    openGymReview();
+  };
+
+  const handleSubmitReview = () => {
+    submitReviewMutation.mutate({ gymId: selectedReview._id, rating: rating });
+  };
+
+  const handleCloseReview = () => {
+    setRating(0);
+    closeGymReview();
+  };
+
   useEffect(() => {
     setPosts(data);
   }, [data]);
@@ -76,31 +125,25 @@ const UserReviews = () => {
     <Box padding="2rem">
       {/* Review Modal*/}
 
-      <Modal isOpen={isGymReviewOpen} onClose={closeGymReview}>
+      <Modal isOpen={isGymReviewOpen} onClose={handleCloseReview}>
         <ModalOverlay />
         <ModalContent paddingInline="2rem" maxWidth="35rem">
-          <ModalHeader>Review Ben's Gym</ModalHeader>
+          <ModalHeader>Review {selectedReview?.gymname}</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>
-            <Text>
-              Give Ben's Gym a review <Text as="span" fontWeight="bold"></Text>
-              <StarRating />
-            </Text>
+          <ModalBody py="2rem">
+            <ReviewStarRating rating={rating} setRating={setRating} />
           </ModalBody>
           <ModalFooter>
-            <Button
-              colorScheme="gray"
-              mr={3}
-              // onClick={handleCloseSub}
-            >
-              No
+            <Button colorScheme="gray" mr={3} onClick={handleCloseReview}>
+              Cancel
             </Button>
             <Button
-              bgColor="red"
+              bgColor="brand.100"
               color="neutral.100"
-              // onClick={handleCancelSub}
+              onClick={handleSubmitReview}
+              isLoading={submitReviewMutation.isLoading}
             >
-              Yes
+              Give a Review
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -115,21 +158,41 @@ const UserReviews = () => {
             <Tr>
               <Th>Gym Name</Th>
               <Th>Star</Th>
-              <Th>Review</Th>
+              <Th>Review Action</Th>
             </Tr>
           </Thead>
           <Tbody>
-            <Tr>
-              <Td>Ben's Gym</Td>
-              <Td>
-                <Box display="inline-block">
-                  <StarRating />
-                </Box>
-              </Td>
-              <Td>
-                <Button onClick={openGymReview}>Review</Button>
-              </Td>
-            </Tr>
+            {!isLoading ? (
+              data?.length !== 0 ? (
+                currentPosts?.map((item) => (
+                  <Tr key={item._id}>
+                    <Td>{item.gymname}</Td>
+                    <Td>
+                      <Box display="inline-block">
+                        <StarRating rating={item.rating} />
+                      </Box>
+                    </Td>
+                    <Td>
+                      {!item.status ? (
+                        <Button onClick={() => handleOpenReview(item)}>
+                          Review
+                        </Button>
+                      ) : (
+                        <Text>Finished</Text>
+                      )}
+                    </Td>
+                  </Tr>
+                ))
+              ) : (
+                <Tr>
+                  <Td textAlign="center" colSpan="3">
+                    n/a
+                  </Td>
+                </Tr>
+              )
+            ) : (
+              <Spinner mt="1rem" ml="1rem" size="lg" />
+            )}
           </Tbody>
         </Table>
       </TableContainer>

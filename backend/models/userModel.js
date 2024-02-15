@@ -1,6 +1,27 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
+const reviewSchema = mongoose.Schema({
+  gymname: {
+    type: String,
+    required: true,
+  },
+  _id: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+  },
+  rating: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  status: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+});
+
 const membershipSchema = mongoose.Schema(
   {
     gym: {
@@ -24,19 +45,27 @@ const membershipSchema = mongoose.Schema(
         startTime: {
           type: Date,
           required: true,
+          // default: "",
         },
         endTime: {
           type: Date,
           required: true,
+          // default: "",
         },
         planStatus: {
           type: String,
-          enum: ["active", "expired", "pending", "cancelled"],
+          enum: ["active", "expired", "pending", "rejected"],
           // default: "pending",
+        },
+        proofOfPayment: {
+          type: mongoose.Schema.Types.Mixed,
+          required: true,
+          default: "",
         },
         paymentStatus: {
           type: String,
           enum: ["paid", "cancelled", "pending"],
+          default: "pending",
         },
         _id: false,
       },
@@ -83,9 +112,15 @@ const userSchema = mongoose.Schema(
       type: [membershipSchema],
       default: [],
     },
+    reviews: {
+      type: [reviewSchema],
+      required: true,
+      default: [],
+    },
     classes: {
       type: Array,
       required: true,
+      default: [],
     },
     gender: {
       type: String,

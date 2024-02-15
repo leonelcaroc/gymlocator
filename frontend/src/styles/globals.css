@@ -27,10 +27,6 @@ body {
   width: 100%;
 }
 
-/* a:hover {
-  text-decoration: none; 
+.gm-style iframe + div {
+  border: none !important;
 }
-
-a {
-  text-decoration: none; 
-} */

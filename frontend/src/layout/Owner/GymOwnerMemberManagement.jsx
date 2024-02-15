@@ -5,6 +5,12 @@ import {
   Flex,
   Button,
   Input,
+  Tabs,
+  TabList,
+  Tab,
+  TabIndicator,
+  TabPanel,
+  TabPanels,
   Table,
   TableContainer,
   Thead,
@@ -117,6 +123,15 @@ const GymOwnerMemberManagement = () => {
     setPosts(gymMembers);
   }, [gymMembers]);
 
+  const returnMembers = (status) => {
+    const members = gymMembers?.filter(
+      (item) => item.plan.planStatus === status
+    );
+    return members;
+  };
+
+  console.log(returnMembers("active"));
+
   return (
     <Box padding="2rem">
       {/* Add Member */}
@@ -132,15 +147,6 @@ const GymOwnerMemberManagement = () => {
       <Text color="brand.200" fontSize="2rem" marginBottom="2rem">
         Member Management
       </Text>
-      {/* <Flex alignItems="center" marginBottom="2rem">
-        <Text marginRight="5rem">Search Member:</Text>
-        <Input
-          type="text"
-          placeholder="Search..."
-          borderRadius="0"
-          maxWidth="20rem"
-        />
-      </Flex> */}
       <Button
         marginBottom="2rem"
         color="neutral.100"
@@ -151,102 +157,256 @@ const GymOwnerMemberManagement = () => {
       >
         Add Walk-In Member
       </Button>
+      <Flex alignItems="center" marginBottom="2rem">
+        <Text marginRight="5rem">Search Member:</Text>
+        <Input
+          type="text"
+          placeholder="Search..."
+          borderRadius="0"
+          maxWidth="20rem"
+        />
+      </Flex>
 
-      <TableContainer>
-        <Table variant="simple" size="sm">
-          <Thead>
-            <Tr>
-              <Th whiteSpace="normal">Member Name</Th>
-              <Th>Address</Th>
-              <Th whiteSpace="normal">Phone Number</Th>
-              <Th whiteSpace="normal">Email</Th>
-              <Th whiteSpace="normal">Membership Type</Th>
-              <Th whiteSpace="normal">Start Date</Th>
-              <Th whiteSpace="normal">End Date</Th>
-              <Th>Amount</Th>
-              <Th whiteSpace="normal">Payment Status</Th>
-              {/* <Th>Action</Th> */}
-            </Tr>
-          </Thead>
-          <Tbody>
-            {gymMembers?.length > 0 ? (
-              currentPosts?.map((item) => (
-                <Tr key={item.user._id}>
-                  <Td whiteSpace="normal">
-                    {item.user.firstname} {item.user.lastname}
-                  </Td>
-                  <Td whiteSpace="normal">{item.user.address}</Td>
-                  <Td>{item.user.contact}</Td>
-                  <Td>{item.user.email}</Td>
-                  <Td>{item.plan.planName}</Td>
-                  <Td whiteSpace="normal">
-                    {format(item.plan.startTime, "MMMM d, yyyy")}
-                  </Td>
-                  <Td whiteSpace="normal">
-                    {format(item.plan.endTime, "MMMM d, yyyy")}
-                  </Td>
-                  <Td>
-                    {item.plan.amount.toLocaleString("en-PH", {
-                      style: "currency",
-                      currency: "PHP",
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </Td>
-                  <Td>{item.plan.paymentStatus}</Td>
-                  {/* <Td display="flex" flexDirection="">
-                  <Button
-                    bgColor="blue"
-                    color="neutral.100"
-                    marginBottom="1rem"
-                  >
-                    Edit
-                  </Button>
-                  <Button bgColor="red" color="white">
-                    Delete
-                  </Button>
-                </Td> */}
-                </Tr>
-              ))
-            ) : (
-              <Tr>
-                <Td colSpan="9" textAlign="center">
-                  n/a
-                </Td>
-              </Tr>
-            )}
-          </Tbody>
-        </Table>
-      </TableContainer>
-      {gymMembers?.length !== 0 && !gymMemberLoading ? (
-        <Flex
-          alignItems="center"
-          gap={5}
-          mt={5}
-          justifyContent="center"
-          mr={10}
-        >
-          <Button
-            isDisabled={currentPage === 1}
-            onClick={() => {
-              if (currentPage !== 1) setCurrentPage(currentPage - 1);
-            }}
-          >
-            Previous
-          </Button>
-          {currentPage} of {Math.ceil(gymMembers?.length / itemsPerPage)}
-          <Button
-            isDisabled={
-              currentPage === Math.ceil(gymMembers?.length / itemsPerPage)
-            }
-            onClick={() => {
-              if (currentPage !== posts.length) setCurrentPage(currentPage + 1);
-            }}
-          >
-            Next
-          </Button>
-        </Flex>
-      ) : null}
+      <Tabs position="relative" variant="enclosed">
+        <TabList>
+          <Tab>Active</Tab>
+          <Tab>Pending</Tab>
+          <Tab>Expired</Tab>
+          <Tab>Rejected</Tab>
+        </TabList>
+        <TabIndicator
+          mt="-1.5px"
+          height="2px"
+          bg="blue.500"
+          borderRadius="1px"
+        />
+        <TabPanels>
+          <TabPanel>
+            <TableContainer>
+              <Table variant="simple" size="sm">
+                <Thead>
+                  <Tr>
+                    <Th whiteSpace="normal">Member Name</Th>
+                    <Th>Address</Th>
+                    <Th whiteSpace="normal">Phone Number</Th>
+                    <Th whiteSpace="normal">Email</Th>
+                    <Th whiteSpace="normal">Start</Th>
+                    <Th whiteSpace="normal">End</Th>
+                    <Th whiteSpace="normal">Membership Type</Th>
+                    <Th whiteSpace="normal">Status</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {gymMembers?.length > 0 ? (
+                    currentPosts?.map((item) => (
+                      <Tr key={item.user._id}>
+                        <Td whiteSpace="normal">
+                          {item.user.firstname} {item.user.lastname}
+                        </Td>
+                        <Td whiteSpace="normal">{item.user.address}</Td>
+                        <Td>{item.user.contact}</Td>
+                        <Td>{item.user.email}</Td>
+                        <Td whiteSpace="normal">
+                          {format(item.plan.startTime, "MMMM d, yyyy")}
+                        </Td>
+                        <Td whiteSpace="normal">
+                          {format(item.plan.endTime, "MMMM d, yyyy")}
+                        </Td>
+                        <Td>{item.plan.planName}</Td>
+                        <Td>{item.plan.planStatus}</Td>
+                      </Tr>
+                    ))
+                  ) : (
+                    <Tr>
+                      <Td colSpan="9" textAlign="center">
+                        n/a
+                      </Td>
+                    </Tr>
+                  )}
+                </Tbody>
+              </Table>
+            </TableContainer>
+            {gymMembers?.length !== 0 && !gymMemberLoading ? (
+              <Flex
+                alignItems="center"
+                gap={5}
+                mt={5}
+                justifyContent="center"
+                mr={10}
+              >
+                <Button
+                  isDisabled={currentPage === 1}
+                  onClick={() => {
+                    if (currentPage !== 1) setCurrentPage(currentPage - 1);
+                  }}
+                >
+                  Previous
+                </Button>
+                {currentPage} of {Math.ceil(gymMembers?.length / itemsPerPage)}
+                <Button
+                  isDisabled={
+                    currentPage === Math.ceil(gymMembers?.length / itemsPerPage)
+                  }
+                  onClick={() => {
+                    if (currentPage !== posts.length)
+                      setCurrentPage(currentPage + 1);
+                  }}
+                >
+                  Next
+                </Button>
+              </Flex>
+            ) : null}
+          </TabPanel>
+          <TabPanel>
+            <TableContainer>
+              <Table variant="simple" size="sm">
+                <Thead>
+                  <Tr>
+                    <Th whiteSpace="normal">Member Name</Th>
+                    <Th>Address</Th>
+                    <Th whiteSpace="normal">Phone Number</Th>
+                    <Th whiteSpace="normal">Email</Th>
+                    <Th whiteSpace="normal">Membership Type</Th>
+                    <Th whiteSpace="normal">Amount</Th>
+                    <Th whiteSpace="normal">Proof of Payment</Th>
+                    <Th whiteSpace="normal">Status</Th>
+
+                    <Th>Action</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {gymMembers?.length > 0 ? (
+                    currentPosts?.map((item) => (
+                      <Tr key={item.user._id}>
+                        <Td whiteSpace="normal">
+                          {item.user.firstname} {item.user.lastname}
+                        </Td>
+                        <Td whiteSpace="normal">{item.user.address}</Td>
+                        <Td>{item.user.contact}</Td>
+                        <Td>{item.user.email}</Td>
+
+                        <Td>{item.plan.planName}</Td>
+                        <Td>10,000</Td>
+                        <Td>
+                          <Text
+                            color="brand.100"
+                            cursor="pointer"
+                            _hover={{ textDecoration: "underline" }}
+                          >
+                            View
+                          </Text>
+                        </Td>
+                        <Td>pending</Td>
+                        <Td>
+                          <Button>Manage</Button>
+                        </Td>
+                      </Tr>
+                    ))
+                  ) : (
+                    <Tr>
+                      <Td colSpan="9" textAlign="center">
+                        n/a
+                      </Td>
+                    </Tr>
+                  )}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </TabPanel>
+          <TabPanel>
+            <TableContainer>
+              <Table variant="simple" size="sm">
+                <Thead>
+                  <Tr>
+                    <Th whiteSpace="normal">Member Name</Th>
+                    <Th>Address</Th>
+                    <Th whiteSpace="normal">Phone Number</Th>
+                    <Th whiteSpace="normal">Email</Th>
+                    <Th whiteSpace="normal">Start</Th>
+                    <Th whiteSpace="normal">End</Th>
+                    <Th whiteSpace="normal">Membership Type</Th>
+                    <Th whiteSpace="normal">Status</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {gymMembers?.length > 0 ? (
+                    currentPosts?.map((item) => (
+                      <Tr key={item.user._id}>
+                        <Td whiteSpace="normal">
+                          {item.user.firstname} {item.user.lastname}
+                        </Td>
+                        <Td whiteSpace="normal">{item.user.address}</Td>
+                        <Td>{item.user.contact}</Td>
+                        <Td>{item.user.email}</Td>
+                        <Td whiteSpace="normal">
+                          {format(item.plan.startTime, "MMMM d, yyyy")}
+                        </Td>
+                        <Td whiteSpace="normal">
+                          {format(item.plan.endTime, "MMMM d, yyyy")}
+                        </Td>
+                        <Td>{item.plan.planName}</Td>
+                        <Td>expired</Td>
+                      </Tr>
+                    ))
+                  ) : (
+                    <Tr>
+                      <Td colSpan="9" textAlign="center">
+                        n/a
+                      </Td>
+                    </Tr>
+                  )}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </TabPanel>
+          <TabPanel>
+            <TableContainer>
+              <Table variant="simple" size="sm">
+                <Thead>
+                  <Tr>
+                    <Th whiteSpace="normal">Member Name</Th>
+                    <Th>Address</Th>
+                    <Th whiteSpace="normal">Phone Number</Th>
+                    <Th whiteSpace="normal">Email</Th>
+                    <Th whiteSpace="normal">Start</Th>
+                    <Th whiteSpace="normal">End</Th>
+                    <Th whiteSpace="normal">Membership Type</Th>
+                    <Th whiteSpace="normal">Status</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {gymMembers?.length > 0 ? (
+                    currentPosts?.map((item) => (
+                      <Tr key={item.user._id}>
+                        <Td whiteSpace="normal">
+                          {item.user.firstname} {item.user.lastname}
+                        </Td>
+                        <Td whiteSpace="normal">{item.user.address}</Td>
+                        <Td>{item.user.contact}</Td>
+                        <Td>{item.user.email}</Td>
+                        <Td whiteSpace="normal">
+                          {format(item.plan.startTime, "MMMM d, yyyy")}
+                        </Td>
+                        <Td whiteSpace="normal">
+                          {format(item.plan.endTime, "MMMM d, yyyy")}
+                        </Td>
+                        <Td>{item.plan.planName}</Td>
+                        <Td>rejected</Td>
+                      </Tr>
+                    ))
+                  ) : (
+                    <Tr>
+                      <Td colSpan="9" textAlign="center">
+                        n/a
+                      </Td>
+                    </Tr>
+                  )}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </Box>
   );
 };
