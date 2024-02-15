@@ -64,6 +64,32 @@ const GymOwnerMemberManagement = () => {
     indexOfLastPendingPost
   );
 
+  // useStates for Expired Members
+
+  const [expiredPosts, setExpiredPosts] = useState([]);
+  const [currentExpiredPostsPage, setCurrentExpiredPostsPage] = useState(1);
+  // const itemsPerPage = 5;
+
+  const indexOfLastExpiredPost = currentExpiredPostsPage * itemsPerPage;
+  const indexOfFirstExpiredPost = indexOfLastExpiredPost - itemsPerPage;
+  const currentExpiredPosts = expiredPosts?.slice(
+    indexOfFirstExpiredPost,
+    indexOfLastExpiredPost
+  );
+
+  // useStates for Rejected Members
+
+  const [rejectedPosts, setRejectedPosts] = useState([]);
+  const [currentRejectedPostsPage, setCurrentRejectedPostsPage] = useState(1);
+  // const itemsPerPage = 5;
+
+  const indexOfLastRejectedPost = currentRejectedPostsPage * itemsPerPage;
+  const indexOfFirstRejectedPost = indexOfLastRejectedPost - itemsPerPage;
+  const currentRejectedPosts = rejectedPosts?.slice(
+    indexOfFirstRejectedPost,
+    indexOfLastRejectedPost
+  );
+
   const {
     isOpen: isAddMemberOpen,
     onOpen: openAddMember,
@@ -195,6 +221,8 @@ const GymOwnerMemberManagement = () => {
   useEffect(() => {
     setActivePosts(returnMembers("active"));
     setPendingPosts(returnMembers("pending"));
+    setPendingPosts(returnMembers("expired"));
+    setPendingPosts(returnMembers("rejected"));
   }, [gymMembers]);
 
   // console.log(gymMembers);
@@ -246,8 +274,8 @@ const GymOwnerMemberManagement = () => {
         <TabList>
           <Tab>Active</Tab>
           <Tab>Pending</Tab>
-          {/* <Tab>Expired</Tab>
-          <Tab>Rejected</Tab> */}
+          <Tab>Expired</Tab>
+          {/* <Tab>Rejected</Tab> */}
         </TabList>
         <TabIndicator
           mt="-1.5px"
@@ -265,7 +293,6 @@ const GymOwnerMemberManagement = () => {
                     <Th>Address</Th>
                     <Th whiteSpace="normal">Phone Number</Th>
                     <Th whiteSpace="normal">Email</Th>
-                    {/* <Th whiteSpace="normal">Start</Th> */}
                     <Th whiteSpace="normal">End</Th>
                     <Th whiteSpace="normal">Membership Type</Th>
                     <Th whiteSpace="normal">Status</Th>
@@ -281,9 +308,6 @@ const GymOwnerMemberManagement = () => {
                         <Td whiteSpace="normal">{item.user.address}</Td>
                         <Td>{item.user.contact}</Td>
                         <Td>{item.user.email}</Td>
-                        {/* <Td whiteSpace="normal">
-                          {format(item.plan.startTime, "MMMM d, yyyy")}
-                        </Td> */}
                         <Td whiteSpace="normal">
                           {format(item.plan.endTime, "MMMM d, yyyy")}
                         </Td>
@@ -421,7 +445,7 @@ const GymOwnerMemberManagement = () => {
               </Flex>
             ) : null}
           </TabPanel>
-          {/* <TabPanel>
+          <TabPanel>
             <TableContainer>
               <Table variant="simple" size="sm">
                 <Thead>
@@ -430,15 +454,14 @@ const GymOwnerMemberManagement = () => {
                     <Th>Address</Th>
                     <Th whiteSpace="normal">Phone Number</Th>
                     <Th whiteSpace="normal">Email</Th>
-                    <Th whiteSpace="normal">Start</Th>
                     <Th whiteSpace="normal">End</Th>
                     <Th whiteSpace="normal">Membership Type</Th>
                     <Th whiteSpace="normal">Status</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {gymMembers?.length > 0 ? (
-                    currentPosts?.map((item) => (
+                  {expiredPosts?.length > 0 ? (
+                    currentExpiredPosts?.map((item) => (
                       <Tr key={item.user._id}>
                         <Td whiteSpace="normal">
                           {item.user.firstname} {item.user.lastname}
@@ -447,13 +470,10 @@ const GymOwnerMemberManagement = () => {
                         <Td>{item.user.contact}</Td>
                         <Td>{item.user.email}</Td>
                         <Td whiteSpace="normal">
-                          {format(item.plan.startTime, "MMMM d, yyyy")}
-                        </Td>
-                        <Td whiteSpace="normal">
                           {format(item.plan.endTime, "MMMM d, yyyy")}
                         </Td>
                         <Td>{item.plan.planName}</Td>
-                        <Td>rejected</Td>
+                        <Td>{item.plan.planStatus}</Td>
                       </Tr>
                     ))
                   ) : (
@@ -466,7 +486,115 @@ const GymOwnerMemberManagement = () => {
                 </Tbody>
               </Table>
             </TableContainer>
-          </TabPanel> */}
+            {expiredPosts?.length !== 0 && !gymMemberLoading ? (
+              <Flex
+                alignItems="center"
+                gap={5}
+                mt={5}
+                justifyContent="center"
+                mr={10}
+              >
+                <Button
+                  isDisabled={currentExpiredPostsPage === 1}
+                  onClick={() => {
+                    if (currentExpiredPostsPage !== 1)
+                      setCurrentExpiredPostsPage(currentExpiredPostsPage - 1);
+                  }}
+                >
+                  Previous
+                </Button>
+                {currentExpiredPostsPage} of{" "}
+                {Math.ceil(expiredPosts?.length / itemsPerPage)}
+                <Button
+                  isDisabled={
+                    currentExpiredPostsPage ===
+                    Math.ceil(expiredPosts?.length / itemsPerPage)
+                  }
+                  onClick={() => {
+                    if (currentExpiredPostsPage !== expiredPosts?.length)
+                      setCurrentExpiredPostsPage(currentExpiredPostsPage + 1);
+                  }}
+                >
+                  Next
+                </Button>
+              </Flex>
+            ) : null}
+          </TabPanel>
+          <TabPanel>
+            <TableContainer>
+              <Table variant="simple" size="sm">
+                <Thead>
+                  <Tr>
+                    <Th whiteSpace="normal">Member Name</Th>
+                    <Th>Address</Th>
+                    <Th whiteSpace="normal">Phone Number</Th>
+                    <Th whiteSpace="normal">Email</Th>
+                    <Th whiteSpace="normal">End</Th>
+                    <Th whiteSpace="normal">Membership Type</Th>
+                    <Th whiteSpace="normal">Status</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {rejectedPosts?.length > 0 ? (
+                    currentRejectedPosts?.map((item) => (
+                      <Tr key={item.user._id}>
+                        <Td whiteSpace="normal">
+                          {item.user.firstname} {item.user.lastname}
+                        </Td>
+                        <Td whiteSpace="normal">{item.user.address}</Td>
+                        <Td>{item.user.contact}</Td>
+                        <Td>{item.user.email}</Td>
+                        <Td whiteSpace="normal">
+                          {format(item.plan.endTime, "MMMM d, yyyy")}
+                        </Td>
+                        <Td>{item.plan.planName}</Td>
+                        <Td>{item.plan.planStatus}</Td>
+                      </Tr>
+                    ))
+                  ) : (
+                    <Tr>
+                      <Td colSpan="9" textAlign="center">
+                        n/a
+                      </Td>
+                    </Tr>
+                  )}
+                </Tbody>
+              </Table>
+            </TableContainer>
+            {rejectedPosts?.length !== 0 && !gymMemberLoading ? (
+              <Flex
+                alignItems="center"
+                gap={5}
+                mt={5}
+                justifyContent="center"
+                mr={10}
+              >
+                <Button
+                  isDisabled={currentRejectedPostsPage === 1}
+                  onClick={() => {
+                    if (currentRejectedPostsPage !== 1)
+                      setCurrentRejectedPostsPage(currentRejectedPostsPage - 1);
+                  }}
+                >
+                  Previous
+                </Button>
+                {currentRejectedPostsPage} of{" "}
+                {Math.ceil(rejectedPosts?.length / itemsPerPage)}
+                <Button
+                  isDisabled={
+                    currentRejectedPostsPage ===
+                    Math.ceil(rejectedPosts?.length / itemsPerPage)
+                  }
+                  onClick={() => {
+                    if (currentRejectedPostsPage !== rejectedPosts?.length)
+                      setCurrentRejectedPostsPage(currentRejectedPostsPage + 1);
+                  }}
+                >
+                  Next
+                </Button>
+              </Flex>
+            ) : null}
+          </TabPanel>
         </TabPanels>
       </Tabs>
     </Box>
