@@ -121,6 +121,8 @@ const UserReviews = () => {
     setPosts(data);
   }, [data]);
 
+  // console.log(data);
+
   return (
     <Box padding="2rem">
       {/* Review Modal*/}

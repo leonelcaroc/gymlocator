@@ -4,6 +4,7 @@ import {
   Box,
   Flex,
   Button,
+  Spinner,
   Table,
   Thead,
   Tr,
@@ -118,6 +119,9 @@ const UserClasses = () => {
   useEffect(() => {
     setPosts(data);
   }, [data]);
+
+  console.log(data);
+
   return (
     <Box padding="2rem">
       <Text color="brand.200" fontSize="2rem" marginBottom="2rem">
@@ -136,64 +140,62 @@ const UserClasses = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {data?.length !== 0 && !isLoading ? (
-              currentPosts?.map((item) => (
-                <Tr key={item._id}>
-                  <Td whiteSpace="normal">{item.gymname}</Td>
-                  <Td whiteSpace="normal">{item.classname}</Td>
-                  <Td whiteSpace="normal">{item.instructor}</Td>
-                  <Td
-                    whiteSpace="normal"
-                    display="flex"
-                    flexDir="column"
-                    gap="5px"
-                  >
-                    <Text>{formatDateToCustomFormat(item.date)}</Text>
-                    <Text>
-                      {convertTo12HourFormat(item.starttime)} -{" "}
-                      {convertTo12HourFormat(item.endtime)}
-                    </Text>
-                  </Td>
-                  <Td>{`${item.joinedMember.length}/${item.capacity}`}</Td>
-                  <Td display="flex">
-                    {item.joinedMember.includes(
-                      JSON.parse(TokenService.getUserLocal())._id
-                    ) ? (
-                      <Button
-                        bgColor="red"
-                        color="neutral.100"
-                        _hover={{ color: "red", bgColor: "gray.200" }}
-                        onClick={() => handleWithdrawClass(item)}
-                        isLoading={userWithdrawClassMutation.isLoading}
-                      >
-                        Withdraw
-                      </Button>
-                    ) : (
-                      <Button
-                        bgColor="brand.100"
-                        color="neutral.100"
-                        _hover={{ color: "brand.100", bgColor: "gray.200" }}
-                        onClick={() => handleJoinNow(item)}
-                        isLoading={userJoinClassMutation.isLoading}
-                      >
-                        Join Now
-                      </Button>
-                    )}
-
-                    {/* <Button
-                  
-                >
-                  Cancel
-                </Button> */}
+            {!isLoading ? (
+              data?.length !== 0 && !isLoading ? (
+                currentPosts?.map((item) => (
+                  <Tr key={item._id}>
+                    <Td whiteSpace="normal">{item.gymname}</Td>
+                    <Td whiteSpace="normal">{item.classname}</Td>
+                    <Td whiteSpace="normal">{item.instructor}</Td>
+                    <Td
+                      whiteSpace="normal"
+                      display="flex"
+                      flexDir="column"
+                      gap="5px"
+                    >
+                      <Text>{formatDateToCustomFormat(item.date)}</Text>
+                      <Text>
+                        {convertTo12HourFormat(item.starttime)} -{" "}
+                        {convertTo12HourFormat(item.endtime)}
+                      </Text>
+                    </Td>
+                    <Td>{`${item.joinedMember.length}/${item.capacity}`}</Td>
+                    <Td display="flex">
+                      {item.joinedMember.includes(
+                        JSON.parse(TokenService.getUserLocal())._id
+                      ) ? (
+                        <Button
+                          bgColor="red"
+                          color="neutral.100"
+                          _hover={{ color: "red", bgColor: "gray.200" }}
+                          onClick={() => handleWithdrawClass(item)}
+                          isLoading={userWithdrawClassMutation.isLoading}
+                        >
+                          Withdraw
+                        </Button>
+                      ) : (
+                        <Button
+                          bgColor="brand.100"
+                          color="neutral.100"
+                          _hover={{ color: "brand.100", bgColor: "gray.200" }}
+                          onClick={() => handleJoinNow(item)}
+                          isLoading={userJoinClassMutation.isLoading}
+                        >
+                          Join Now
+                        </Button>
+                      )}
+                    </Td>
+                  </Tr>
+                ))
+              ) : (
+                <Tr>
+                  <Td colSpan="6" textAlign="center">
+                    n/a
                   </Td>
                 </Tr>
-              ))
+              )
             ) : (
-              <Tr>
-                <Td colSpan="6" textAlign="center">
-                  n/a
-                </Td>
-              </Tr>
+              <Spinner mt="1rem" ml="1rem" size="lg" />
             )}
           </Tbody>
         </Table>

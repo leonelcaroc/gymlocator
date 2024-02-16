@@ -144,6 +144,10 @@ const registerUser = asyncHandler(async (req, res) => {
       .json({ error: "Password must be between 8 and 16 characters" });
   }
 
+  if (!validator.isLength(paymentImage, { min: 1 })) {
+    return res.status(400).json({ error: "Proof of payment is required." });
+  }
+
   const uploadPayment = await cloudinary.uploader.upload(paymentImage, {
     upload_preset: "payment-image",
   });
@@ -467,9 +471,11 @@ const getUserClasses = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  const ownerIdList = user.memberships.map(
-    (membership) => membership.gym.ownerId
-  );
+  const activeMembers = user.memberships.filter((item) => {
+    return item.myPlan.planStatus === "active";
+  });
+
+  const ownerIdList = activeMembers.map((membership) => membership.gym.ownerId);
 
   const availableClasses = await Class.find({
     gymOwnerId: { $in: ownerIdList },
@@ -596,6 +602,11 @@ const getUserAnnouncements = asyncHandler(async (req, res) => {
       $unwind: "$memberships",
     },
     {
+      $match: {
+        "memberships.myPlan.planStatus": "active",
+      },
+    },
+    {
       $lookup: {
         from: "gymowners",
         localField: "memberships.gym.ownerId",
@@ -642,7 +653,11 @@ const getUserReviews = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  res.status(200).json(user.reviews);
+  const activeMembers = user.reviews.filter((item) => {
+    return item.isJoined === true;
+  });
+
+  res.status(200).json(activeMembers);
 });
 
 const submitUserReview = asyncHandler(async (req, res) => {
@@ -704,3 +719,61 @@ export {
   getUserReviews,
   submitUserReview,
 };
+
+const a = {
+  memberships: [
+    {
+      gym: {
+        gymname: "Ben's Gym",
+        ownerId: "65cad1fd24dd9f66898a5f1e",
+      },
+      myPlan: {
+        planStatus: "active",
+      },
+    },
+  ],
+  reviews: [
+    {
+      gymname: "Ben's Gym",
+      _id: "65cad1fd24dd9f66898a5f1e",
+      rating: 0,
+      status: false,
+    },
+  ],
+};
+
+// const userReviewsAggregate = [
+//   {
+//     $match: {
+//       _id: ObjectId("65cad1fd24dd9f66898a5f1e"),
+//     },
+//   },
+//   {
+//     $unwind: "$reviews",
+//   },
+//   {
+//     $lookup: {
+//       from: "Memberships",
+//       localField: "reviews.gymname",
+//       foreignField: "gym.gymname",
+//       as: "membership",
+//     },
+//   },
+//   {
+//     $unwind: "$membership",
+//   },
+//   {
+//     $match: {
+//       "membership.myPlan.planStatus": "active",
+//     },
+//   },
+//   {
+//     $project: {
+//       _id: "$reviews._id",
+//       gymname: "$reviews.gymname",
+//       rating: "$reviews.rating",
+//       status: "$reviews.status",
+//       ownerId: 1, // include ownerId if needed
+//     },
+//   },
+// ];

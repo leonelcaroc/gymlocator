@@ -20,6 +20,11 @@ const reviewSchema = mongoose.Schema({
     required: true,
     default: false,
   },
+  isJoined: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
 });
 
 const membershipSchema = mongoose.Schema(

@@ -10,6 +10,7 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalFooter,
+  Spinner,
   Text,
   Table,
   Thead,
@@ -164,20 +165,32 @@ const UserSubscriptions = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {currentPosts?.map((item) => (
-              <Tr key={item._id}>
-                <Td whiteSpace="normal">{item.gym.gymname}</Td>
-                <Td>
-                  {item.myPlan.endTime !== null
-                    ? formatDateToCustomFormat(item.myPlan.endTime)
-                    : "n/a"}
-                </Td>
+            {!isLoading ? (
+              data?.length !== 0 && !isLoading ? (
+                currentPosts?.map((item) => (
+                  <Tr key={item._id}>
+                    <Td whiteSpace="normal">{item.gym.gymname}</Td>
+                    <Td>
+                      {item.myPlan.endTime !== null
+                        ? formatDateToCustomFormat(item.myPlan.endTime)
+                        : "n/a"}
+                    </Td>
 
-                <Td>{item.myPlan.planName}</Td>
-                <Td>{item.myPlan.planStatus}</Td>
-                <Td>n/a</Td>
-              </Tr>
-            ))}
+                    <Td>{item.myPlan.planName}</Td>
+                    <Td>{item.myPlan.planStatus}</Td>
+                    <Td>n/a</Td>
+                  </Tr>
+                ))
+              ) : (
+                <Tr>
+                  <Td colSpan="5" textAlign="center">
+                    n/a
+                  </Td>
+                </Tr>
+              )
+            ) : (
+              <Spinner mt="1rem" ml="1rem" size="lg" />
+            )}
           </Tbody>
         </Table>
       </TableContainer>

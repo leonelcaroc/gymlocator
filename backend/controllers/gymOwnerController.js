@@ -1714,6 +1714,7 @@ const addNewMember = asyncHandler(async (req, res) => {
     memberships: membershipPlan,
     gender: gender,
     password: password,
+    reviews: [...reviews.map((review) => ({ ...review, isJoined: true }))],
   });
 
   if (user) {
@@ -1788,11 +1789,6 @@ const updatePendingMemberStatus = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  // console.log(
-  //   member.memberships[0].gym.ownerId.toString() === owner._id.toString()
-  // );
-  // console.log(owner._id);
-
   const memberIndex = member.memberships.findIndex(
     (member) => member.gym.ownerId.toString() === owner._id.toString()
   );
@@ -1826,6 +1822,16 @@ const updatePendingMemberStatus = asyncHandler(async (req, res) => {
         member.memberships[memberIndex].myPlan.duration
       );
 
+      // Find the review index that matches the gymname
+      const reviewIndex = member.reviews.findIndex(
+        (review) => review._id.toString() === owner._id.toString()
+      );
+
+      // Set isJoined to true if the review is found
+      if (reviewIndex !== -1 && !member.reviews[reviewIndex].isJoined) {
+        member.reviews[reviewIndex].isJoined = true;
+      }
+
       owner.gym.members[ownerIndex].plan.planStatus = "active";
       owner.gym.members[ownerIndex].plan.paymentStatus = "paid";
       owner.gym.members[ownerIndex].plan.startTime = new Date();
@@ -1841,7 +1847,7 @@ const updatePendingMemberStatus = asyncHandler(async (req, res) => {
         .json({ message: "Successfully updated member status" });
     }
   } catch (error) {
-    // res.status(400).json({ error: "Failed to update member status." });
+    res.status(400).json({ error: "Failed to update member status." });
     throw new Error(error);
   }
 });

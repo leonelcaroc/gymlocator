@@ -12,6 +12,7 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalFooter,
+  Spinner,
   Table,
   Thead,
   Tr,
@@ -113,25 +114,34 @@ const UserAnnouncements = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {currentPosts?.map((item) => (
-              <Tr
-                key={item._id}
-                _hover={{ bgColor: "gray.300" }}
-                cursor="pointer"
-                onClick={() => handleOpenItem(item)}
-              >
-                <Td whiteSpace="normal">{item.gymname}</Td>
-                <Td whiteSpace="normal">
-                  {item.announcement.length > 20
-                    ? item.announcement.slice(0, 20).concat("...")
-                    : item.announcement}
+            {!isLoading ? (
+              data?.length !== 0 ? (
+                currentPosts?.map((item) => (
+                  <Tr
+                    key={item._id}
+                    _hover={{ bgColor: "gray.300" }}
+                    cursor="pointer"
+                    onClick={() => handleOpenItem(item)}
+                  >
+                    <Td whiteSpace="normal">{item.gymname}</Td>
+                    <Td whiteSpace="normal">
+                      {item.announcement.length > 20
+                        ? item.announcement.slice(0, 20).concat("...")
+                        : item.announcement}
+                    </Td>
+                    <Td>{`${formatDateToCustomFormat(
+                      item.createdAt
+                    )} - ${format(parseISO(item.createdAt), "h:mm a")}`}</Td>
+                  </Tr>
+                ))
+              ) : (
+                <Td colSpan="3" textAlign="center">
+                  n/a
                 </Td>
-                <Td>{`${formatDateToCustomFormat(item.createdAt)} - ${format(
-                  parseISO(item.createdAt),
-                  "h:mm a"
-                )}`}</Td>
-              </Tr>
-            ))}
+              )
+            ) : (
+              <Spinner mt="1rem" ml="1rem" size="lg" />
+            )}
           </Tbody>
         </Table>
       </TableContainer>
