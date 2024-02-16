@@ -221,11 +221,11 @@ const GymOwnerMemberManagement = () => {
   useEffect(() => {
     setActivePosts(returnMembers("active"));
     setPendingPosts(returnMembers("pending"));
-    setPendingPosts(returnMembers("expired"));
-    setPendingPosts(returnMembers("rejected"));
+    setExpiredPosts(returnMembers("expired"));
+    setRejectedPosts(returnMembers("rejected"));
   }, [gymMembers]);
 
-  // console.log(gymMembers);
+  // console.log(pendingPosts);
   // console.log(returnMembers("pending"));
 
   return (
@@ -368,8 +368,6 @@ const GymOwnerMemberManagement = () => {
                     <Th>Address</Th>
                     <Th whiteSpace="normal">Phone Number</Th>
                     <Th whiteSpace="normal">Email</Th>
-                    <Th whiteSpace="normal">Start</Th>
-                    <Th whiteSpace="normal">End</Th>
                     <Th whiteSpace="normal">Membership Type</Th>
                     <Th whiteSpace="normal">Status</Th>
                     <Th>Action</Th>
