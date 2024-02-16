@@ -160,32 +160,22 @@ const UserSubscriptions = () => {
               <Th>End Date</Th>
               <Th>Plan</Th>
               <Th>Status</Th>
-              {/* <Th>Action</Th> */}
+              <Th>Action</Th>
             </Tr>
           </Thead>
           <Tbody>
             {currentPosts?.map((item) => (
               <Tr key={item._id}>
                 <Td whiteSpace="normal">{item.gym.gymname}</Td>
-                <Td>{formatDateToCustomFormat(item.myPlan.endTime)}</Td>
+                <Td>
+                  {item.myPlan.endTime !== null
+                    ? formatDateToCustomFormat(item.myPlan.endTime)
+                    : "n/a"}
+                </Td>
+
                 <Td>{item.myPlan.planName}</Td>
                 <Td>{item.myPlan.planStatus}</Td>
-                {/* <Td>
-                  <Button
-                    bgColor="red"
-                    color="neutral.100"
-                    _hover={{ color: "red", bgColor: "gray.200" }}
-                    onClick={() => handleOpenSub(item)}
-                    // onClick={() =>
-                    //   handleCancelSub(
-                    //     item.gym._id,
-                    //     JSON.parse(TokenService.getUserLocal())._id
-                    //   )
-                    // }
-                  >
-                    Cancel
-                  </Button>
-                </Td> */}
+                <Td>n/a</Td>
               </Tr>
             ))}
           </Tbody>
