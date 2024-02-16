@@ -1797,8 +1797,8 @@ const updatePendingMemberStatus = asyncHandler(async (req, res) => {
     (owner) => owner.user._id.toString() === member._id.toString()
   );
 
-  console.log("memberIndex", memberIndex);
-  console.log("ownerIndex", ownerIndex);
+  // console.log("memberIndex", memberIndex);
+  // console.log("ownerIndex", ownerIndex);
 
   try {
     if (action === "reject") {
@@ -1836,7 +1836,7 @@ const updatePendingMemberStatus = asyncHandler(async (req, res) => {
       owner.gym.members[ownerIndex].plan.paymentStatus = "paid";
       owner.gym.members[ownerIndex].plan.startTime = new Date();
       owner.gym.members[ownerIndex].plan.endTime = calculateEndTime(
-        owner.gym.members[memberIndex].plan.duration
+        owner.gym.members[ownerIndex].plan.duration
       );
 
       await member.save();

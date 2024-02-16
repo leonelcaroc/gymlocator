@@ -166,8 +166,8 @@ const registerUser = asyncHandler(async (req, res) => {
         // endTime: calculateEndTime(plan.duration),
         // startTime: "",
         // endTime: "",
-        planStatus: "pending",
-        paymentStatus: "pending",
+        // planStatus: "pending",
+        // paymentStatus: "pending",
         proofOfPayment: uploadPayment,
       },
     },
@@ -221,8 +221,8 @@ const registerUser = asyncHandler(async (req, res) => {
         // endTime: calculateEndTime(plan.duration),
         // startTime: "",
         // endTime: "",
-        planStatus: "pending",
-        paymentStatus: "pending",
+        // planStatus: "pending",
+        // paymentStatus: "pending",
         proofOfPayment: uploadPayment,
       },
     });
@@ -245,7 +245,7 @@ const userJoinGym = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  const { plan, gymId } = req.body;
+  const { plan, gymId, paymentImage } = req.body;
 
   const verifiedGymOwner = await GymOwner.findById(gymId);
 
@@ -268,6 +268,14 @@ const userJoinGym = asyncHandler(async (req, res) => {
     throw new Error("Gym plan doesn't exists to your chosen gym");
   }
 
+  if (!validator.isLength(paymentImage, { min: 1 })) {
+    return res.status(400).json({ error: "Proof of payment is required." });
+  }
+
+  const uploadPayment = await cloudinary.uploader.upload(paymentImage, {
+    upload_preset: "payment-image",
+  });
+
   const membershipPlan = {
     gym: {
       gymname: verifiedGymOwner.gym.gymname,
@@ -277,10 +285,11 @@ const userJoinGym = asyncHandler(async (req, res) => {
       planName: plan.planName,
       amount: plan.amount,
       duration: plan.duration,
-      startTime: Date.now(),
-      endTime: calculateEndTime(plan.duration),
-      planStatus: "active",
-      paymentStatus: "paid",
+      // startTime: Date.now(),
+      // endTime: calculateEndTime(plan.duration),
+      // planStatus: "active",
+      // paymentStatus: "paid",
+      proofOfPayment: uploadPayment,
     },
   };
 
@@ -312,16 +321,17 @@ const userJoinGym = asyncHandler(async (req, res) => {
         planName: plan.planName,
         amount: plan.amount,
         duration: plan.duration,
-        startTime: Date.now(),
-        endTime: calculateEndTime(plan.duration),
-        planStatus: "active",
-        paymentStatus: "paid",
+        // startTime: Date.now(),
+        // endTime: calculateEndTime(plan.duration),
+        // planStatus: "active",
+        // paymentStatus: "paid",
+        proofOfPayment: uploadPayment,
       },
     });
     await verifiedGymOwner.save();
 
     res.status(201).json({
-      message: `Successfully joined at ${verifiedGymOwner.gym.gymname}`,
+      message: `Successfully sent a request for subscription at ${verifiedGymOwner.gym.gymname}`,
     });
   } else {
     res.status(400);

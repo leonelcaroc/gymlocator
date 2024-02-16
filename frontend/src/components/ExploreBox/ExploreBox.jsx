@@ -19,6 +19,7 @@ const ExploreBox = ({
   selectedGym,
   setSelectedGym,
   openUserSignUp,
+  openUserJoinGym,
 }) => {
   return (
     <Flex
@@ -114,6 +115,7 @@ const ExploreBox = ({
               setSelectedGym={setSelectedGym}
               selectedGym={selectedGym}
               openUserSignUp={openUserSignUp}
+              openUserJoinGym={openUserJoinGym}
             />
           ))
         )}

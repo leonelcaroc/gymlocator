@@ -101,11 +101,12 @@ export const getUserGyms = async () => {
   }
 };
 
-export const postUserJoinGym = async (plan, gymId) => {
+export const postUserJoinGym = async (plan, gymId, paymentImage) => {
   try {
     const { data } = await privateUserApi.post("/join", {
-      plan,
-      gymId,
+      plan: plan,
+      gymId: gymId,
+      paymentImage: paymentImage,
     });
     return data;
   } catch (error) {

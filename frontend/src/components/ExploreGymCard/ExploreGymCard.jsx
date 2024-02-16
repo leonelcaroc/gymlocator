@@ -40,6 +40,7 @@ import StarRating from "../StarRating/StarRating";
 import { useNavigate } from "react-router-dom";
 import getAbbreviatedDay from "../../utils/getAbbreviatedDay";
 import { formattedTime } from "../../utils/convertToAmericanTime";
+import TokenService from "../../services/token";
 
 const ExploreGymCard = ({
   owner,
@@ -47,6 +48,7 @@ const ExploreGymCard = ({
   selectedGym,
   setSelectedGym,
   openUserSignUp,
+  openUserJoinGym,
 }) => {
   const [review, setReview] = useState(0);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -67,7 +69,9 @@ const ExploreGymCard = ({
 
   const roundedAverage = averageReview.toFixed(1);
 
-  console.log(owner);
+  // console.log(owner);
+
+  // console.log(JSON.parse(TokenService.getUserLocal()).token);
 
   return (
     <Card
@@ -79,7 +83,8 @@ const ExploreGymCard = ({
       cursor="pointer"
       _hover={{ bgColor: "gray.100" }}
     >
-      {/* This is the Modal for User Sign Up - see ABOVE*/}
+      {/* Join Other Gym Modal*/}
+
       <Flex>
         <Box position="relative" flexGrow="1" width="50%">
           <Image
@@ -210,30 +215,6 @@ const ExploreGymCard = ({
         </TabPanels>
       </Tabs>
 
-      {/* <Box mt="1rem" paddingInline="1rem">
-        <Box my="0.5rem">
-          <Text fontWeight="bold">Gym Details</Text>
-          <Text>- This is ben's gym</Text>
-        </Box>
-        <Box>
-          <Text as="span" fontWeight="bold">
-            Contact Phone:
-          </Text>{" "}
-          09124523652
-        </Box>
-        <Box>
-          <Text as="span" fontWeight="bold">
-            Email:
-          </Text>{" "}
-          ben@gmail.com
-        </Box>
-        <Box>
-          <Text as="span" fontWeight="bold">
-            Address:
-          </Text>{" "}
-          Manila
-        </Box>
-      </Box> */}
       <Flex justifyContent="space-evenly" marginBlock="1rem">
         <Button
           variant="solid"
@@ -252,7 +233,10 @@ const ExploreGymCard = ({
           width="120px"
           _hover={{ color: "brand.100", bgColor: "gray.300" }}
           onClick={() => {
-            openUserSignUp();
+            const userToken = JSON.parse(TokenService.getUserLocal()).token;
+
+            userToken ? openUserJoinGym() : openUserSignUp();
+
             setSelectedGym(owner);
           }}
         >

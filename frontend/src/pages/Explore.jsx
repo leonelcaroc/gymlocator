@@ -211,6 +211,7 @@ const Explore = () => {
             setExploreState={setExploreState}
             owners={approvedGyms}
             openUserSignUp={openUserSignUp}
+            openUserJoinGym={openUserJoinGym}
           />
 
           {/* <Box
