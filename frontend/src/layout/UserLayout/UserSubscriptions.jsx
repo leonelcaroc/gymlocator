@@ -177,7 +177,22 @@ const UserSubscriptions = () => {
                     </Td>
 
                     <Td>{item.myPlan.planName}</Td>
-                    <Td>{item.myPlan.planStatus}</Td>
+                    <Td
+                      color={
+                        item.myPlan.planStatus === "active"
+                          ? "brand.100"
+                          : item.myPlan.planStatus === "pending"
+                          ? "yellow.500"
+                          : item.myPlan.planStatus === "expired"
+                          ? "black"
+                          : item.myPlan.planStatus === "rejected"
+                          ? "red"
+                          : null
+                      }
+                      fontWeight="bold"
+                    >
+                      {item.myPlan.planStatus}
+                    </Td>
                     <Td>n/a</Td>
                   </Tr>
                 ))
