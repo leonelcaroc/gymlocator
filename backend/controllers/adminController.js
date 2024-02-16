@@ -29,44 +29,6 @@ const authAdmin = asyncHandler(async (req, res) => {
   }
 });
 
-// desc     Register a new user
-// route    POST /api/users
-// @access  Public
-// const registerAdmin = asyncHandler(async (req, res) => {
-//   const { email, password } = req.body;
-
-//   if (!validator.isEmail(email)) {
-//     return res.status(400).json({ error: "Invalid email address" });
-//   }
-
-//   if (!validator.isLength(password, { min: 6, max: 16 })) {
-//     return res
-//       .status(400)
-//       .json({ error: "Password must between 6 and 16 character length" });
-//   }
-
-//   const userEmailExists = await Admin.findOne({ email });
-
-//   if (userEmailExists) {
-//     res.status(400);
-//     throw new Error("Email already exists.");
-//   }
-
-//   const user = await Admin.create({
-//     email,
-//     password,
-//   });
-
-//   if (user) {
-//     res.status(201).json({
-//       message: "Account Created",
-//     });
-//   } else {
-//     res.status(400);
-//     throw new Error("Invalid user data.");
-//   }
-// });
-
 // desc     Logout user
 // route    POST /api/users/logout
 // @access  Public
