@@ -145,7 +145,7 @@ const ExploreGymCard = ({
         />
         <TabPanels>
           <TabPanel fontSize="1rem">
-            <Box my="0.5rem">
+            <Box my="0.3rem">
               <Text fontWeight="bold">Gym Details</Text>
               <Text>- {owner.gym.description}</Text>
             </Box>
@@ -168,8 +168,8 @@ const ExploreGymCard = ({
               {owner.gym.address}
             </Box>
           </TabPanel>
-          <TabPanel>
-            <Box my="0.5rem">
+          <TabPanel fontSize="1rem">
+            <Box my="0.3rem">
               {owner.gym.amenities.length !== 0 ? (
                 <UnorderedList>
                   {owner.gym.amenities.map((item) => (
@@ -181,27 +181,31 @@ const ExploreGymCard = ({
               )}
             </Box>
           </TabPanel>
-          <TabPanel>
-            {owner.gym.services.length !== 0 ? (
-              <UnorderedList>
-                {owner.gym.services.map((item) => (
-                  <ListItem key={item._id}>{item.serviceName}</ListItem>
-                ))}
-              </UnorderedList>
-            ) : (
-              <Text>n/a</Text>
-            )}
+          <TabPanel fontSize="1rem">
+            <Box my="0.3rem">
+              {owner.gym.services.length !== 0 ? (
+                <UnorderedList>
+                  {owner.gym.services.map((item) => (
+                    <ListItem key={item._id}>{item.serviceName}</ListItem>
+                  ))}
+                </UnorderedList>
+              ) : (
+                <Text>n/a</Text>
+              )}
+            </Box>
           </TabPanel>
-          <TabPanel>
-            {owner.gym.equipments.length !== 0 ? (
-              <UnorderedList>
-                {owner.gym.equipments.map((item) => (
-                  <ListItem key={item._id}>{item.equipmentName}</ListItem>
-                ))}
-              </UnorderedList>
-            ) : (
-              <Text>n/a</Text>
-            )}
+          <TabPanel fontSize="1rem">
+            <Box my="0.3rem">
+              {owner.gym.equipments.length !== 0 ? (
+                <UnorderedList>
+                  {owner.gym.equipments.map((item) => (
+                    <ListItem key={item._id}>{item.equipmentName}</ListItem>
+                  ))}
+                </UnorderedList>
+              ) : (
+                <Text>n/a</Text>
+              )}
+            </Box>
           </TabPanel>
         </TabPanels>
       </Tabs>
