@@ -1,55 +1,42 @@
-import { useQuery, useMutation, useQueryClient } from "react-query";
+import { useQuery, useMutation } from "react-query";
 import { postRegisterUser } from "../api/userApi/userApi";
 import { getGymOwners } from "../api/publicApi/publicApi";
 import { getUserGyms } from "../api/userApi/privateUserApi";
-import { formattedTime } from "../utils/convertToAmericanTime";
-import getAbbreviatedDay from "../utils/getAbbreviatedDay";
+
 import Header from "../layout/Header/Header";
 import ExploreBox from "../components/ExploreBox/ExploreBox";
 import UserSignUpModal from "../components/UserSignUpModal/UserSignUpModal";
 import backgroundImage from "../assets/images/gym-sample.jpg";
 import { useState, useEffect } from "react";
 import TokenService from "../services/token";
+import locationMarker from "../assets/images/current-location-marker.png";
 import UserJoinOtherGymModal from "../components/UserJoinOtherGymModal/UserJoinOtherGymModal";
-import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
-import { Outlet, useNavigate } from "react-router-dom";
 import {
-  Flex,
-  Box,
-  Text,
-  Stack,
-  Input,
-  Select,
-  Divider,
-  Button,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
+  useJsApiLoader,
+  GoogleMap,
+  MarkerF,
+  DirectionsRenderer,
+  InfoWindowF,
+  CircleF,
+} from "@react-google-maps/api";
+import { useNavigate } from "react-router-dom";
+import { Flex, Box, useDisclosure, useToast } from "@chakra-ui/react";
 
 const center = { lat: 6.919008776885199, lng: 122.07734107888048 };
 
 const Explore = () => {
   const navigate = useNavigate();
   const toast = useToast();
-  const [exploreState, setExploreState] = useState("explore");
   const [selectedGym, setSelectedGym] = useState(null);
+  const [exploreState, setExploreState] = useState("explore");
   const [location, setLocation] = useState([]);
   const { isLoaded } = useJsApiLoader({
     // googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAP_API_KEY,
     googleMapsApiKey: "AIzaSyDrEoMAjf6lO-05iin-Gat1FlMqVHQJ2LU",
   });
 
-  const queryClient = useQueryClient();
-
-  const startDay = getAbbreviatedDay(selectedGym?.gym.schedule.startday);
-  const endDay = getAbbreviatedDay(selectedGym?.gym.schedule.endday);
-  const startTime = formattedTime(selectedGym?.gym.schedule.opentime);
-  const endTime = formattedTime(selectedGym?.gym.schedule.closetime);
-
-  const totalReviews = selectedGym?.gym.reviews.reduce(
-    (accumulator, currentValue) => accumulator + currentValue,
-    0
-  );
+  const [hoveredMarker, setHoveredMarker] = useState(null);
+  const [directionResponse, setDirectionResponse] = useState(null);
 
   const {
     isOpen: isUserSignUpOpen,
@@ -131,45 +118,68 @@ const Explore = () => {
     }
   );
 
-  // useEffect(() => {
-  //   let isMounted = true;
+  useEffect(() => {
+    const getLocation = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
 
-  //   if (navigator.geolocation) {
-  //     navigator.geolocation.getCurrentPosition(
-  //       (position) => {
-  //         if (isMounted) {
-  //           const latitude = position.coords.latitude;
-  //           const longitude = position.coords.longitude;
-  //           setLocation([latitude, longitude]);
-  //           console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-  //         }
-  //       },
-  //       () => {
-  //         console.log("Unable to retrieve your location");
-  //       }
-  //     );
-  //   } else {
-  //     console.log("Geolocation not supported");
-  //   }
+            setLocation({ latitude, longitude });
+          },
+          (error) => {
+            console.log("Error getting user location:", error);
 
-  //   return () => {
-  //     isMounted = false;
-  //     queryClient.cancelQueries("gymOwners");
-  //   };
-  // }, []);
+            toast({
+              title: "Error getting user location",
+              status: "error",
+              duration: 2000,
+              position: "bottom-right",
+            });
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000, // Maximum time (in milliseconds) allowed for obtaining the position
+            maximumAge: 0, // Maximum age (in milliseconds) of a possible cached position that is acceptable
+          }
+        );
+      } else {
+        console.log("Geolocation is not supported by this browser.");
+        toast({
+          title: "Geolocation is not supported by this browser.",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      }
+    };
 
-  // console.log(selectedGym);
-  // console.log(approvedGyms);
-  // console.log(TokenService.getUserLocal()?.token);
-  // console.log(allGyms);
+    getLocation();
+  }, []);
 
-  const onMapClick = (e) => {
-    setLocation([e.latLng.lat(), e.latLng.lng()]);
+  const fetchDirections = async (gymLoc) => {
+    setDirectionResponse(null);
+
+    if (gymLoc.length === 0 || Array.isArray(location)) {
+      return;
+    }
+
+    const directionService = new google.maps.DirectionsService();
+
+    const results = await directionService.route({
+      origin: new window.google.maps.LatLng(
+        location.latitude,
+        location.longitude
+      ),
+      destination: new window.google.maps.LatLng(gymLoc[0], gymLoc[1]),
+      travelMode: google.maps.TravelMode.DRIVING,
+    });
+
+    return setDirectionResponse(results);
   };
 
-  if (!isLoaded) {
-    return;
-  }
+  console.log(approvedGyms);
 
   return (
     <>
@@ -208,22 +218,12 @@ const Explore = () => {
           <ExploreBox
             setSelectedGym={setSelectedGym}
             selectedGym={selectedGym}
-            setExploreState={setExploreState}
+            fetchDirections={fetchDirections}
             owners={approvedGyms}
             openUserSignUp={openUserSignUp}
             openUserJoinGym={openUserJoinGym}
           />
 
-          {/* <Box
-            height="30rem"
-            width="38rem"
-            borderRadius="10px"
-            padding="10px"
-            bgColor="gray.100"
-            position="relative"
-          >
-            <Box></Box>
-          </Box> */}
           <Box
             position="relative"
             height="30rem"
@@ -233,21 +233,92 @@ const Explore = () => {
             bgColor="neutral.100"
           >
             <Box position="absolute" left="0" top="0" h="100%" w="100%">
-              <GoogleMap
-                center={center}
-                zoom={14}
-                mapContainerStyle={{ width: "100%", height: "100%" }}
-                onClick={onMapClick}
-              >
-                {location.length !== 0 && (
-                  <Marker
-                    position={{
-                      lat: location[0],
-                      lng: location[1],
-                    }}
-                  />
-                )}
-              </GoogleMap>
+              {isLoaded && !isLoading && (
+                <GoogleMap
+                  // center={
+                  //   !Array.isArray(location)
+                  //     ? {
+                  //         lat: location.latitude,
+                  //         lng: location.longitude,
+                  //       }
+                  //     : center
+                  // }
+                  center={center}
+                  zoom={13}
+                  mapContainerStyle={{ width: "100%", height: "100%" }}
+                  clickableIcons={false}
+
+                  // onClick={onMapClick}
+                >
+                  {approvedGyms?.map((item) => (
+                    <MarkerF
+                      key={item.gym._id}
+                      position={{
+                        lat: item.gym.gymLocation[0],
+                        lng: item.gym.gymLocation[1],
+                      }}
+                      // onMouseOver={() => setHoveredMarker(item.gym._id)}
+                      // onMouseOut={() => setHoveredMarker(null)}
+                      onClick={
+                        !Array.isArray(location) ||
+                        item.gym.gymLocation.length !== 0
+                          ? () => fetchDirections(item.gym.gymLocation)
+                          : null
+                      }
+                    >
+                      {/* {hoveredMarker === item.gym._id && ( */}
+                      <InfoWindowF
+                        position={{
+                          lat: item.gym.gymLocation[0],
+                          lng: item.gym.gymLocation[1],
+                        }}
+                      >
+                        <div id="my-info-window">
+                          <div>{item.gym.gymname}</div>
+                          <img
+                            src={item.gym.gymImage.url}
+                            alt={item.gym.gymname}
+                            style={{ width: "auto", height: "50px" }}
+                          />
+                        </div>
+                      </InfoWindowF>
+                      {/* )} */}
+                    </MarkerF>
+                  ))}
+
+                  {location && (
+                    <>
+                      <MarkerF
+                        position={{
+                          lat: location.latitude,
+                          lng: location.longitude,
+                        }}
+                        icon={{
+                          url: locationMarker,
+                          scaledSize: new window.google.maps.Size(35, 35),
+                        }}
+                      />
+                      <CircleF
+                        center={{
+                          lat: location.latitude,
+                          lng: location.longitude,
+                        }}
+                        radius={3000}
+                        options={{
+                          fillColor: "#007bff",
+                          fillOpacity: 0.2,
+                          strokeColor: "#007bff",
+                          strokeOpacity: 0.8,
+                          strokeWeight: 2,
+                        }}
+                      />
+                    </>
+                  )}
+                  {!Array.isArray(location) && directionResponse && (
+                    <DirectionsRenderer directions={directionResponse} />
+                  )}
+                </GoogleMap>
+              )}
             </Box>
           </Box>
         </Flex>

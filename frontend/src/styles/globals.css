@@ -22,11 +22,22 @@ body {
   cursor: pointer;
 }
 
-.leaflet-container {
-  height: 100%;
-  width: 100%;
-}
-
 .gm-style iframe + div {
   border: none !important;
+}
+
+button.gm-ui-hover-effect {
+  display: none !important;
+}
+
+#my-info-window {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#my-info-window > div {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 0.2rem;
 }

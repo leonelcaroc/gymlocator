@@ -11,7 +11,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "react-query";
 import { postRegisterOwner } from "../api/ownerApi/ownerApi";
-import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
+import { useJsApiLoader, GoogleMap, MarkerF } from "@react-google-maps/api";
 
 const center = { lat: 6.919008776885199, lng: 122.07734107888048 };
 
@@ -338,9 +338,10 @@ const GymSignUpPermit = ({ setState, signUpForm, setSignUpForm }) => {
             zoom={14}
             mapContainerStyle={{ width: "100%", height: "100%" }}
             onClick={onMapClick}
+            clickableIcons={false}
           >
             {signUpForm.gymLocation.length !== 0 && (
-              <Marker
+              <MarkerF
                 position={{
                   lat: signUpForm.gymLocation[0],
                   lng: signUpForm.gymLocation[1],

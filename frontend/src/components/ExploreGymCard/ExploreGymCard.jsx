@@ -44,7 +44,7 @@ import TokenService from "../../services/token";
 
 const ExploreGymCard = ({
   owner,
-  setExploreState,
+  fetchDirections,
   selectedGym,
   setSelectedGym,
   openUserSignUp,
@@ -69,7 +69,7 @@ const ExploreGymCard = ({
 
   const roundedAverage = averageReview.toFixed(1);
 
-  // console.log(owner);
+  console.log(owner);
 
   // console.log(JSON.parse(TokenService.getUserLocal()).token);
 
@@ -222,7 +222,7 @@ const ExploreGymCard = ({
           color="neutral.100"
           width="120px"
           _hover={{ color: "brand.100", bgColor: "gray.300" }}
-          // onClick={() => setExploreState("map")}
+          onClick={() => fetchDirections(owner.gym.gymLocation)}
         >
           Direction
         </Button>

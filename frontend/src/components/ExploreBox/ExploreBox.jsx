@@ -15,7 +15,7 @@ import {
 
 const ExploreBox = ({
   owners,
-  setExploreState,
+  fetchDirections,
   selectedGym,
   setSelectedGym,
   openUserSignUp,
@@ -111,7 +111,7 @@ const ExploreBox = ({
             <ExploreGymCard
               key={item._id}
               owner={item}
-              setExploreState={setExploreState}
+              fetchDirections={fetchDirections}
               setSelectedGym={setSelectedGym}
               selectedGym={selectedGym}
               openUserSignUp={openUserSignUp}
