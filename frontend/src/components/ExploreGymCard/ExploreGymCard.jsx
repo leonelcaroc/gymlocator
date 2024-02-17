@@ -233,9 +233,13 @@ const ExploreGymCard = ({
           width="120px"
           _hover={{ color: "brand.100", bgColor: "gray.300" }}
           onClick={() => {
-            const userToken = JSON.parse(TokenService.getUserLocal()).token;
+            const userToken = JSON.parse(TokenService.getUserLocal());
 
-            userToken ? openUserJoinGym() : openUserSignUp();
+            if (userToken) {
+              openUserJoinGym();
+            } else {
+              openUserSignUp();
+            }
 
             setSelectedGym(owner);
           }}
