@@ -162,19 +162,6 @@ const UserClasses = () => {
                   </Td>
                   <Td>{`${item.joinedMember.length}/${item.capacity}`}</Td>
                   <Td display="flex">
-                    {/* {new Date() > new Date(item.endtime)
-                        ? "Ended"
-                        : new Date() < new Date(item.endtime) &&
-                          new Date() > new Date(item.starttime)
-                        ? "Ongoing"
-                        : "Hello"} */}
-
-                    {/* {new Date() > combineDateAndTime(item.date, item.endtime)
-                      ? "Ended"
-
-                      
-                      : "Not ended"} */}
-
                     {new Date() >
                     combineDateAndTime(item.date, item.endtime) ? (
                       "Ended"
