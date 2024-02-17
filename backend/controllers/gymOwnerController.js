@@ -1827,6 +1827,16 @@ const updatePendingMemberStatus = asyncHandler(async (req, res) => {
         (review) => review._id.toString() === owner._id.toString()
       );
 
+      if (reviewIndex === -1) {
+        member.reviews.push({
+          gymname: owner.gym.gymname,
+          _id: owner._id,
+          rating: 0,
+          status: false,
+          isJoined: true,
+        });
+      }
+
       // Set isJoined to true if the review is found
       if (reviewIndex !== -1 && !member.reviews[reviewIndex].isJoined) {
         member.reviews[reviewIndex].isJoined = true;
