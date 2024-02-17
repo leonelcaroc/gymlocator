@@ -22,6 +22,7 @@ import {
 } from "../../api/userApi/privateUserApi";
 import formatDateToCustomFormat from "../../utils/formatDateToCustomFormat";
 import convertTo12HourFormat from "../../utils/convertTo12HourFormat";
+import combineDateAndTime from "../../utils/combineDateAndTime";
 import TokenService from "../../services/token";
 
 const UserClasses = () => {
@@ -140,63 +141,84 @@ const UserClasses = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {!isLoading ? (
-              data?.length !== 0 && !isLoading ? (
-                currentPosts?.map((item) => (
-                  <Tr key={item._id}>
-                    <Td whiteSpace="normal">{item.gymname}</Td>
-                    <Td whiteSpace="normal">{item.classname}</Td>
-                    <Td whiteSpace="normal">{item.instructor}</Td>
-                    <Td
-                      whiteSpace="normal"
-                      display="flex"
-                      flexDir="column"
-                      gap="5px"
-                    >
-                      <Text>{formatDateToCustomFormat(item.date)}</Text>
-                      <Text>
-                        {convertTo12HourFormat(item.starttime)} -{" "}
-                        {convertTo12HourFormat(item.endtime)}
-                      </Text>
-                    </Td>
-                    <Td>{`${item.joinedMember.length}/${item.capacity}`}</Td>
-                    <Td display="flex">
-                      {item.joinedMember.includes(
+            {/* !isLoading ? ( */}
+            {data?.length !== 0 && !isLoading ? (
+              currentPosts?.map((item) => (
+                <Tr key={item._id}>
+                  <Td whiteSpace="normal">{item.gymname}</Td>
+                  <Td whiteSpace="normal">{item.classname}</Td>
+                  <Td whiteSpace="normal">{item.instructor}</Td>
+                  <Td
+                    whiteSpace="normal"
+                    display="flex"
+                    flexDir="column"
+                    gap="5px"
+                  >
+                    <Text>{formatDateToCustomFormat(item.date)}</Text>
+                    <Text>
+                      {convertTo12HourFormat(item.starttime)} -{" "}
+                      {convertTo12HourFormat(item.endtime)}
+                    </Text>
+                  </Td>
+                  <Td>{`${item.joinedMember.length}/${item.capacity}`}</Td>
+                  <Td display="flex">
+                    {/* {new Date() > new Date(item.endtime)
+                        ? "Ended"
+                        : new Date() < new Date(item.endtime) &&
+                          new Date() > new Date(item.starttime)
+                        ? "Ongoing"
+                        : "Hello"} */}
+
+                    {/* {new Date() > combineDateAndTime(item.date, item.endtime)
+                      ? "Ended"
+
+                      
+                      : "Not ended"} */}
+
+                    {new Date() >
+                    combineDateAndTime(item.date, item.endtime) ? (
+                      "Ended"
+                    ) : new Date() <
+                        combineDateAndTime(item.date, item.endtime) &&
+                      new Date() >
+                        combineDateAndTime(item.date, item.starttime) ? (
+                      "Ongoing"
+                    ) : item.joinedMember.includes(
                         JSON.parse(TokenService.getUserLocal())._id
                       ) ? (
-                        <Button
-                          bgColor="red"
-                          color="neutral.100"
-                          _hover={{ color: "red", bgColor: "gray.200" }}
-                          onClick={() => handleWithdrawClass(item)}
-                          isLoading={userWithdrawClassMutation.isLoading}
-                        >
-                          Withdraw
-                        </Button>
-                      ) : (
-                        <Button
-                          bgColor="brand.100"
-                          color="neutral.100"
-                          _hover={{ color: "brand.100", bgColor: "gray.200" }}
-                          onClick={() => handleJoinNow(item)}
-                          isLoading={userJoinClassMutation.isLoading}
-                        >
-                          Join Now
-                        </Button>
-                      )}
-                    </Td>
-                  </Tr>
-                ))
-              ) : (
-                <Tr>
-                  <Td colSpan="6" textAlign="center">
-                    n/a
+                      <Button
+                        bgColor="red"
+                        color="neutral.100"
+                        _hover={{ color: "red", bgColor: "gray.200" }}
+                        onClick={() => handleWithdrawClass(item)}
+                        isLoading={userWithdrawClassMutation.isLoading}
+                      >
+                        Withdraw
+                      </Button>
+                    ) : (
+                      <Button
+                        bgColor="brand.100"
+                        color="neutral.100"
+                        _hover={{ color: "brand.100", bgColor: "gray.200" }}
+                        onClick={() => handleJoinNow(item)}
+                        isLoading={userJoinClassMutation.isLoading}
+                      >
+                        Join Now
+                      </Button>
+                    )}
                   </Td>
                 </Tr>
-              )
+              ))
             ) : (
-              <Spinner mt="1rem" ml="1rem" size="lg" />
+              <Tr>
+                <Td colSpan="6" textAlign="center">
+                  n/a
+                </Td>
+              </Tr>
             )}
+            {/* ) : (
+              <Spinner mt="1rem" ml="1rem" size="lg" />
+            ) */}
           </Tbody>
         </Table>
       </TableContainer>
