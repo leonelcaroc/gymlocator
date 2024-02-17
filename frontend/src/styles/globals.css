@@ -34,6 +34,7 @@ button.gm-ui-hover-effect {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  max-width: 80px;
 }
 
 #my-info-window > div {
