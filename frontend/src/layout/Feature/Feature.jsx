@@ -68,14 +68,12 @@ const Feature = () => {
         </Text>
       </Flex>
       <Flex marginInline="auto">
-        {slicedData[1] !== undefined && (
-          <FeatureGymCard owner={slicedData[1]} />
-        )}
-        {slicedData[0] !== undefined && (
-          <FeatureGymCard owner={slicedData[0]} />
-        )}
-        {slicedData[2] !== undefined && (
-          <FeatureGymCard owner={slicedData[2]} />
+        {slicedData?.length >= 3 && (
+          <>
+            <FeatureGymCard owner={slicedData[1]} />
+            <FeatureGymCard owner={slicedData[0]} />
+            <FeatureGymCard owner={slicedData[2]} />
+          </>
         )}
       </Flex>
       <Flex marginBlock="5rem" paddingInline="5rem">
