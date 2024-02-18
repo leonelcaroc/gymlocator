@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -10,7 +10,10 @@ import {
   Box,
   Flex,
   Text,
+  Icon,
   Input,
+  InputGroup,
+  InputRightElement,
   Textarea,
   Select,
   ModalFooter,
@@ -21,7 +24,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { postRegisterUser } from "../../api/userApi/userApi";
 import { useMutation } from "react-query";
-import { useEffect } from "react";
+import { IoEye } from "react-icons/io5";
+import { IoEyeOff } from "react-icons/io5";
 
 const UserSignUpModal = ({
   isModalOpen,
@@ -32,6 +36,8 @@ const UserSignUpModal = ({
 }) => {
   const navigate = useNavigate();
   const toast = useToast();
+  const [show, setShow] = useState(false);
+  const handleShowPassword = () => setShow(!show);
 
   const [signUpUser, setSignUpUser] = useState({
     firstname: "",
@@ -69,6 +75,7 @@ const UserSignUpModal = ({
         password: "",
         paymentImage: "",
       });
+      setShow(false);
     };
   }, [selectedGym]);
 
@@ -83,6 +90,11 @@ const UserSignUpModal = ({
       ...signUpUser,
       plan: selectedPlanObject,
     });
+  };
+
+  const handleCloseModal = () => {
+    setShow(false);
+    closeModal();
   };
 
   const handleFileChange = (event) => {
@@ -123,7 +135,7 @@ const UserSignUpModal = ({
   };
 
   return (
-    <Modal isOpen={isModalOpen} onClose={closeModal}>
+    <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
       <ModalOverlay />
       <ModalContent paddingInline="2rem" maxWidth="35rem">
         <ModalHeader>{modalName}</ModalHeader>
@@ -227,7 +239,7 @@ const UserSignUpModal = ({
               >
                 {selectedGym?.gym?.plans.map((item) => (
                   <option key={item._id} value={item._id}>
-                    {item.planName}
+                    {item.planName} ({item.duration} days)
                   </option>
                 ))}
               </Select>
@@ -300,21 +312,32 @@ const UserSignUpModal = ({
             </Box>
             <Box>
               <Text fontWeight="bold">Password</Text>
-              <Input
-                onChange={(e) =>
-                  setSignUpUser({
-                    ...signUpUser,
-                    password: e.target.value,
-                  })
-                }
-                type="password"
-                placeholder="Password"
-              />
+              <InputGroup>
+                <Input
+                  onChange={(e) =>
+                    setSignUpUser({
+                      ...signUpUser,
+                      password: e.target.value,
+                    })
+                  }
+                  type={show ? "text" : "password"}
+                  placeholder="Password"
+                />
+                <InputRightElement width="4.5rem" bgColor="none" height="100%">
+                  <Button h="1.75rem" size="sm" onClick={handleShowPassword}>
+                    {show ? (
+                      <Icon as={IoEye} boxSize={6} bgColor="none" />
+                    ) : (
+                      <Icon as={IoEyeOff} boxSize={6} />
+                    )}
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
             </Box>
           </Stack>
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={closeModal}>
+          <Button colorScheme="blue" mr={3} onClick={handleCloseModal}>
             Close
           </Button>
           <Button

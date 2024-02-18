@@ -149,7 +149,7 @@ const UserJoinOtherGymModal = ({ isModalOpen, closeModal, selectedGym }) => {
               >
                 {selectedGym?.gym?.plans.map((item) => (
                   <option key={item._id} value={item._id}>
-                    {item.planName}
+                    {item.planName} ({item.duration} days)
                   </option>
                 ))}
               </Select>

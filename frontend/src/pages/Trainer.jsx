@@ -50,7 +50,7 @@ const Trainer = () => {
           </Text>
         </Flex>
         <Box>
-          <UserNav route="/trainer" name="Dashboard" />
+          <UserNav route="/trainer" name="Classes" />
           {/* <UserNav route="/trainer" name="Dashboard" />
           <UserNav route="/trainer/profile" name="Profile" />
           <UserNav route="/trainer/bookings" name="Bookings" /> */}
@@ -67,7 +67,7 @@ const Trainer = () => {
         >
           <Stack direction="row" h="80px" p={4}>
             <Flex alignItems="center" fontSize="1.2rem" cursor="pointer">
-              Mary
+              {JSON.parse(TokenService.getTrainerLocal()).firstname}
             </Flex>
             <Divider orientation="vertical" />
 

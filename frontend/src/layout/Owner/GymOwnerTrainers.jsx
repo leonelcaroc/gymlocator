@@ -4,6 +4,7 @@ import {
   Box,
   Flex,
   Button,
+  Icon,
   Input,
   InputGroup,
   InputRightElement,
@@ -37,10 +38,15 @@ import {
   getGymTrainers,
   deleteGymTrainer,
 } from "../../api/ownerApi/privateOwnerApi";
+import { IoEye } from "react-icons/io5";
+import { IoEyeOff } from "react-icons/io5";
 
 const GymOwnerTrainers = () => {
   const toast = useToast();
   const queryClient = useQueryClient();
+
+  const [show, setShow] = useState(false);
+  const handleShowPassword = () => setShow(!show);
 
   const newUniqueId = uuidv4();
 
@@ -544,16 +550,31 @@ const GymOwnerTrainers = () => {
               </Box>
               <Box>
                 <Text fontWeight="bold">Password</Text>
-                <Input
-                  onChange={(e) =>
-                    setNewTrainer({
-                      ...newTrainer,
-                      password: e.target.value,
-                    })
-                  }
-                  type="password"
-                  placeholder="Type your password"
-                />
+                <InputGroup>
+                  <Input
+                    onChange={(e) =>
+                      setNewTrainer({
+                        ...newTrainer,
+                        password: e.target.value,
+                      })
+                    }
+                    type={show ? "text" : "password"}
+                    placeholder="Type your password"
+                  />
+                  <InputRightElement
+                    width="4.5rem"
+                    bgColor="none"
+                    height="100%"
+                  >
+                    <Button h="1.75rem" size="sm" onClick={handleShowPassword}>
+                      {show ? (
+                        <Icon as={IoEye} boxSize={6} bgColor="none" />
+                      ) : (
+                        <Icon as={IoEyeOff} boxSize={6} />
+                      )}
+                    </Button>
+                  </InputRightElement>
+                </InputGroup>
               </Box>
             </Stack>
           </ModalBody>

@@ -64,6 +64,8 @@ const TrainerClasses = () => {
     setPosts(data);
   }, [data]);
 
+  console.log(data);
+
   return (
     <Box padding="2rem">
       <Text color="brand.200" fontSize="2rem" marginBottom="1rem">
@@ -74,6 +76,7 @@ const TrainerClasses = () => {
           <Thead>
             <Tr>
               <Th whiteSpace="normal">Class Name</Th>
+              <Th>Description</Th>
               <Th>Date</Th>
               <Th>Time</Th>
               <Th>Slots</Th>
@@ -84,6 +87,7 @@ const TrainerClasses = () => {
               currentPosts?.map((item) => (
                 <Tr key={item._id}>
                   <Td>{item.classname}</Td>
+                  <Td whiteSpace="normal">{item.description}</Td>
                   <Td>{format(item.date, "MMMM d, yyyy")}</Td>
                   <Td>
                     {convertTo12HourFormat(item.starttime)} -{" "}

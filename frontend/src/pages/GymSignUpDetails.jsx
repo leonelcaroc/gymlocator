@@ -2,15 +2,24 @@ import {
   Box,
   Button,
   Text,
+  Icon,
   Input,
+  InputGroup,
+  InputRightElement,
   Flex,
   VStack,
   Divider,
   useToast,
 } from "@chakra-ui/react";
+import { IoEye } from "react-icons/io5";
+import { IoEyeOff } from "react-icons/io5";
+import { useState } from "react";
 
 const GymSignUpDetails = ({ setState, setSignUpForm, signUpForm }) => {
   const toast = useToast();
+
+  const [show, setShow] = useState(false);
+  const handleShowPassword = () => setShow(!show);
 
   return (
     <Box maxWidth="40rem">
@@ -83,19 +92,30 @@ const GymSignUpDetails = ({ setState, setSignUpForm, signUpForm }) => {
           }
           value={signUpForm.email}
         />
-        <Input
-          type="password"
-          placeholder="Password"
-          bgColor="neutral.100"
-          height="45px"
-          onChange={(e) =>
-            setSignUpForm({
-              ...signUpForm,
-              password: e.target.value,
-            })
-          }
-          value={signUpForm.password}
-        />
+        <InputGroup>
+          <Input
+            type={show ? "text" : "password"}
+            placeholder="Password"
+            bgColor="neutral.100"
+            height="45px"
+            onChange={(e) =>
+              setSignUpForm({
+                ...signUpForm,
+                password: e.target.value,
+              })
+            }
+            value={signUpForm.password}
+          />
+          <InputRightElement width="4.5rem" bgColor="none" height="100%">
+            <Button h="1.75rem" size="sm" onClick={handleShowPassword}>
+              {show ? (
+                <Icon as={IoEye} boxSize={6} bgColor="none" />
+              ) : (
+                <Icon as={IoEyeOff} boxSize={6} />
+              )}
+            </Button>
+          </InputRightElement>
+        </InputGroup>
       </VStack>
       <Button
         width="100%"
