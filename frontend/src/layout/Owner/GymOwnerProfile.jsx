@@ -204,7 +204,7 @@ const GymOwnerProfile = () => {
             )}
           </Box>
 
-          {isEditing ? (
+          {/* {isEditing ? (
             <>
               <Button
                 onClick={handleSaveClick}
@@ -233,7 +233,7 @@ const GymOwnerProfile = () => {
             >
               Edit
             </Button>
-          )}
+          )} */}
         </>
       )}
     </Box>

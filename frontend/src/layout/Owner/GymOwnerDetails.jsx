@@ -344,7 +344,7 @@ const GymOwnerDetails = () => {
             </Box>
           </Grid>
 
-          <Flex p="10px 0">
+          {/* <Flex p="10px 0">
             {isEditing ? (
               <>
                 <Button
@@ -375,7 +375,7 @@ const GymOwnerDetails = () => {
                 Edit
               </Button>
             )}
-          </Flex>
+          </Flex> */}
         </Box>
       )}
     </Box>

@@ -286,7 +286,7 @@ const UserProfile = () => {
               </Text>
             </Box>
           </Flex>
-          <Flex>
+          {/* <Flex>
             <Button
               color="neutral.100"
               bgColor="brand.100"
@@ -296,7 +296,7 @@ const UserProfile = () => {
             >
               Edit Profile
             </Button>
-          </Flex>
+          </Flex> */}
         </>
       )}
     </Box>
