@@ -13,7 +13,6 @@ import adminRoutes from "./routes/adminRoutes.js";
 import gymOwnerRoutes from "./routes/gymOwnerRoutes.js";
 import publicRoutes from "./routes/publicRoutes.js";
 import trainerRoutes from "./routes/trainerRoutes.js";
-// import searchRoutes from "./routes/searchRoutes.js";
 
 connectDB();
 
@@ -58,7 +57,6 @@ app.use(
   })
 );
 // app.use(cors());
-app.use(express.static("uploads"));
 
 app.use(cookieParser());
 
