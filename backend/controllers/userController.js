@@ -696,6 +696,14 @@ const submitUserReview = asyncHandler(async (req, res) => {
 
     specificGym.gym.reviews.push(rating);
 
+    const gymRating =
+      specificGym.gym.reviews.reduce((acc, num) => acc + num, 0) /
+      specificGym.gym.reviews.length;
+
+    const roundedRating = Math.round(gymRating * 10) / 10;
+
+    specificGym.gym.rating = roundedRating;
+
     // Save both user and specificGym
     const saveUser = await user.save();
     const saveGym = await specificGym.save();

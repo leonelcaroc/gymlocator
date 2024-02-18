@@ -260,7 +260,7 @@ const GymOwnerMemberManagement = () => {
       >
         Add Walk-In Member
       </Button>
-      <Flex alignItems="center" marginBottom="2rem">
+      {/* <Flex alignItems="center" marginBottom="2rem">
         <Text marginRight="5rem">Search Member:</Text>
         <Input
           type="text"
@@ -268,7 +268,7 @@ const GymOwnerMemberManagement = () => {
           borderRadius="0"
           maxWidth="20rem"
         />
-      </Flex>
+      </Flex> */}
 
       <Tabs position="relative" variant="enclosed">
         <TabList>

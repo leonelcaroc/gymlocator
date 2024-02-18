@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Flex,
   Icon,
@@ -69,7 +69,7 @@ const ExploreGymCard = ({
 
   const roundedAverage = averageReview.toFixed(1);
 
-  console.log(owner);
+  // console.log(owner);
 
   // console.log(JSON.parse(TokenService.getUserLocal()).token);
 

@@ -179,7 +179,7 @@ const Explore = () => {
     return setDirectionResponse(results);
   };
 
-  console.log(approvedGyms);
+  // console.log(approvedGyms);
 
   return (
     <>
@@ -257,8 +257,8 @@ const Explore = () => {
                         lat: item.gym.gymLocation[0],
                         lng: item.gym.gymLocation[1],
                       }}
-                      // onMouseOver={() => setHoveredMarker(item.gym._id)}
-                      // onMouseOut={() => setHoveredMarker(null)}
+                      onMouseOver={() => setHoveredMarker(item.gym._id)}
+                      onMouseOut={() => setHoveredMarker(null)}
                       onClick={
                         !Array.isArray(location) ||
                         item.gym.gymLocation.length !== 0
@@ -266,23 +266,23 @@ const Explore = () => {
                           : null
                       }
                     >
-                      {/* {hoveredMarker === item.gym._id && ( */}
-                      <InfoWindowF
-                        position={{
-                          lat: item.gym.gymLocation[0],
-                          lng: item.gym.gymLocation[1],
-                        }}
-                      >
-                        <div id="my-info-window">
-                          <div>{item.gym.gymname}</div>
-                          <img
-                            src={item.gym.gymImage.url}
-                            alt={item.gym.gymname}
-                            style={{ width: "auto", height: "50px" }}
-                          />
-                        </div>
-                      </InfoWindowF>
-                      {/* )} */}
+                      {hoveredMarker === item.gym._id && (
+                        <InfoWindowF
+                          position={{
+                            lat: item.gym.gymLocation[0],
+                            lng: item.gym.gymLocation[1],
+                          }}
+                        >
+                          <div id="my-info-window">
+                            <div>{item.gym.gymname}</div>
+                            <img
+                              src={item.gym.gymImage.url}
+                              alt={item.gym.gymname}
+                              style={{ width: "auto", height: "50px" }}
+                            />
+                          </div>
+                        </InfoWindowF>
+                      )}
                     </MarkerF>
                   ))}
 

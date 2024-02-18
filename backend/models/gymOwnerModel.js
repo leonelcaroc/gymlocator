@@ -264,6 +264,10 @@ const gymSchema = mongoose.Schema({
     required: true,
     default: [],
   },
+  rating: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const gymOwnerSchema = mongoose.Schema(

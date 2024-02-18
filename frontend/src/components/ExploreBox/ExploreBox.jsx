@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import ExploreGymCard from "../ExploreGymCard/ExploreGymCard";
 import { IoSearch } from "react-icons/io5";
 import {
@@ -21,6 +21,53 @@ const ExploreBox = ({
   openUserSignUp,
   openUserJoinGym,
 }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchStars, setSearchStars] = useState("");
+  const [searchService, setSearchService] = useState("");
+  const [searchAmenity, setSearchAmenity] = useState("");
+
+  const filteredOwners = owners?.filter((owner) => {
+    const gymName = owner.gym.gymname.toLowerCase();
+    const includesSearchTerm = gymName.includes(searchTerm.toLowerCase());
+
+    if (searchAmenity || searchService || searchStars) {
+      const includesAmenityOrService =
+        owner.gym.amenities.some(
+          (amenity) =>
+            amenity.amenityName &&
+            amenity.amenityName
+              .toLowerCase()
+              .includes(searchAmenity.toLowerCase())
+        ) ||
+        owner.gym.services.some(
+          (service) =>
+            service.serviceName &&
+            service.serviceName
+              .toLowerCase()
+              .includes(searchService.toLowerCase())
+        );
+
+      const includesRating = searchStars
+        ? owner.gym.rating >= parseInt(searchStars) &&
+          owner.gym.rating < parseInt(searchStars) + 1
+        : true;
+
+      return includesSearchTerm && includesAmenityOrService && includesRating;
+    }
+
+    return includesSearchTerm;
+  });
+
+  const allAmenity = owners?.flatMap((owner) => owner.gym.amenities);
+  const filteredAmenity = allAmenity?.map((item) => {
+    return item.amenityName;
+  });
+
+  const allService = owners?.flatMap((owner) => owner.gym.services);
+  const filteredService = allService?.map((item) => {
+    return item.serviceName;
+  });
+
   return (
     <Flex
       flexDirection="column"
@@ -37,7 +84,9 @@ const ExploreBox = ({
       >
         <Input
           pr="4.5rem"
-          type="search"
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search for..."
           borderRadius="30px"
           height="56px"
@@ -47,8 +96,7 @@ const ExploreBox = ({
           width="7rem"
           bgColor="none"
           height="full"
-          borderRadius="20px"
-          marginRight="0.8rem"
+          borderRadius="30px"
         >
           <Button
             color="neutral.100"
@@ -57,6 +105,7 @@ const ExploreBox = ({
             borderRadius="20px"
             width="50%"
             _hover={{ bgColor: "gray" }}
+            onClick={() => console.log(filteredAmenity)}
           >
             <Icon as={IoSearch} />
           </Button>
@@ -68,31 +117,39 @@ const ExploreBox = ({
           marginRight="0.5rem"
           borderRadius="20px"
           cursor="pointer"
+          onChange={(e) => setSearchStars(e.target.value)}
         >
           <option value="5">5 stars</option>
           <option value="4">4 stars</option>
           <option value="3">3 stars</option>
           <option value="2">2 stars</option>
-          <option value="1">1 stars</option>
+          <option value="1">1 star</option>
+          <option value="0">0 stars</option>
         </Select>
         <Select
-          placeholder="Classes"
+          placeholder="Services"
           marginRight="0.5rem"
           borderRadius="20px"
           cursor="pointer"
+          onChange={(e) => setSearchService(e.target.value)}
         >
-          <option value="Yoga">Yoga</option>
-          <option value="Pilates">Pilates</option>
-          <option value="Zumba">Zumba</option>
-          <option value="Spinning">Spinning</option>
-          <option value="Aerobics">Aerobics</option>
+          {filteredService?.map((item, index) => (
+            <option key={index} value={item}>
+              {item}
+            </option>
+          ))}
         </Select>
-        <Select placeholder="Amenities" borderRadius="20px" cursor="pointer">
-          <option value="Pool">Pool</option>
-          <option value="Sauna">Sauna</option>
-          <option value="Steam Room">Steam Room</option>
-          <option value="Group Classes">Group Classes</option>
-          <option value="Personal Training">Personal Training</option>
+        <Select
+          placeholder="Amenities"
+          borderRadius="20px"
+          cursor="pointer"
+          onChange={(e) => setSearchAmenity(e.target.value)}
+        >
+          {filteredAmenity?.map((item, index) => (
+            <option key={index} value={item}>
+              {item}
+            </option>
+          ))}
         </Select>
       </Flex>
       <Divider />
@@ -107,7 +164,7 @@ const ExploreBox = ({
             "No Results Found"
           </Box>
         ) : (
-          owners?.map((item) => (
+          filteredOwners?.map((item) => (
             <ExploreGymCard
               key={item._id}
               owner={item}
