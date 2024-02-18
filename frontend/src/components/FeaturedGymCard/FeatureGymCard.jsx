@@ -13,8 +13,9 @@ import {
 } from "@chakra-ui/react";
 import { FaStar } from "react-icons/fa";
 import gym from "../../assets/images/gym-sample.jpg";
+import StarRating from "../StarRating/StarRating";
 
-const FeatureGymCard = ({ name }) => {
+const FeatureGymCard = ({ owner }) => {
   return (
     <Card
       maxW="sm"
@@ -22,7 +23,11 @@ const FeatureGymCard = ({ name }) => {
       marginInline="1rem"
     >
       <CardBody>
-        <Image src={gym} alt="This is a gym" borderRadius="lg" />
+        <Image
+          src={owner.gym.gymImage.url}
+          alt="This is a gym"
+          borderRadius="lg"
+        />
         <Stack mt="6" spacing="3">
           <Heading
             size="md"
@@ -30,25 +35,23 @@ const FeatureGymCard = ({ name }) => {
             fontWeight="800"
             fontSize="1.75rem"
           >
-            {name}
+            {owner.gym.gymname}
           </Heading>
-          <Stack direction="row" justifyContent="center">
+          {/* <Stack direction="row" justifyContent="center">
             <Icon as={FaStar} color="brand.100" />
             <Icon as={FaStar} color="brand.100" />
             <Icon as={FaStar} color="brand.100" />
             <Icon as={FaStar} color="brand.100" />
             <Icon as={FaStar} color="brand.100" />
-          </Stack>
-          <Text textAlign="center">
-            Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit diam
-            amet diam eos
-          </Text>
+          </Stack> */}
+          <StarRating rating={owner.gym.rating} gap="0.38rem" />
+          <Text textAlign="center">{owner.gym.description}</Text>
         </Stack>
       </CardBody>
       <CardFooter>
         <ButtonGroup spacing="2" marginInline="auto">
-          <Button bgColor="brand.100">Explore</Button>
-          <Button bgColor="brand.100">Join now</Button>
+          {/* <Button bgColor="brand.100">Explore</Button>
+          <Button bgColor="brand.100">Join now</Button> */}
         </ButtonGroup>
       </CardFooter>
     </Card>

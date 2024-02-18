@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import backgroundImage from "../../assets/images/background.webp";
 import {
   Box,
@@ -9,8 +9,15 @@ import {
   Button,
   Text,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
+import useSearch from "../../store/public";
 
 const HomeSearch = () => {
+  const navigate = useNavigate();
+
+  const [search, setSearch] = useState("");
+  const { setWordSearch } = useSearch();
+
   return (
     <Flex
       backgroundImage={`url(${backgroundImage})`}
@@ -38,10 +45,11 @@ const HomeSearch = () => {
           <Input
             pr="4.5rem"
             type="search"
-            placeholder="Search for..."
+            placeholder="Search for a gym..."
             borderRadius="30px"
             height="56px"
             color="accent.500"
+            onChange={(e) => setSearch(e.target.value)}
           />
           <InputRightElement
             width="7rem"
@@ -57,6 +65,10 @@ const HomeSearch = () => {
               borderRadius="20px"
               width="full"
               _hover={{ bgColor: "gray" }}
+              onClick={() => {
+                setWordSearch(search.trim());
+                navigate("/explore");
+              }}
             >
               Search
             </Button>

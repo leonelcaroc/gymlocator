@@ -1,13 +1,10 @@
 import asyncHandler from "express-async-handler";
-import generateToken from "../utils/generateToken.js";
 import validator from "validator";
 import User from "../models/userModel.js";
 import GymOwner from "../models/gymOwnerModel.js";
 import Class from "../models/classModel.js";
-import calculateEndTime from "../utils/calculateEndTime.js";
 import { ObjectId } from "mongodb";
 import createToken from "../utils/createToken.js";
-import stringifySafe from "json-stringify-safe";
 import cloudinary from "../utils/cloudinary.js";
 
 // desc     Auth user/set token

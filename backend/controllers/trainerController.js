@@ -1,15 +1,7 @@
 import asyncHandler from "express-async-handler";
-// import generateToken from "../utils/generateToken.js";
-// import validator from "validator";
-// import User from "../models/userModel.js";
-// import GymOwner from "../models/gymOwnerModel.js";
-// import Class from "../models/classModel.js";
 import Trainer from "../models/trainerModel.js";
-// import calculateEndTime from "../utils/calculateEndTime.js";
-// import { ObjectId } from "mongodb";
 import Class from "../models/classModel.js";
 import createToken from "../utils/createToken.js";
-// import stringifySafe from "json-stringify-safe";
 
 const authTrainer = asyncHandler(async (req, res) => {
   const { email, password } = req.body;

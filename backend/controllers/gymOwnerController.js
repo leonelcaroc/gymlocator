@@ -8,16 +8,14 @@ import Trainer from "../models/trainerModel.js";
 import calculateEndTime from "../utils/calculateEndTime.js";
 import createPreset from "../utils/createPreset.js";
 import cloudinary from "../utils/cloudinary.js";
-import formidable from "formidable";
 
 import createToken from "../utils/createToken.js";
 import isValid24HourTime from "../utils/validateTime.js";
 import fs from "fs";
 import path from "path";
-import multer from "multer";
+
 // import mongoose from "mongoose";
 import { ObjectId } from "mongodb";
-import { multerUpload } from "../utils/multerUpload.js";
 
 // desc     Auth user/set token
 // route    POST /api/users/auth

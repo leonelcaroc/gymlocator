@@ -12,6 +12,7 @@ import {
   Text,
   Image,
   Box,
+  Link,
 } from "@chakra-ui/react";
 import gym from "../../assets/images/gym-sample.jpg";
 
@@ -60,16 +61,19 @@ const PendingMemberModal = ({
         <ModalHeader>Manage</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Box width="full" marginBottom="1rem">
-            <Image
-              src={member.plan.proofOfPayment.url}
-              alt="This is a gym"
-              borderRadius="lg"
-              width="100%"
-              height="200px"
-              objectFit="cover"
-            />
-          </Box>
+          <Link href={member.plan.proofOfPayment.url} isExternal>
+            <Box width="full" marginBottom="1rem">
+              <Image
+                src={member.plan.proofOfPayment.url}
+                alt="This is a gym"
+                borderRadius="lg"
+                width="100%"
+                height="200px"
+                objectFit="cover"
+                cursor="pointer"
+              />
+            </Box>
+          </Link>
           <Text>
             Member Name:{" "}
             {`${member.user.lastname}, ${member.user.firstname} ${member.user.middlename} `}

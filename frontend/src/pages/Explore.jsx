@@ -29,7 +29,9 @@ const Explore = () => {
   const toast = useToast();
   const [selectedGym, setSelectedGym] = useState(null);
   const [exploreState, setExploreState] = useState("explore");
+
   const [location, setLocation] = useState([]);
+
   const { isLoaded } = useJsApiLoader({
     // googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAP_API_KEY,
     googleMapsApiKey: "AIzaSyDrEoMAjf6lO-05iin-Gat1FlMqVHQJ2LU",

@@ -12,6 +12,7 @@ import {
   Select,
   Divider,
 } from "@chakra-ui/react";
+import useSearch from "../../store/public";
 
 const ExploreBox = ({
   owners,
@@ -21,6 +22,8 @@ const ExploreBox = ({
   openUserSignUp,
   openUserJoinGym,
 }) => {
+  const { wordSearch, setWordSearch } = useSearch();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchStars, setSearchStars] = useState("");
   const [searchService, setSearchService] = useState("");
@@ -67,6 +70,16 @@ const ExploreBox = ({
   const filteredService = allService?.map((item) => {
     return item.serviceName;
   });
+
+  useEffect(() => {
+    if (wordSearch.length !== 0) {
+      setSearchTerm(wordSearch);
+    }
+
+    return () => {
+      setWordSearch("");
+    };
+  }, []);
 
   return (
     <Flex
@@ -124,7 +137,6 @@ const ExploreBox = ({
           <option value="3">3 stars</option>
           <option value="2">2 stars</option>
           <option value="1">1 star</option>
-          <option value="0">0 stars</option>
         </Select>
         <Select
           placeholder="Services"

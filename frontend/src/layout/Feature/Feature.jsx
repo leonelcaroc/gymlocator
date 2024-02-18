@@ -1,21 +1,61 @@
 import React from "react";
-import { Flex, Box, Text, Button, Image } from "@chakra-ui/react";
+import {
+  Flex,
+  Box,
+  Text,
+  Button,
+  Icon,
+  Image,
+  useToast,
+} from "@chakra-ui/react";
 import FeatureGymCard from "../../components/FeaturedGymCard/FeatureGymCard";
 import gym from "../../assets/images/gym-sample.jpg";
+import { FaStar, FaDumbbell } from "react-icons/fa";
+import { useQuery } from "react-query";
+import { getGymOwners } from "../../api/publicApi/publicApi";
 
 const Feature = () => {
+  const toast = useToast();
+
+  const { data, isLoading } = useQuery(
+    "gymOwners",
+    async () => {
+      return getGymOwners();
+    },
+    {
+      refetchOnWindowFocus: false,
+      onError: (error) => {
+        toast({
+          title: error.response.data.error || "Something went wrong",
+          status: "error",
+          duration: 2000,
+          position: "bottom-right",
+        });
+      },
+    }
+  );
+
+  const sortedData = data?.toSorted((a, b) => b.gym.rating - a.gym.rating);
+
+  // Slice out the first three elements
+  const slicedData = sortedData?.slice(0, 3);
+
   return (
     <Flex bgColor="neutral.100" flexDirection="column" paddingTop="5rem">
       <Flex flexDirection="column" marginInline="auto">
         <Box>
-          <Text
-            color="brand.100"
-            fontWeight="bold"
-            fontSize="1.5rem"
-            textAlign="center"
-          >
-            FEATURED GYMS
-          </Text>
+          <Flex justifyContent="center" alignItems="center" gap="0.8rem">
+            <Icon as={FaDumbbell} color="brand.100" boxSize={9} />
+            <Text
+              color="brand.100"
+              fontWeight="bold"
+              fontSize="1.5rem"
+              textAlign="center"
+            >
+              FEATURED GYMS
+            </Text>
+            <Icon as={FaDumbbell} color="brand.100" boxSize={9} />
+          </Flex>
         </Box>
 
         <Text
@@ -28,9 +68,9 @@ const Feature = () => {
         </Text>
       </Flex>
       <Flex marginInline="auto">
-        <FeatureGymCard name="Gym 1" />
-        <FeatureGymCard name="Gym 2" />
-        <FeatureGymCard name="Gym 3" />
+        {slicedData?.length > 0 && <FeatureGymCard owner={slicedData[1]} />}
+        {slicedData?.length > 0 && <FeatureGymCard owner={slicedData[0]} />}
+        {slicedData?.length > 0 && <FeatureGymCard owner={slicedData[2]} />}
       </Flex>
       <Flex marginBlock="5rem" paddingInline="5rem">
         <Box width="80rem">

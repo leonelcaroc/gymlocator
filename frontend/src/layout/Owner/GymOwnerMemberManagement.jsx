@@ -260,22 +260,13 @@ const GymOwnerMemberManagement = () => {
       >
         Add Walk-In Member
       </Button>
-      {/* <Flex alignItems="center" marginBottom="2rem">
-        <Text marginRight="5rem">Search Member:</Text>
-        <Input
-          type="text"
-          placeholder="Search..."
-          borderRadius="0"
-          maxWidth="20rem"
-        />
-      </Flex> */}
 
       <Tabs position="relative" variant="enclosed">
         <TabList>
           <Tab>Active</Tab>
           <Tab>Pending</Tab>
           <Tab>Expired</Tab>
-          {/* <Tab>Rejected</Tab> */}
+          <Tab>Rejected</Tab>
         </TabList>
         <TabIndicator
           mt="-1.5px"

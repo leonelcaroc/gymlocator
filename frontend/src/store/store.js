@@ -1,11 +1,7 @@
-// import { create } from "zustand";
+import { create } from "zustand";
 
-// const useStore = create((set) => ({
-//   user: null,
-//   admin: localStorage.getItem("adminInfo")
-//     ? JSON.parse(localStorage.getItem("adminInfo"))
-//     : null,
-//   owner: null,
-// }));
+const useStore = create((set) => ({
+  wordSearch: "",
+}));
 
-// export default useStore;
+export default useStore;

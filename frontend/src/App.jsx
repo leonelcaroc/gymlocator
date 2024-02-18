@@ -30,7 +30,6 @@ import UserBookings from "./layout/UserLayout/UserBookings";
 import UserClasses from "./layout/UserLayout/UserClasses";
 import UserAnnouncements from "./layout/UserLayout/UserAnnouncements";
 import UserLogin from "./pages/UserLogin";
-import "leaflet/dist/leaflet.css";
 import UserSubscriptions from "./layout/UserLayout/UserSubscriptions";
 import UserReviews from "./layout/UserLayout/UserReviews";
 
