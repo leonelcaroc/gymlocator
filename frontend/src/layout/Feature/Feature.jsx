@@ -68,9 +68,15 @@ const Feature = () => {
         </Text>
       </Flex>
       <Flex marginInline="auto">
-        {slicedData?.length > 0 && <FeatureGymCard owner={slicedData[1]} />}
-        {slicedData?.length > 0 && <FeatureGymCard owner={slicedData[0]} />}
-        {slicedData?.length > 0 && <FeatureGymCard owner={slicedData[2]} />}
+        {slicedData[1] !== undefined && (
+          <FeatureGymCard owner={slicedData[1]} />
+        )}
+        {slicedData[0] !== undefined && (
+          <FeatureGymCard owner={slicedData[0]} />
+        )}
+        {slicedData[2] !== undefined && (
+          <FeatureGymCard owner={slicedData[2]} />
+        )}
       </Flex>
       <Flex marginBlock="5rem" paddingInline="5rem">
         <Box width="80rem">
@@ -94,9 +100,9 @@ const Feature = () => {
             membership management to class scheduling, allowing you to focus on
             what you do best - helping people achieve their fitness goals.
           </Text>
-          <Button bgColor="brand.100" maxWidth="10rem">
+          {/* <Button bgColor="brand.100" maxWidth="10rem">
             Read More
-          </Button>
+          </Button> */}
         </Flex>
       </Flex>
     </Flex>

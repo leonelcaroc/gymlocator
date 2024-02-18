@@ -9,8 +9,14 @@ import { MdEmail } from "react-icons/md";
 
 const HomeFooter = () => {
   return (
-    <Flex bgColor="brand.200" color="neutral.100" padding="2rem 8rem">
-      <Flex flexDirection="column" marginRight="25rem">
+    <Flex
+      flexDir="column"
+      bgColor="brand.200"
+      color="neutral.100"
+      padding="1.2rem 8rem"
+      alignItems="center"
+    >
+      {/* <Flex flexDirection="column" marginRight="25rem">
         <Text fontSize="1.5rem" fontWeight="800" marginBottom="1rem">
           Company
         </Text>
@@ -36,8 +42,8 @@ const HomeFooter = () => {
             FAQs & Help
           </ListItem>
         </List>
-      </Flex>
-      <Flex flexDirection="column">
+      </Flex> */}
+      {/* <Flex flexDirection="column">
         <Text fontSize="1.5rem" fontWeight="800" marginBottom="1rem">
           Contact
         </Text>
@@ -55,6 +61,20 @@ const HomeFooter = () => {
             gymlocator@gmail.com
           </ListItem>
         </List>
+      </Flex> */}
+      {/* <Box fontWeight="800" fontSize="1.2rem" mb="1rem">
+        Contact
+      </Box> */}
+      <Flex>
+        <Box>
+          <Text as="span" fontWeight="800">
+            Gym Locator
+          </Text>{" "}
+          © Copyright 2024, Inc. All rights reserved.
+        </Box>
+        {/* <Box>123 Street, Philippines</Box>
+        <Box>+63 965 345 6789</Box>
+        <Box>gymlocator@gmail.com</Box> */}
       </Flex>
     </Flex>
   );

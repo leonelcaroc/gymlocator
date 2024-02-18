@@ -243,9 +243,7 @@ const getOwnerDashboard = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  res.status(200).json({
-    members: user.gym.members,
-  });
+  res.status(200).json(user.gym.members);
 });
 
 // GYM OWNER PROFILE //

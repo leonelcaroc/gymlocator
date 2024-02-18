@@ -1,10 +1,13 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100&family=Nunito:wght@200;300;400;500;600;700;800;900;1000&display=swap");
+html {
+  min-height: 100vh;
+}
 
 body {
   font-family: "Nunito" !important;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100%;
 }
 
 /* li {

@@ -13,7 +13,7 @@ const Admin = () => {
 
   return (
     <Flex minHeight="100vh">
-      <Box bgColor="brand.100" minW="20rem">
+      <Flex flexDir="column" bgColor="brand.100" minW="20rem">
         <Flex alignItems="center" width="full" borderBottom="1px solid white">
           <Icon
             as={IoLocationSharp}
@@ -31,35 +31,51 @@ const Admin = () => {
           </Text>
         </Flex>
         <Box>
-          <Link as={ReachLink} to="/admin">
-            <Center
-              padding="0 1rem"
-              marginBlock="1.5rem"
-              cursor="pointer"
-              color="neutral.100"
-              fontSize="18px"
-              fontWeight="600"
-              transition="color 0.2s"
+          <Box _hover={{ bgColor: "neutral.100" }}>
+            <Link as={ReachLink} to="/admin" style={{ textDecoration: "none" }}>
+              <Center
+                padding="1.2rem 1rem"
+                // marginBlock="1.5rem"
+                cursor="pointer"
+                color="neutral.100"
+                fontSize="20px"
+                fontWeight="600"
+                transition="color 0.2s"
+                _hover={{
+                  textDecoration: "none",
+                  color: "brand.100",
+                }}
+              >
+                Dashboard
+              </Center>
+            </Link>
+          </Box>
+          <Box _hover={{ bgColor: "neutral.100" }}>
+            <Link
+              as={ReachLink}
+              to="/admin/manage"
+              style={{ textDecoration: "none" }}
             >
-              Dashboard
-            </Center>
-          </Link>
-          <Link as={ReachLink} to="/admin/manage">
-            <Center
-              padding="0 1rem"
-              marginBlock="1.5rem"
-              cursor="pointer"
-              color="neutral.100"
-              fontSize="18px"
-              fontWeight="600"
-              transition="color 0.2s"
-            >
-              Gym Manage
-            </Center>
-          </Link>
+              <Center
+                padding="1.2rem 1rem"
+                // marginBlock="1.5rem"
+                cursor="pointer"
+                color="neutral.100"
+                fontSize="20px"
+                fontWeight="600"
+                transition="color 0.2s"
+                _hover={{
+                  textDecoration: "none",
+                  color: "brand.100",
+                }}
+              >
+                Gym Manage
+              </Center>
+            </Link>
+          </Box>
         </Box>
-      </Box>
-      <Box height="100px" width="full" bgColor="neutral.100">
+      </Flex>
+      <Box height="full" width="full" bgColor="neutral.100">
         <Flex
           boxShadow="0px 0px 10px rgba(0, 0, 0, 0.1)"
           height="100px"
