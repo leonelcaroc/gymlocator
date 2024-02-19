@@ -26,36 +26,194 @@ const ExploreBox = ({
 
   const [searchTerm, setSearchTerm] = useState("");
   const [searchStars, setSearchStars] = useState("");
-  const [searchService, setSearchService] = useState("");
+  const [searchServices, setSearchService] = useState("");
   const [searchAmenity, setSearchAmenity] = useState("");
 
+  // const filteredOwners = owners?.filter((owner) => {
+  //   const gymName = owner.gym.gymname.toLowerCase();
+  //   const includesSearchTerm = gymName.includes(searchTerm.toLowerCase());
+
+  //   if (searchAmenity || searchService || searchStars) {
+  //     const includesAmenityOrService =
+  //       owner.gym.amenities.some(
+  //         (amenity) =>
+  //           amenity.amenityName &&
+  //           amenity.amenityName
+  //             .toLowerCase()
+  //             .includes(searchAmenity.toLowerCase())
+  //       ) ||
+  //       owner.gym.services.some(
+  //         (service) =>
+  //           service.serviceName &&
+  //           service.serviceName
+  //             .toLowerCase()
+  //             .includes(searchService.toLowerCase())
+  //       );
+
+  //     const includesRating = searchStars
+  //       ? owner.gym.rating >= parseInt(searchStars) &&
+  //         owner.gym.rating < parseInt(searchStars) + 1
+  //       : true;
+
+  //     return includesSearchTerm && includesAmenityOrService && includesRating;
+  //   }
+
+  //   return includesSearchTerm;
+  // });
+
+  // const filteredOwners = owners?.filter((owner) => {
+  //   const gymName = owner.gym.gymname.toLowerCase();
+  //   const includesSearchTerm = gymName.includes(searchTerm.toLowerCase());
+
+  //   if (searchAmenity || searchService || searchStars !== "") {
+  //     const includesAmenityOrService =
+  //       owner.gym.amenities.some(
+  //         (amenity) =>
+  //           amenity.amenityName &&
+  //           amenity.amenityName
+  //             .toLowerCase()
+  //             .includes(searchAmenity.toLowerCase())
+  //       ) ||
+  //       owner.gym.services.some(
+  //         (service) =>
+  //           service.serviceName &&
+  //           service.serviceName
+  //             .toLowerCase()
+  //             .includes(searchService.toLowerCase())
+  //       );
+
+  //     const includesRating =
+  //       searchStars !== ""
+  //         ? owner.gym.rating >= parseInt(searchStars) &&
+  //           owner.gym.rating < parseInt(searchStars) + 1
+  //         : true;
+
+  //     // Check if at least one condition is true
+  //     return includesSearchTerm && includesAmenityOrService && includesRating;
+  //   }
+
+  //   return includesSearchTerm;
+  // });
+
+  // const filteredOwners = owners?.filter((owner) => {
+  //   const gymName = owner.gym.gymname.toLowerCase();
+  //   const includesSearchTerm = gymName.includes(searchTerm.toLowerCase());
+
+  //   if (
+  //     searchStars !== "" ||
+  //     searchAmenity
+  //     // || searchService
+  //   ) {
+  //     const includesAmenity =
+  //       owner.gym.amenities &&
+  //       owner.gym.amenities.length > 0 &&
+  //       owner.gym.amenities.some(
+  //         (amenity) =>
+  //           amenity.amenityName &&
+  //           amenity.amenityName
+  //             .toLowerCase()
+  //             .includes(searchAmenity.toLowerCase())
+  //       );
+
+  //     // ||
+  //     //   (owner.gym.services &&
+  //     //     owner.gym.services.length > 0 &&
+  //     //     owner.gym.services.some(
+  //     //       (service) =>
+  //     //         service.serviceName &&
+  //     //         service.serviceName
+  //     //           .toLowerCase()
+  //     //           .includes(searchService.toLowerCase())
+  //     //     ));
+
+  //     const includesRating =
+  //       searchStars !== ""
+  //         ? owner.gym.rating >= parseInt(searchStars) &&
+  //           owner.gym.rating < parseInt(searchStars) + 1
+  //         : true;
+
+  //     return (
+  //       includesSearchTerm &&
+  //       includesAmenity &&
+  //       // OrService
+  //       includesRating
+  //     );
+  //   }
+
+  //   return includesSearchTerm;
+  // });
+
   const filteredOwners = owners?.filter((owner) => {
-    const gymName = owner.gym.gymname.toLowerCase();
+    const gym = owner.gym;
+    const gymName = gym.gymname.toLowerCase();
     const includesSearchTerm = gymName.includes(searchTerm.toLowerCase());
 
-    if (searchAmenity || searchService || searchStars) {
-      const includesAmenityOrService =
-        owner.gym.amenities.some(
+    if ((searchAmenity || searchServices) && searchStars !== "") {
+      const includesAmenity =
+        gym.amenities &&
+        gym.amenities.length > 0 &&
+        gym.amenities.some(
           (amenity) =>
             amenity.amenityName &&
             amenity.amenityName
               .toLowerCase()
               .includes(searchAmenity.toLowerCase())
-        ) ||
-        owner.gym.services.some(
+        );
+
+      const includesServices =
+        gym.services &&
+        gym.services.length > 0 &&
+        gym.services.some(
           (service) =>
             service.serviceName &&
             service.serviceName
               .toLowerCase()
-              .includes(searchService.toLowerCase())
+              .includes(searchServices.toLowerCase())
         );
 
-      const includesRating = searchStars
-        ? owner.gym.rating >= parseInt(searchStars) &&
-          owner.gym.rating < parseInt(searchStars) + 1
-        : true;
+      const includesRating =
+        searchStars !== ""
+          ? gym.rating >= parseInt(searchStars) &&
+            gym.rating < parseInt(searchStars) + 1
+          : true;
 
-      return includesSearchTerm && includesAmenityOrService && includesRating;
+      return (
+        includesSearchTerm &&
+        (includesAmenity || includesServices) &&
+        includesRating
+      );
+    } else if (searchAmenity || searchServices) {
+      const includesAmenity =
+        gym.amenities &&
+        gym.amenities.length > 0 &&
+        gym.amenities.some(
+          (amenity) =>
+            amenity.amenityName &&
+            amenity.amenityName
+              .toLowerCase()
+              .includes(searchAmenity.toLowerCase())
+        );
+
+      const includesServices =
+        gym.services &&
+        gym.services.length > 0 &&
+        gym.services.some(
+          (service) =>
+            service.serviceName &&
+            service.serviceName
+              .toLowerCase()
+              .includes(searchServices.toLowerCase())
+        );
+
+      return includesSearchTerm && (includesAmenity || includesServices);
+    } else if (searchStars !== "") {
+      const includesRating =
+        searchStars !== ""
+          ? gym.rating >= parseInt(searchStars) &&
+            gym.rating < parseInt(searchStars) + 1
+          : true;
+
+      return includesSearchTerm && includesRating;
     }
 
     return includesSearchTerm;
@@ -80,6 +238,8 @@ const ExploreBox = ({
       setWordSearch("");
     };
   }, []);
+
+  console.log(owners);
 
   return (
     <Flex

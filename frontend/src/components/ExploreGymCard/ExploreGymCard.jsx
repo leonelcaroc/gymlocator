@@ -109,11 +109,13 @@ const ExploreGymCard = ({
               marginBottom="0.5rem"
             >
               <Text>
-                ({owner.gym.reviews.length !== 0 ? roundedAverage : 0})
+                {/* ({owner.gym.reviews.length !== 0 ? roundedAverage : 0}) */}
+                {owner.gym.rating.toFixed(1)}
               </Text>
 
               <StarRating
-                rating={owner.gym.reviews.length !== 0 ? roundedAverage : 0}
+                rating={owner.gym.rating}
+                // rating={owner.gym.reviews.length !== 0 ? roundedAverage : 0}
               />
             </HStack>
 
